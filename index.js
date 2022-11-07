@@ -1,9 +1,9 @@
 import  express from "express";
 import mongoose from "mongoose";
+import dotenv from "dotenv";
 import bodyParser from 'body-parser';
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import  config  from './utils/config.js';
 import authRouter from "./routes/authRouter.js"
 import ownersRouter from "./routes/ownerRouter.js"
 import usersRouter from "./routes/userRouter.js"
@@ -11,8 +11,10 @@ import hotelsRouter from "./routes/hotelRouter.js"
 // import roomsRoute from "./routes/rooms.js"
 import {notFound} from "./middlewares/not-found.js"
 
+const app = express();
+dotenv.config()
 
-mongoose.connect(config.MONGODB_URL, {
+mongoose.connect(process.env.MONGODB_URL, {
 })
 .then(()=>{
   console.log('Connected to mongodb.');
@@ -21,14 +23,14 @@ mongoose.connect(config.MONGODB_URL, {
   console.log(error.reason);
 })
 
-const app = express();
+
 app.use(cors());
 app.use(cookieParser())
 app.use(express.json())
 // app.use(bodyParser.json())
 
 app.get('/', (req, res) => {
-    res.send('Welcome to Awuf-Booking Api ')
+    res.send('Welcome to Awuf-Booking Api')
 });
 
 app.use('/api/auth', authRouter);
@@ -49,7 +51,7 @@ app.use((err, req, res, next)=>{
 })
 app.use(notFound)
 
-const port = config.PORT || 3000
+const port = process.env.PORT || 3000
 app.listen(port, ()=>{
     console.log(`connected to backend - ${port}`);
 });
