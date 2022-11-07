@@ -33,7 +33,7 @@ app.use('/api/users', usersRouter);
 app.use('/api/hotels', hotelsRouter);
  
 app.get("/", (req, res) => {
-    res.status(200).send('Welcome to Awuf-Booking Api ')
+    res.send('Welcome to Awuf-Booking Api ')
 });
 
 app.use(notFound)
