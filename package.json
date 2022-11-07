@@ -25,6 +25,7 @@
     "passport-google-oauth2": "^0.2.0"
   },
   "engine": {
-    "node": "14.x"
+    "node": "14.x",
+    "npm": "6.9.0"
   }
 }
