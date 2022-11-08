@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { createError } from "../utils/error.js";
 import  config  from '../utils/config.js';
 import jwt from "jsonwebtoken";
+import { generateToken } from "../utils/verifyToken.js";
 
 //Only Owner sections
 export const ownerRegister  = async (req, res, next)=>{
@@ -16,31 +17,34 @@ export const ownerRegister  = async (req, res, next)=>{
             password:hash,
         })
         await newOwner.save()
-        res.status(200).json({message: "Property Owner has been created."})
+         res.status(200).json({message: "Property Owner has been created."})
     } catch (err) {
         next(err)
     }
 }
 
 export const ownerLogin  = async (req, res, next)=>{
-    try {
-        const  owner = await Owner.findOne({email:req.body.email}) 
-        if(!owner) return next(createError(404, "User not found"))
-        const  isPasswordCorrect = await bcrypt.compare(req.body.password, owner.password)
-        if(!isPasswordCorrect) return next(createError(400, "Wrong password or Email!"))
+    try { 
+        const {email, password} = req.body
+        //empty login parameters
+        if(email ==="" || password ==="") return next(createError(400, "password or Email field is Empty!"))
 
-         const token = jwt.sign(
-            {id: owner._id, isVerified: owner.isVerified},
-            config.JWT_SECRET
-         )
-       
-        const {password, isVerified, ...otherDetails } = owner._doc
-        res
-        .cookie("access_token", token, {
-            httpOnly: true,
+        const  signinOwner = await Owner.findOne({email:email}) 
+        if(!signinOwner) return next(createError(404, "User not found"))
+        const  isPasswordCorrect = await bcrypt.compare(password, signinOwner.password)
+        if(!isPasswordCorrect) return next(createError(400, "Wrong password or Email!"))
+        
+        res.status(200).send({
+            _id: signinOwner._id,
+            firstName: signinOwner.firstName,
+            lastName: signinOwner.lastName,
+            phoneNumber: signinOwner.phoneNumber,
+            email: signinOwner.email,
+            isVerified: signinOwner.isVerified,
+            isKyc: signinOwner.isKyc,
+            token: generateToken(signinOwner),
         })
-        .status(200)
-        .json({details:{...otherDetails}, isVerified})
+
     } catch (err) {
         next(err)
     }
@@ -65,23 +69,25 @@ export const userRegister  = async (req, res, next)=>{
 
 export const userLogin  = async (req, res, next)=>{
     try {
-        const  user = await User.findOne({email:req.body.email}) 
-        if(!user) return next(createError(404, "User not found"))
-        const  isPasswordCorrect = await bcrypt.compare(req.body.password, user.password)
+        const {email, password} = req.body
+        //empty login parameters
+        if(email ==="" || password ==="") return next(createError(400, "password or Email field is Empty!"))
+
+        const  signinUser = await User.findOne({email:email}) 
+        if(!signinUser) return next(createError(404, "User not found"))
+        const  isPasswordCorrect = await bcrypt.compare(password, signinUser.password)
         if(!isPasswordCorrect) return next(createError(400, "Wrong password or Email!"))
 
-         const token = jwt.sign(
-            {id: user._id, isAdmin: user.isAdmin},
-            config.JWT_SECRET
-         )
-       
-        const {password, isAdmin, ...otherDetails } = user._doc
-        res
-        .cookie("access_token", token, {
-            httpOnly: true,
+        res.status(200).send({
+            _id: signinUser._id,
+            firstName: signinUser.firstName,
+            lastName: signinUser.lastName,
+            phoneNumber: signinUser.phoneNumber,
+            email: signinUser.email,
+            isAdmin: signinUser.isAdmin,
+            token: generateToken(signinUser),
         })
-        .status(200)
-        .json({details:{...otherDetails}, isAdmin})
+
     } catch (err) {
         next(err)
     }

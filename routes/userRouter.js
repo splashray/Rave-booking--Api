@@ -1,8 +1,19 @@
 import  express  from "express";
 import { deleteUser, getUser, getUsers, updateUser, updateUserPassword } from "../controllers/userController.js";
-import { verifyAdmin, verifyToken } from "../utils/verifyToken.js";
+import { isKycOwner, isVerifiedOwner, verifyAdmin, verifyToken } from "../utils/verifyToken.js";
 
 const router = express.Router()
+
+router.get("/verify/", verifyToken, isVerifiedOwner, (req,res)=>{
+    res.json(req.user)
+})
+router.get("/verify/kyc", verifyToken, isKycOwner, (req,res)=>{
+    res.json(req.user)
+})
+router.get("/verify/admin", verifyToken, verifyAdmin, (req,res)=>{
+    res.json(req.user)
+})
+
 
 //update except password and email
 router.put("/:id",verifyToken, updateUser)
