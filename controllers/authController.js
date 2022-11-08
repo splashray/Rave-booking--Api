@@ -2,11 +2,20 @@ import Owner from "../models/ownerModel.js";
 import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import { createError } from "../utils/error.js";
-import  config  from '../utils/config.js';
-import jwt from "jsonwebtoken";
 import { generateToken } from "../utils/verifyToken.js";
 
 //Only Owner sections
+export const checkEmail  = async (req, res, next)=>{
+        try {
+            const {email} = req.body
+           const cEmail = await Owner.findOne({email:email})
+           if(!cEmail){ res.status(200).json({message: "Email address available."})  }
+           else{ res.status(400).json({message: "Email address already existed, choose another one."}) }
+        } catch (err) {
+            next(err)
+        }
+}
+
 export const ownerRegister  = async (req, res, next)=>{
     try {
         const salt = bcrypt.genSaltSync(10)
@@ -51,6 +60,17 @@ export const ownerLogin  = async (req, res, next)=>{
 } 
 
 //Only Users/Admin sections
+export const checkUserEmail  = async (req, res, next)=>{
+    try {
+        const {email} = req.body
+       const cEmail = await User.findOne({email:email})
+       if(!cEmail){ res.status(200).json({message: "Email address available."})  }
+       else{ res.status(400).json({message: "Email address already existed, choose another one."}) }
+    } catch (err) {
+        next(err)
+    }
+}
+
 export const userRegister  = async (req, res, next)=>{
     try {
         const salt = bcrypt.genSaltSync(10)

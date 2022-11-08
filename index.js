@@ -1,14 +1,14 @@
-import  express from "express";
+import express from "express";
 import mongoose from "mongoose";
 import bodyParser from 'body-parser';
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import  config  from './utils/config.js';
+import config  from './utils/config.js';
 import authRouter from "./routes/authRouter.js"
 import ownersRouter from "./routes/ownerRouter.js"
 import usersRouter from "./routes/userRouter.js"
 import hotelsRouter from "./routes/hotelRouter.js"
-// import roomsRoute from "./routes/rooms.js"
+import roomsRouter from "./routes/roomRouter.js"
 import {notFound} from "./middlewares/not-found.js"
 
 const app = express();
@@ -36,7 +36,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/owners', ownersRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/hotels', hotelsRouter);
- 
+app.use('/api/rooms', roomsRouter);
 
 app.use((err, req, res, next)=>{
   const errorStatus = err.status || 500
