@@ -1,6 +1,6 @@
 import  express  from "express";
-import {createHotel, deleteHotel, getHotel, getHotels, updateHotel } from "../controllers/hotelController.js";
-import { verifyAdmin, verifyToken } from "../utils/verifyToken.js";
+import {createHotel, deleteHotel, FeaturedHotel, getHotel, getHotels, updateHotel } from "../controllers/hotelController.js";
+import { isKycOwner, isVerifiedOwner, verifyAdmin, verifyToken } from "../utils/verifyToken.js";
 
 const router = express.Router()
 
@@ -8,10 +8,10 @@ const router = express.Router()
 router.post("/", verifyToken, createHotel)
 
 // update hotel by owners
-router.put("/:id", verifyToken, updateHotel)
+router.put("/edit/:id", verifyToken, isVerifiedOwner, updateHotel)
 
 // update the hotel and set featured property to avaialble/true
-router.put("/:id", verifyToken, verifyAdmin, updateHotel)
+router.put("/:id", verifyToken, verifyAdmin, FeaturedHotel)
 
 //delete
 router.delete("/:id", verifyToken, verifyAdmin, deleteHotel)

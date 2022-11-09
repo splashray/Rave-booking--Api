@@ -28,7 +28,7 @@ export const FeaturedHotel = async (req, res, next)=>{
     try {
         const updatedHotel = await Hotel.findByIdAndUpdate(
             req.params.id, 
-            {$set: {...req.body, featured:req.body.featured || {featured:req.body.featured} }},
+            {$set: {...req.body, featured:req.body.featured  }},
             {new: true}
             )
             res.status(200).json(updatedHotel)
