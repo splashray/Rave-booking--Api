@@ -1,11 +1,10 @@
 # Awuf-Booking-Api
 
-## Job-Application-Api 
 API contains: 
 
-User Registration/Login with CRUD
+Users/Admin Registration/Login with CRUD
 
-Admin Registration/Login 
+Owners Registration/Login with CRUD
 
 Hotel Managemnt with CRUD
 
@@ -14,24 +13,116 @@ Use the root api [link](https://awuf-booking.azurewebsites.net/) to begin.
 
 link = https://awuf-booking.azurewebsites.net/
 
-## Admin 
-This is with Authentication and Authorization token where necessary.
 
+## Users/Admin Accounts
 use the link as reference
 ```
-# Create Admin (post)
-   link/api/auth/register
+# Create user(post)
+   link/api/auth/user/register
 
-# Login Admin (post)
-   link/api/auth/login
+# Login user (post)
+   link/api/auth/user/login
 
-# Get users(get)
+# See Available user/admin Email(post)
+   link/api/auth/user/register/check
+
+
+```
+## Owner Accounts
+use the link as reference
+```
+# Create user(post)
+   link/api/auth/owner/register
+
+# Login user (post)
+   link/api/auth/owner/login
+
+# See Available owner Email(post)
+   link/api/auth/owner/register/check
+
+```
+
+
+## Available to everybody
+use the link as reference
+```
+
+# Get all Hotel(get)
+   link/api/hotels/
+
+# Get a hotel(get)
+   link/api/hotels/find/:id
+   
+############################      
+# Get all Rooms(get)
+   link/api/rooms/
+
+# Get a Room(get)
+   link/api/rooms/:id
+############################
+```
+
+## Owners (Available to owners )
+use the link as reference
+```
+# Create a Hotel(post)
+   link/api/hotels/
+```
+## Owners (Available to owners that are verified)
+use the link as reference
+```
+# Update a hotel(put)
+   link/api/hotels/edit/:id
+ 
+############################
+# Create a Room(post)
+  link/api/rooms/:hotelid
+ 
+# Update a Room(put)
+   link/api/rooms/:id
+   
+ ############################
+```
+
+## Admin Features
+use the link as reference
+```
+
+# Get users/admin(get)
    link/api/users/
 
-# Get one user(get)
+# Delete user/admin(delete)
    link/api/users/:id
 
-# Delete user(delete)
+############################
+
+# Get owners(get)
+   link/api/owners/
+
+# Delete owners(delete)
+   link/api/owners/:id
+
+############################
+
+# Update a hotel to set to featured (put)
+   link/api/hotels/:id
+   
+# Delete a hotel (delete)
+   link/api/hotels/:id
+ 
+############################  
+
+# Delete a room (delete)
+   link/api/rooms/:id/:hotelId
+ 
+############################  
+```
+
+## Admin/User Features
+use the link as reference
+```
+
+# Get one's details user(get)
    link/api/users/:id
 
 # Update user(put)
@@ -40,48 +131,25 @@ use the link as reference
 # Update user's password(put)
    link/api/users/pass/:id
 
-# Create Job(post)
-   link/api/jobs
-
-# Delete Job(delete)
-   link/api/jobs/:id
-
-# Update Job(put)
-   link/api/jobs/:id
-
+######################################
 ```
 
-## Users
-This is with Authentication token,
-use the link as reference
-```
-# Create user(post)
-   link/api/auth/registeruser
-
-# Login user (post)
-   link/api/auth/loginuser
-
-# Get one's details(get)
-   link/api/users/
-
-# Update one's details(put)
-   link/api/users/:id
-
-# Update one's password(put)
-   link/api/users/pass/:id
-
-```
-
-## Job
+## Admin/Owner Features
 use the link as reference
 ```
 
-# Get one Job(get)
-   link/api/jobs/
+# Get one's details owner(get)
+   link/api/owners/:id
 
-# Get Jobs(get)
-   link/api/jobs/:id
+# Update owners(put)
+   link/api/owners/:id
+
+# Update owners's password(put)
+   link/api/owners/pass/:id
+
+######################################
 ```
+
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
