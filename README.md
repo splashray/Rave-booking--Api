@@ -62,15 +62,12 @@ use the link as reference
 ############################
 ```
 
-## Owners (Available to owners )
+## Owners (Available to owners that are verified)
 use the link as reference
 ```
 # Create a Hotel(post)
    link/api/hotels/
-```
-## Owners (Available to owners that are verified)
-use the link as reference
-```
+
 # Update a hotel(put)
    link/api/hotels/edit/:id
  
