@@ -4,10 +4,10 @@ import { isKycOwner, isVerifiedOwner, verifyAdmin, verifyToken } from "../utils/
 
 const router = express.Router()
 
-// create
-router.post("/", verifyToken, createHotel)
+// create hotel by verified owners
+router.post("/", verifyToken, isVerifiedOwner, createHotel)
 
-// update hotel by owners
+// update hotel by verified owners
 router.put("/edit/:id", verifyToken, isVerifiedOwner, updateHotel)
 
 // update the hotel and set featured property to avaialble/true

@@ -36,9 +36,9 @@ export const ownerLogin  = async (req, res, next)=>{
     try { 
         const {email, password} = req.body
         //empty login parameters
+        
         if(email ==="" || password ==="") return next(createError(400, "password or Email field is Empty!"))
-
-        const  signinOwner = await Owner.findOne({email:email}) 
+        const  signinOwner = await Owner.findOne({email:email.toLowerCase()}) 
         if(!signinOwner) return next(createError(404, "User not found"))
         const  isPasswordCorrect = await bcrypt.compare(password, signinOwner.password)
         if(!isPasswordCorrect) return next(createError(400, "Wrong password or Email!"))
@@ -93,7 +93,7 @@ export const userLogin  = async (req, res, next)=>{
         //empty login parameters
         if(email ==="" || password ==="") return next(createError(400, "password or Email field is Empty!"))
 
-        const  signinUser = await User.findOne({email:email}) 
+        const  signinUser = await User.findOne({email:email.toLowerCase()}) 
         if(!signinUser) return next(createError(404, "User not found"))
         const  isPasswordCorrect = await bcrypt.compare(password, signinUser.password)
         if(!isPasswordCorrect) return next(createError(400, "Wrong password or Email!"))

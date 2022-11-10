@@ -24,12 +24,11 @@ const HotelSchema = new mongoose.Schema({
         parking:  {type: String, required: true},
         breakfast: {type: String, required: true},
         staffLang: {type: String, required: true},
-        facilitiesOption:{type: String, required: true},
+        facilitiesOption: [{ option: String }],
     },
     hotelAmenities: {
         extraBedOption:{type: String, required: true},
-        breakfast: {type: String, required: true},
-        amenitiesOption: {type: String, required: true},
+        amenitiesOption: [{ option: String }],
     },
     photos:{
         type: [String],
