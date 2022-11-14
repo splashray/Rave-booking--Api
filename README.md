@@ -70,7 +70,13 @@ use the link as reference
 
 # Update a hotel(put)
    link/api/hotels/edit/:id
- 
+
+ # Get a Hotel by owner(get)
+   link/api/hotels/owners/:hotelid
+
+# Get all hotel by owner(get)
+   link/api/hotels/owners/
+   
 ############################
 # Create a Room(post)
   link/api/rooms/:hotelid
