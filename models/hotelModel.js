@@ -54,6 +54,14 @@ const HotelSchema = new mongoose.Schema({
         min: 0,
         max: 5,
     },
+    verified:{
+        type: Boolean,
+        default: false,
+    },
+    bookable:{
+        type: Boolean,
+        default: false,
+    },
     featured:{
         type: Boolean,
         default: false,

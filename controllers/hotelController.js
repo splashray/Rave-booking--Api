@@ -1,5 +1,5 @@
 import Hotel from "../models/hotelModel.js"
-// import Room from "../models/Room.js"
+import Room from "../models/roomModel.js"
 
 export const createHotel = async (req, res, next)=>{
     const newHotel = new Hotel({...req.body,  user: req.user.id})
@@ -28,7 +28,7 @@ export const FeaturedHotel = async (req, res, next)=>{
     try {
         const updatedHotel = await Hotel.findByIdAndUpdate(
             req.params.id, 
-            {$set: {...req.body, featured:req.body.featured  }},
+            {$set: {...req.body, featured:req.body.featured, verified:req.body.verified , bookable:req.body.bookable   }},
             {new: true}
             )
             res.status(200).json(updatedHotel)
@@ -68,6 +68,31 @@ export const getHotels = async (req, res, next)=>{
       }
   }
 
+  export const getOwnerHotels = async (req, res, next)=>{
+    try {
+        // const ownerId = req.params.ownerid
+        const hotels = await Hotel.find({user:req.user.id})
+        if(hotels){
+            res.status(200).json({hotels:hotels})
+        }else{
+            res.status(404).send({message: 'hotels created are empty, add atleast one'})
+        }
+    } catch (err) {
+        next(err)
+    }
+}
+
+export const getOwnerSingleHotel = async (req, res, next)=>{
+    try {
+        const hotel = await Hotel.findOne(
+            {_id:req.params.hotelid, user:req.user.id}
+            )
+            res.status(200).json({hotel:hotel})
+    } catch (err) {
+        next(err)
+    }
+}
+
 // export const getHotels = async (req, res, next)=>{
 //   const {min, max, ...others}= req.query
 //     try {
@@ -93,20 +118,6 @@ export const getHotels = async (req, res, next)=>{
 //     }
 // }
 
-
-// export const countByCity = async (req, res, next)=>{
-//     const cities = req.query.cities.split(",")
-//     try {
-//         const list = await Promise.all(hotelBasicInfo_city.map(hotelBasicInfo_city=>{
-//             return Hotel.countDocuments({hotelBasicInfo_city:hotelBasicInfo_city})
-//         }))
-//         res.status(200).json(list)
-//     } catch (err) {
-//         next(err)
-//     }
-// }
-
-
 // export const countByType = async (req, res, next)=>{
 //     try {
 //         const hotelCount = await Hotel.countDocuments({ type: "hotel" });
@@ -127,14 +138,14 @@ export const getHotels = async (req, res, next)=>{
 //     }
 // }
 
-// export const getHotelRooms = async (req, res, next)=>{
-//     try{
-//         const hotel = Hotel.findById(req.params.id)
-//         const list = await Promise.all(hotel.rooms.map(room=>{
-//             return Room.findById(room)
-//         }))
-//             res.status(200).json({list})
-//     }catch(err){
-//         next(err)
-//     }
-// }
+export const getHotelRooms = async (req, res, next)=>{
+    try{
+        const hotel = await Hotel.findById(req.params.id)
+        const list = await Promise.all(hotel.rooms.map(room=>{
+            return Room.findById(room)
+        }))
+            res.status(200).json({Rooms:list})
+    }catch(err){
+        next(err)
+    }
+}
