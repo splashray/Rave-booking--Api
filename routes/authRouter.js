@@ -1,7 +1,7 @@
-import  express  from "express";
-import { checkEmail, checkUserEmail, ownerLogin, ownerRegister, userLogin, userRegister } from "../controllers/authController.js";
-
+const express = require('express')
 const router = express.Router()
+
+const { checkEmail, checkUserEmail, ownerLogin, ownerRegister, userLogin, userRegister } = require("../controllers/authController");
 
 //Only Owner sections
 router.post("/owner/register/check",checkEmail)
@@ -14,4 +14,4 @@ router.post("/user/register/check",checkUserEmail)
 router.post("/user/register", userRegister)
 router.post("/user/login", userLogin)
 
-export default router
+module.exports = router

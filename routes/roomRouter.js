@@ -1,8 +1,8 @@
-import  express  from "express";
-import { createRoom, deleteRoom, getRoom, getRooms, updateRoom } from "../controllers/roomController.js";
-import { isVerifiedOwner, verifyAdmin, verifyToken } from "../utils/verifyToken.js";
-
+const express = require('express')
 const router = express.Router()
+const { createRoom, deleteRoom, getRoom, getRooms, updateRoom } = require("../controllers/roomController");
+const { isVerifiedOwner, verifyAdmin, verifyToken } = require("../utils/verifyToken");
+
 
 // create
 router.post("/:hotelid", verifyToken, isVerifiedOwner, createRoom)
@@ -19,4 +19,4 @@ router.get("/:id", getRoom)
 //get all
 router.get("/", getRooms)
 
-export default router
+module.exports = router

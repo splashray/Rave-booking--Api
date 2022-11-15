@@ -1,8 +1,8 @@
-import  express  from "express";
-import { deleteOwner, getOwner, getOwners, updateOwner, updateOwnerPassword } from "../controllers/ownerController.js";
-import { verifyAdmin, verifyToken } from "../utils/verifyToken.js";
-
+const express = require('express')
 const router = express.Router()
+const  { deleteOwner, getOwner, getOwners, updateOwner, updateOwnerPassword } = require("../controllers/ownerController");
+const { verifyAdmin, verifyToken } = require("../utils/verifyToken");
+
 
 //update except password and email
 router.put("/:id",verifyToken, updateOwner)
@@ -19,4 +19,4 @@ router.get("/:id",verifyToken, getOwner)
 //get all
 router.get("/", verifyToken, verifyAdmin, getOwners)
 
-export default router
+module.exports = router

@@ -1,6 +1,6 @@
-import jwt from "jsonwebtoken";
-import { createError } from "../utils/error.js";
-import  config  from '../utils/config.js';
+const jwt = require('jsonwebtoken')
+const createError = require('../utils/error')
+const config = require('../utils/config')
 
 // export const verifyToken = (req, res, next)=>{
 //     const token = req.cookies.access_token;
@@ -34,7 +34,7 @@ import  config  from '../utils/config.js';
 // }
 
 
-export const generateToken = (user) => {
+const generateToken = (user) => {
     return jwt.sign(
       {
         id: user._id,
@@ -51,7 +51,7 @@ export const generateToken = (user) => {
   };
   
   
-  export const verifyToken = (req, res, next) =>{
+const verifyToken = (req, res, next) =>{
     const BearerToken = req.headers.authorization
     if(!BearerToken){
       res.status(401).send({message: 'You are not authenticated!'})
@@ -68,7 +68,7 @@ export const generateToken = (user) => {
     }
   }
   
-  export const  verifyAdmin  = (req, res, next) =>{
+const  verifyAdmin  = (req, res, next) =>{
     if(req.user && req.user.isAdmin){
       next()
     }else{
@@ -76,7 +76,7 @@ export const generateToken = (user) => {
     }
   }
 
-  export const  isVerifiedOwner  = (req, res, next) =>{
+  const  isVerifiedOwner  = (req, res, next) =>{
     if(req.user && req.user.isVerified){
       next()
     }else{
@@ -84,10 +84,14 @@ export const generateToken = (user) => {
     }
   }
 
-  export const  isKycOwner  = (req, res, next) =>{
+  const  isKycOwner  = (req, res, next) =>{
     if(req.user && req.user.isKyc){
       next()
     }else{
       res.status(401).send({message: 'You have not been Authorized as owner, Do your KYC!'})
     }
   }
+
+  module.exports ={
+    generateToken, verifyToken, verifyAdmin, isVerifiedOwner, isKycOwner
+}

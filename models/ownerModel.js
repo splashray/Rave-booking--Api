@@ -1,4 +1,5 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose')
+
 const OwnerSchema = new mongoose.Schema({
     firstName:{
         type: String,
@@ -34,4 +35,4 @@ const OwnerSchema = new mongoose.Schema({
     },
 },{timestamps:true})
 
-export default  mongoose.model("Owner", OwnerSchema)
+module.exports = mongoose.model('Owner',OwnerSchema)

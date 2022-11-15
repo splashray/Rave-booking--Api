@@ -1,8 +1,8 @@
-import  express  from "express";
-import { deleteUser, getUser, getUsers, updateUser, updateUserPassword } from "../controllers/userController.js";
-import { isKycOwner, isVerifiedOwner, verifyAdmin, verifyToken } from "../utils/verifyToken.js";
-
+const express = require('express')
 const router = express.Router()
+const { deleteUser, getUser, getUsers, updateUser, updateUserPassword } = require("../controllers/userController");
+const { isKycOwner, isVerifiedOwner, verifyAdmin, verifyToken } = require("../utils/verifyToken");
+
 
 router.get("/verify/", verifyToken, isVerifiedOwner, (req,res)=>{
     res.json(req.user)
@@ -30,4 +30,4 @@ router.get("/:id",verifyToken, getUser)
 //get all
 router.get("/", verifyToken, verifyAdmin, getUsers)
 
-export default router
+module.exports = router

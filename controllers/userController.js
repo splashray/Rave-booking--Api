@@ -1,8 +1,9 @@
-import bcrypt from "bcryptjs";
-import User from "../models/userModel.js"
-import { createError } from "../utils/error.js";
+const bcrypt = require('bcryptjs')
+const User = require('../models/userModel')
+const createError = require('../utils/error')
 
-export const updateUser = async (req, res, next)=>{
+
+ const updateUser = async (req, res, next)=>{
     try {
         const updatedUser = await User.findByIdAndUpdate(
             req.params.id, 
@@ -15,7 +16,7 @@ export const updateUser = async (req, res, next)=>{
         next(err)
     }
 }
-export const updateUserPassword = async (req, res, next)=>{
+ const updateUserPassword = async (req, res, next)=>{
     try {
         const salt = bcrypt.genSaltSync(10)
         const hash = bcrypt.hashSync(req.body.npassword, salt)
@@ -38,7 +39,7 @@ export const updateUserPassword = async (req, res, next)=>{
     }
 }
 
-export const deleteUser = async (req, res, next)=>{
+ const deleteUser = async (req, res, next)=>{
     try {
        const user =  await User.findByIdAndDelete(req.params.id)
        if(!user) return next(createError(401, "User Not Found'!"))
@@ -48,7 +49,7 @@ export const deleteUser = async (req, res, next)=>{
     }
 }
 
-export const getUser = async (req, res, next)=>{
+ const getUser = async (req, res, next)=>{
     try {
         const user = await User.findById( req.params.id)
          if(!user) return next(createError(401, "User Not Found'!"))
@@ -58,7 +59,7 @@ export const getUser = async (req, res, next)=>{
     }
 }
 
-export const getUsers = async (req, res, next)=>{
+ const getUsers = async (req, res, next)=>{
     try {
         const users = await User.find()
         if(!users) return next(createError(401, "Users Not Found'!"))
@@ -66,4 +67,10 @@ export const getUsers = async (req, res, next)=>{
     } catch (err) {
         next(err)
     }
+}
+
+
+
+module.exports ={
+    updateUser, updateUserPassword, deleteUser, getUser, getUsers
 }

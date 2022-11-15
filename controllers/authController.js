@@ -1,11 +1,12 @@
-import Owner from "../models/ownerModel.js";
-import User from "../models/userModel.js";
-import bcrypt from "bcryptjs";
-import { createError } from "../utils/error.js";
-import { generateToken } from "../utils/verifyToken.js";
+const Owner = require('../models/ownerModel')
+const User = require('../models/userModel')
+const bcrypt = require('bcryptjs')
+const createError = require('../utils/error')
+const {generateToken} = require('../utils/verifyToken')
+
 
 //Only Owner sections
-export const checkEmail  = async (req, res, next)=>{
+ const checkEmail  = async (req, res, next)=>{
         try {
             const {email} = req.body
            const cEmail = await Owner.findOne({email:email})
@@ -16,7 +17,7 @@ export const checkEmail  = async (req, res, next)=>{
         }
 }
 
-export const ownerRegister  = async (req, res, next)=>{
+ const ownerRegister  = async (req, res, next)=>{
     try {
         const salt = bcrypt.genSaltSync(10)
         const hash = bcrypt.hashSync(req.body.password, salt)
@@ -32,7 +33,7 @@ export const ownerRegister  = async (req, res, next)=>{
     }
 }
 
-export const ownerLogin  = async (req, res, next)=>{
+ const ownerLogin  = async (req, res, next)=>{
     try { 
         const {email, password} = req.body
         //empty login parameters
@@ -60,7 +61,7 @@ export const ownerLogin  = async (req, res, next)=>{
 } 
 
 //Only Users/Admin sections
-export const checkUserEmail  = async (req, res, next)=>{
+ const checkUserEmail  = async (req, res, next)=>{
     try {
         const {email} = req.body
        const cEmail = await User.findOne({email:email})
@@ -71,7 +72,7 @@ export const checkUserEmail  = async (req, res, next)=>{
     }
 }
 
-export const userRegister  = async (req, res, next)=>{
+ const userRegister  = async (req, res, next)=>{
     try {
         const salt = bcrypt.genSaltSync(10)
         const hash = bcrypt.hashSync(req.body.password, salt)
@@ -87,7 +88,7 @@ export const userRegister  = async (req, res, next)=>{
     }
 }
 
-export const userLogin  = async (req, res, next)=>{
+ const userLogin  = async (req, res, next)=>{
     try {
         const {email, password} = req.body
         //empty login parameters
@@ -112,3 +113,7 @@ export const userLogin  = async (req, res, next)=>{
         next(err)
     }
 } 
+
+module.exports ={
+    checkEmail, ownerRegister, ownerLogin, checkUserEmail, userRegister, userLogin
+}

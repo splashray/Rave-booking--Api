@@ -1,15 +1,16 @@
-import express from "express";
-import mongoose from "mongoose";
-import bodyParser from 'body-parser';
-import cookieParser from "cookie-parser";
-import cors from "cors";
-import config  from './utils/config.js';
-import authRouter from "./routes/authRouter.js"
-import ownersRouter from "./routes/ownerRouter.js"
-import usersRouter from "./routes/userRouter.js"
-import hotelsRouter from "./routes/hotelRouter.js"
-import roomsRouter from "./routes/roomRouter.js"
-import {notFound} from "./middlewares/not-found.js"
+const express = require('express')
+const mongoose = require('mongoose')
+const bodyParser = require('body-Parser')
+const cookieParser = require('cookie-Parser')
+const cors = require('cors')
+const config = require('./utils/config')
+const authRouter = require('./routes/authRouter')
+const ownersRouter = require('./routes/ownerRouter')
+const usersRouter = require('./routes/userRouter')
+const hotelsRouter = require('./routes/hotelRouter')
+const roomsRouter = require('./routes/roomRouter')
+const notFound = require('./middlewares/not-found')
+
 
 const app = express();
 

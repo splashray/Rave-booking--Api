@@ -1,17 +1,41 @@
-import Hotel from "../models/hotelModel.js"
-import Room from "../models/roomModel.js"
+const Hotel = require('../models/hotelModel')
+const Room = require('../models/roomModel')
+const {sendNewHotelRegistrationEmail} = require('../utils/email')
 
-export const createHotel = async (req, res, next)=>{
-    const newHotel = new Hotel({...req.body,  user: req.user.id})
-    try {
-        const savedHotel = await newHotel.save()
-        res.status(200).json(savedHotel)
-    } catch (err) {
-        next(err)
+const createHotel = async (req, res, next) => {
+    const generateId = async() => {
+        // genhotelCustomId 
+        var genhotelCustomId = Math.floor(Math.random() * 10000000) + 10000000
+        //search for availability of generated id
+        const search = await Hotel.findOne({hotelCustomId:genhotelCustomId})
+            if(!search){
+                const newHotel = new Hotel({
+                    ...req.body, 
+                    hotelCustomId: `AOW${genhotelCustomId}`,  
+                    user: req.user.id, 
+                    email:req.user.email 
+                })
+                try {
+                    newHotel.save()
+                    .then(result=>{
+                        // handle account verification
+                        sendNewHotelRegistrationEmail(result, res)
+                    }).catch(err =>{
+                        console.log(err);
+                        res.json({status:"FAILED", message:"An error occurred while saving hotel details"})
+                    })
+                }catch (err) {
+                    next(err)
+                }
+            }else{
+                generateId()
+            }
     }
+
+    generateId()
 }
 
-export const updateHotel = async (req, res, next)=>{
+const updateHotel = async (req, res, next)=>{
     try {
         const updatedHotel = await Hotel.findByIdAndUpdate(
             req.params.id, 
@@ -24,7 +48,7 @@ export const updateHotel = async (req, res, next)=>{
     }
 }
 
-export const FeaturedHotel = async (req, res, next)=>{
+const FeaturedHotel = async (req, res, next)=>{
     try {
         const updatedHotel = await Hotel.findByIdAndUpdate(
             req.params.id, 
@@ -37,7 +61,7 @@ export const FeaturedHotel = async (req, res, next)=>{
     }
 }
 
-export const deleteHotel = async (req, res, next)=>{
+const deleteHotel = async (req, res, next)=>{
     try {
         await Hotel.findByIdAndDelete(
             req.params.id
@@ -48,7 +72,7 @@ export const deleteHotel = async (req, res, next)=>{
     }
 }
 
-export const getHotel = async (req, res, next)=>{
+const getHotel = async (req, res, next)=>{
     try {
         const hotel = await Hotel.findById(
             req.params.id
@@ -59,7 +83,7 @@ export const getHotel = async (req, res, next)=>{
     }
 }
 
-export const getHotels = async (req, res, next)=>{
+const getHotels = async (req, res, next)=>{
       try {
           const hotels = await Hotel.find({})
               res.status(200).json({hotels:hotels})
@@ -68,7 +92,7 @@ export const getHotels = async (req, res, next)=>{
       }
   }
 
-  export const getOwnerHotels = async (req, res, next)=>{
+const getOwnerHotels = async (req, res, next)=>{
     try {
         // const ownerId = req.params.ownerid
         const hotels = await Hotel.find({user:req.user.id})
@@ -82,7 +106,7 @@ export const getHotels = async (req, res, next)=>{
     }
 }
 
-export const getOwnerSingleHotel = async (req, res, next)=>{
+const getOwnerSingleHotel = async (req, res, next)=>{
     try {
         const hotel = await Hotel.findOne(
             {_id:req.params.hotelid, user:req.user.id}
@@ -93,7 +117,7 @@ export const getOwnerSingleHotel = async (req, res, next)=>{
     }
 }
 
-// export const getHotels = async (req, res, next)=>{
+//  const getHotels = async (req, res, next)=>{
 //   const {min, max, ...others}= req.query
 //     try {
 //         const hotels = await Hotel.find({
@@ -106,7 +130,7 @@ export const getOwnerSingleHotel = async (req, res, next)=>{
 //     }
 // }
 
-// export const countByCity = async (req, res, next)=>{
+//  const countByCity = async (req, res, next)=>{
 //     const cities = req.query.cities.split(",")
 //     try {
 //         const list = await Promise.all(cities.map(city=>{
@@ -118,7 +142,7 @@ export const getOwnerSingleHotel = async (req, res, next)=>{
 //     }
 // }
 
-// export const countByType = async (req, res, next)=>{
+//  const countByType = async (req, res, next)=>{
 //     try {
 //         const hotelCount = await Hotel.countDocuments({ type: "hotel" });
 //         const apartmentCount = await Hotel.countDocuments({ type: "apartment" });
@@ -138,7 +162,7 @@ export const getOwnerSingleHotel = async (req, res, next)=>{
 //     }
 // }
 
-export const getHotelRooms = async (req, res, next)=>{
+const getHotelRooms = async (req, res, next)=>{
     try{
         const hotel = await Hotel.findById(req.params.id)
         const list = await Promise.all(hotel.rooms.map(room=>{
@@ -148,4 +172,9 @@ export const getHotelRooms = async (req, res, next)=>{
     }catch(err){
         next(err)
     }
+}
+
+
+module.exports ={
+    createHotel, updateHotel, FeaturedHotel, deleteHotel, getHotel, getHotels, getOwnerHotels, getOwnerSingleHotel,getHotelRooms
 }

@@ -1,8 +1,9 @@
-import  express  from "express";
-import {createHotel, deleteHotel, FeaturedHotel, getHotel, getHotelRooms, getHotels, getOwnerHotels, getOwnerSingleHotel, updateHotel } from "../controllers/hotelController.js";
-import { isKycOwner, isVerifiedOwner, verifyAdmin, verifyToken } from "../utils/verifyToken.js";
 
+const express = require('express')
 const router = express.Router()
+
+const  {createHotel, deleteHotel, FeaturedHotel, getHotel, getHotelRooms, getHotels, getOwnerHotels, getOwnerSingleHotel, updateHotel } = require("../controllers/hotelController");
+const { isKycOwner, isVerifiedOwner, verifyAdmin, verifyToken } = require("../utils/verifyToken");
 
 // create hotel by verified owners
 router.post("/", verifyToken, isVerifiedOwner, createHotel)
@@ -40,4 +41,4 @@ router.get("/", getHotels)
 router.get("/room/:id", getHotelRooms)
 
 
-export default router
+module.exports = router

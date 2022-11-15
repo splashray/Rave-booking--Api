@@ -1,8 +1,8 @@
-import bcrypt from "bcryptjs";
-import Owner from "../models/ownerModel.js"
-import { createError } from "../utils/error.js";
+const bcrypt = require('bcryptjs')
+const Owner = require('../models/ownerModel')
+const createError = require('../utils/error')
 
-export const updateOwner = async (req, res, next)=>{
+ const updateOwner = async (req, res, next)=>{
     try {
         const updatedOwner = await Owner.findByIdAndUpdate(
             req.params.id, 
@@ -15,7 +15,7 @@ export const updateOwner = async (req, res, next)=>{
         next(err)
     }
 }
-export const updateOwnerPassword = async (req, res, next)=>{
+ const updateOwnerPassword = async (req, res, next)=>{
     try {
         const salt = bcrypt.genSaltSync(10)
         const hash = bcrypt.hashSync(req.body.npassword, salt)
@@ -39,7 +39,7 @@ export const updateOwnerPassword = async (req, res, next)=>{
 }
 
 
-export const deleteOwner = async (req, res, next)=>{
+ const deleteOwner = async (req, res, next)=>{
     try {
         const owner =  await Owner.findByIdAndDelete(req.params.id )
         if(!owner) return next(createError(401, "Owner Not Found'!"))
@@ -49,7 +49,7 @@ export const deleteOwner = async (req, res, next)=>{
     }
 }
 
-export const getOwner = async (req, res, next)=>{
+ const getOwner = async (req, res, next)=>{
     try {
         const owner = await Owner.findById(req.params.id)
         if(!owner) return next(createError(401, "Owner Not Found'!"))
@@ -59,7 +59,7 @@ export const getOwner = async (req, res, next)=>{
     }
 }
 
-export const getOwners = async (req, res, next)=>{
+ const getOwners = async (req, res, next)=>{
 
     try {
         const owners = await Owner.find()
@@ -68,4 +68,9 @@ export const getOwners = async (req, res, next)=>{
     } catch (err) {
         next(err)
     }
+}
+
+
+module.exports ={
+    updateOwner, updateOwnerPassword, deleteOwner, getOwner, getOwners
 }

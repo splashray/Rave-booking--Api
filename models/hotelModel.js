@@ -1,10 +1,13 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose')
+
 const HotelSchema = new mongoose.Schema({
     category:{
         type: String,
         default: `hotel`
     },
+    hotelCustomId:{type: String, required: true},
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    email:{type: String},
     hotelBasicInfo: {
         hotelName:    {type: String, required: true},
         starRating:   {type: String, required: true},
@@ -69,4 +72,4 @@ const HotelSchema = new mongoose.Schema({
 
 },{timestamps:true})
 
-export default  mongoose.model("Hotel", HotelSchema)
+module.exports = mongoose.model('Hotel', HotelSchema)
