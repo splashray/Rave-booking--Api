@@ -2,7 +2,7 @@
 const express = require('express')
 const router = express.Router()
 
-const  {createHotel, deleteHotel, FeaturedHotel, getHotel, getHotelRooms, getHotels, getOwnerHotels, getOwnerSingleHotel, updateHotel } = require("../controllers/hotelController");
+const  {createHotel, deleteHotel, getHotel, getHotelRooms, getHotels, getOwnerHotels, getOwnerSingleHotel, updateHotel, AdminHotel, OwnersetHotelToBookable } = require("../controllers/hotelController");
 const { isKycOwner, isVerifiedOwner, verifyAdmin, verifyToken } = require("../utils/verifyToken");
 
 // create hotel by verified owners
@@ -14,11 +14,14 @@ router.get("/owners/", verifyToken, isVerifiedOwner, getOwnerHotels)
 // Get hotel created by verified owners
 router.get("/owners/:hotelid", verifyToken, isVerifiedOwner, getOwnerSingleHotel)
 
+// update hotel by kyc owners
+router.put("/bookable/:id", verifyToken, isVerifiedOwner, isKycOwner, OwnersetHotelToBookable)
+
 // update hotel by verified owners
 router.put("/edit/:id", verifyToken, isVerifiedOwner, updateHotel)
 
 // update the hotel and set featured property to avaialble/true
-router.put("/:id", verifyToken, verifyAdmin, FeaturedHotel)
+router.put("/:id", verifyToken, verifyAdmin, AdminHotel)
 
 //delete
 router.delete("/:id", verifyToken, verifyAdmin, deleteHotel)

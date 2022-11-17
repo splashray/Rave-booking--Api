@@ -48,13 +48,28 @@ const updateHotel = async (req, res, next)=>{
     }
 }
 
-const FeaturedHotel = async (req, res, next)=>{
+const AdminHotel = async (req, res, next)=>{
     try {
         const updatedHotel = await Hotel.findByIdAndUpdate(
             req.params.id, 
             {$set: {...req.body, featured:req.body.featured, verified:req.body.verified , bookable:req.body.bookable   }},
             {new: true}
             )
+            res.status(200).json(updatedHotel)
+    } catch (err) {
+        next(err)
+    }
+}
+
+const OwnersetHotelToBookable = async (req, res, next)=>{
+    try {
+        const updatedHotel = await Hotel.findByIdAndUpdate(
+            req.params.id, 
+            {$set: {bookable:req.body.bookable, featured:true}},
+            {new: true}
+            )
+            if(!updatedHotel) return next(createError(401, "Hotel Not Found'!"))
+
             res.status(200).json(updatedHotel)
     } catch (err) {
         next(err)
@@ -176,5 +191,5 @@ const getHotelRooms = async (req, res, next)=>{
 
 
 module.exports ={
-    createHotel, updateHotel, FeaturedHotel, deleteHotel, getHotel, getHotels, getOwnerHotels, getOwnerSingleHotel,getHotelRooms
+    createHotel, updateHotel, AdminHotel, OwnersetHotelToBookable, deleteHotel, getHotel, getHotels, getOwnerHotels, getOwnerSingleHotel,getHotelRooms 
 }

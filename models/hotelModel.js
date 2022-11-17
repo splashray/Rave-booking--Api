@@ -7,7 +7,7 @@ const HotelSchema = new mongoose.Schema({
     },
     hotelCustomId:{type: String, required: true},
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    email:{type: String},
+    email:{type: String, required: true},
     hotelBasicInfo: {
         hotelName:    {type: String, required: true},
         starRating:   {type: String, required: true},
@@ -34,7 +34,7 @@ const HotelSchema = new mongoose.Schema({
         amenitiesOption: [{ option: String }],
     },
     photos:{
-        type: [String],
+        type: [{ photo: String }],
     },
     hotelPolicies: {
         checkInFrom:{type: String},

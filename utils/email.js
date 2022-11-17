@@ -29,7 +29,7 @@ const sendNewHotelRegistrationEmail = ({hotelCustomId,category,hotelBasicInfo, e
             to: `${email}`,
             subject: `Confirmation-${hotelCustomId}: Application for New ${category} Listing with Awuf-booking`,
             html: `<p>Thank you for adding a new property with Awuf-booking .</p>
-                   <p>Ensure the following basic infromations about your entires are correct or else, Contact the support immediately .</p>
+                   <p>Ensure the following basic information about your entries are correct or else, Contact the support immediately .</p>
                    <p> <b> Hotel Registration Number </b>: ${hotelCustomId}. </p>
                    <p> <b> Category Type </b>: ${category}. </p>
                    <p> <b> Hotel Name </b>: ${hotelName}. </p>

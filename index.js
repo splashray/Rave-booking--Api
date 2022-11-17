@@ -9,6 +9,7 @@ const ownersRouter = require('./routes/ownerRouter')
 const usersRouter = require('./routes/userRouter')
 const hotelsRouter = require('./routes/hotelRouter')
 const roomsRouter = require('./routes/roomRouter')
+const kycsRouter = require('./routes/kycRouter')
 const notFound = require('./middlewares/not-found')
 
 
@@ -38,6 +39,8 @@ app.use('/api/owners', ownersRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/hotels', hotelsRouter);
 app.use('/api/rooms', roomsRouter);
+app.use('/api/kycs', kycsRouter);
+
 
 app.use((err, req, res, next)=>{
   const errorStatus = err.status || 500
