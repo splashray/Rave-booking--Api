@@ -3,22 +3,40 @@ const Hotel = require('../models/hotelModel')
 const createError = require('../utils/error')
 
 const createRoom =  async(req,res, next) =>{
-    const hotelId = req.params.hotelid
-    const newRoom = new Room(req.body)
+    const generateId = async() => {
+                // generateCustomId 
+                var generateCustomId = Math.floor(Math.random() * 10000000) + 10000000
+                //search for availability of generated id
+                const search = await Room.findOne({roomCustomId:generateCustomId})
 
-    try {
-        const savedRoom = await newRoom.save()
-        try {
-            await Hotel.findByIdAndUpdate(hotelId,{
-                $push: {rooms: savedRoom._id},
-            })
-        } catch (err) {
-            next(err)
-        }
-        res.status(200).json({savedRoom:savedRoom})
-    } catch (err) {
-            next(err)
+                if(!search){
+                        try {
+                            const hotelId = req.params.hotelid
+                            const searchHotel = await Hotel.findOne({_id:hotelId})
+                            if(searchHotel){
+                                const newRoom = new Room({...req.body, roomCustomId:`RN${generateCustomId}`, user: req.user.id})
+                                const savedRoom = await newRoom.save()
+                                try {
+                                    await Hotel.findByIdAndUpdate(hotelId,{
+                                        $push: {rooms: savedRoom._id},
+                                    })
+                                } catch (err) {
+                                    next(err)
+                                }
+                                res.status(200).json({savedRoom:savedRoom})
+                            }else{
+                                res.status(404).json(`Hotel not found`)
+                            }
+
+                        } catch (err) {
+                                next(err)
+                    }
+
+                }else{
+                    generateId()
+                }
     }
+    generateId()
 }
 
 const updateRoom = async (req, res, next)=>{
@@ -71,7 +89,29 @@ const getRooms = async (req, res, next)=>{
     }
 }
 
+const getOwnerRooms = async (req, res, next)=>{
+    try {
+        const rooms = await Room.find({user:req.user.id})
+        if(rooms){
+            res.status(200).json({rooms:rooms})
+        }else{
+            res.status(404).send({message: 'Room created are empty, add atleast one'})
+        }
+    } catch (err) {
+        next(err)
+    }
+}
+
+const getOwnerSingleRoom = async (req, res, next)=>{
+    try {
+        const room = await Room.findOne({_id:req.params.roomid, user:req.user.id})
+            res.status(200).json({room:room})
+    } catch (err) {
+        next(err)
+    }
+}
+
 
 module.exports ={
-    createRoom, updateRoom, deleteRoom, getRoom, getRooms
+    createRoom, updateRoom, deleteRoom, getRoom, getRooms, getOwnerSingleRoom, getOwnerRooms
 }
