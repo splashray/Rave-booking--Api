@@ -14,7 +14,7 @@ const createRoom =  async(req,res, next) =>{
                             const hotelId = req.params.hotelid
                             const searchHotel = await Hotel.findOne({_id:hotelId})
                             if(searchHotel){
-                                const newRoom = new Room({...req.body, roomCustomId:`RN${generateCustomId}`, user: req.user.id})
+                                const newRoom = new Room({...req.body, roomCustomId:`RN${generateCustomId}`, user: req.user.id, hotelId:hotelId})
                                 const savedRoom = await newRoom.save()
                                 try {
                                     await Hotel.findByIdAndUpdate(hotelId,{
@@ -91,7 +91,8 @@ const getRooms = async (req, res, next)=>{
 
 const getOwnerRooms = async (req, res, next)=>{
     try {
-        const rooms = await Room.find({user:req.user.id})
+        const hotelId = req.params.hotelid
+        const rooms = await Room.find({user:req.user.id, hotelId:hotelId})
         if(rooms){
             res.status(200).json({rooms:rooms})
         }else{
@@ -103,8 +104,9 @@ const getOwnerRooms = async (req, res, next)=>{
 }
 
 const getOwnerSingleRoom = async (req, res, next)=>{
+    const hotelId = req.params.hotelid
     try {
-        const room = await Room.findOne({_id:req.params.roomid, user:req.user.id})
+        const room = await Room.findOne({_id:req.params.roomid, user:req.user.id, hotelId:hotelId})
             res.status(200).json({room:room})
     } catch (err) {
         next(err)
