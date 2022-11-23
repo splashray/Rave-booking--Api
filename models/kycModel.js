@@ -12,6 +12,9 @@ const KycSchema = new mongoose.Schema({
     },
     ownerOfProperty:{type: String, required: true},
     managerOfProperty:{type: String, required: true},
+
+
+    
     VerificationMessage:{type: String, default:`Processing`},
     submitted:{
         type: Boolean,

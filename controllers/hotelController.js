@@ -132,18 +132,50 @@ const getOwnerSingleHotel = async (req, res, next)=>{
     }
 }
 
-//  const getHotels = async (req, res, next)=>{
-//   const {min, max, ...others}= req.query
+const getSearchHotels = async (req, res, next)=>{
+      try {
+        let data = await Hotel.find(
+            {
+                "$or":[
+                    {hotelName:{$regex:req.params.key}},
+                    {city:{$regex:req.params.key}},
+                    {hotelCustomId:{$regex:req.params.key}}
+                ]
+            }
+        )
+              res.send(data)
+      } catch (err) {
+          next(err)
+      }
+}
+  
+
+// const getSearchHotels = async (req, res, next)=>{
+//   const {hotelName, state, ...others}= req.query
 //     try {
 //         const hotels = await Hotel.find({
 //             ...others,
-//             cheapestPrice: {$gt: min | 1, $lt: max || 999},
-//         }).limit(req.query.limit)
+//              hotelName: hotelName, 
+//              state : state
+//             })
 //             res.status(200).json(hotels)
 //     } catch (err) {
 //         next(err)
 //     }
 // }
+
+// const getSearchHotels = async (req, res, next)=>{
+//     const {hotelName, state, ...others}= req.query
+//       try {
+//           const hotels = await Hotel.find({
+//               ...others,
+              
+//           }).limit(req.query.limit)
+//               res.status(200).json(hotels)
+//       } catch (err) {
+//           next(err)
+//       }
+//   }
 
 //  const countByCity = async (req, res, next)=>{
 //     const cities = req.query.cities.split(",")
@@ -191,5 +223,5 @@ const getHotelRooms = async (req, res, next)=>{
 
 
 module.exports ={
-    createHotel, updateHotel, AdminHotel, OwnersetHotelToBookable, deleteHotel, getHotel, getHotels, getOwnerHotels, getOwnerSingleHotel,getHotelRooms 
+    createHotel, updateHotel, AdminHotel, OwnersetHotelToBookable, deleteHotel, getHotel, getHotels, getOwnerHotels, getOwnerSingleHotel,getHotelRooms, getSearchHotels
 }

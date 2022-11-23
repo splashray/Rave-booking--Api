@@ -1,8 +1,7 @@
-
 const express = require('express')
 const router = express.Router()
 
-const  {createHotel, deleteHotel, getHotel, getHotelRooms, getHotels, getOwnerHotels, getOwnerSingleHotel, updateHotel, AdminHotel, OwnersetHotelToBookable } = require("../controllers/hotelController");
+const  {createHotel, deleteHotel, getHotel, getHotelRooms, getHotels, getOwnerHotels, getOwnerSingleHotel, updateHotel, AdminHotel, OwnersetHotelToBookable, getSearchHotels } = require("../controllers/hotelController");
 const { isKycOwner, isVerifiedOwner, verifyAdmin, verifyToken } = require("../utils/verifyToken");
 
 // create hotel by verified owners
@@ -34,10 +33,10 @@ router.get("/find/:id", getHotel)
 //get all
 router.get("/", getHotels)
 
-//get city
-// router.get("/countByCity", countByCity)
+// get search hotel
+router.get("/searchresult", getSearchHotels)
 
-// //get type
+//get type
 // router.get("/countByType", countByType)
 
 //get room
