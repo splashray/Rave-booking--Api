@@ -5,12 +5,14 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "swagger-autogen": "node swagger.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "and": "^0.0.3",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
@@ -21,7 +23,9 @@
     "nodemailer": "^6.8.0",
     "nodemon": "^2.0.20",
     "passport": "^0.6.0",
-    "passport-google-oauth2": "^0.2.0"
+    "passport-google-oauth2": "^0.2.0",
+    "swagger-autogen": "^2.22.0",
+    "swagger-ui-express": "^4.6.0"
   },
   "engine": {
     "node": "14.x",

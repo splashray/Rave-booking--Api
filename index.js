@@ -2,6 +2,8 @@ const express = require('express')
 const mongoose = require('mongoose')
 // const bodyParser = require('body-parser')
 // const cookieParser = require('cookie-Parser')
+const swaggerUi = require('swagger-ui-express')
+const swaggerFile = require('./swagger_output.json')
 const cors = require('cors')
 const config = require('./utils/config')
 const authRouter = require('./routes/authRouter')
@@ -42,6 +44,7 @@ app.use('/api/rooms', roomsRouter);
 app.use('/api/kycs', kycsRouter);
 
 
+
 app.use((err, req, res, next)=>{
   const errorStatus = err.status || 500
   const errorMessage = err.message || "Something went wrong!"
@@ -53,6 +56,7 @@ app.use((err, req, res, next)=>{
   })
 })
 
+app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile))
 app.use(notFound)
 
 app.listen(config.PORT , ()=>{

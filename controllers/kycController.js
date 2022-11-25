@@ -3,6 +3,8 @@ const Owner = require('../models/ownerModel')
 const createError = require('../utils/error')
 
 const createKyc  = async (req, res, next)=>{
+    // #swagger.tags = ['Kyc']
+    // #swagger.description = 'Endpoint to create Kyc Details of owner.'
     try {
         const newKyc = new Kyc({ ...req.body, user: req.user.id, email:req.user.email, submitted: true })
         await newKyc.save()
@@ -13,6 +15,8 @@ const createKyc  = async (req, res, next)=>{
 }
 
  const updateKyc = async (req, res, next)=>{
+    // #swagger.tags = ['Kyc']
+    // #swagger.description = 'Endpoint to update Kyc Details of owner.'
     try {
         const updatedKyc = await Kyc.findByIdAndUpdate(
             req.params.id, 

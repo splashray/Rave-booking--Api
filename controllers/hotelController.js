@@ -3,6 +3,9 @@ const Room = require('../models/roomModel')
 const {sendNewHotelRegistrationEmail} = require('../utils/email')
 
 const createHotel = async (req, res, next) => {
+    	// #swagger.tags = ['Hotels']
+        // #swagger.description = 'Endpoint to create Hotel.'
+
     const generateId = async() => {
         // genhotelCustomId 
         var genhotelCustomId = Math.floor(Math.random() * 10000000) + 10000000
