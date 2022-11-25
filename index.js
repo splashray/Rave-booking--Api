@@ -1,7 +1,7 @@
 const express = require('express')
 const mongoose = require('mongoose')
-const bodyParser = require('body-parser')
-const cookieParser = require('cookie-Parser')
+// const bodyParser = require('body-parser')
+// const cookieParser = require('cookie-Parser')
 const cors = require('cors')
 const config = require('./utils/config')
 const authRouter = require('./routes/authRouter')
@@ -26,9 +26,9 @@ mongoose.connect(config.MONGODB_URL, {
 
 //middleware
 app.use(cors());
-app.use(cookieParser())
+// app.use(cookieParser())
 app.use(express.json())
-app.use(bodyParser.json())
+// app.use(bodyParser.json())
 
 app.get('/', (req, res) => {
     res.send('Welcome to Awuf-Booking Api')
