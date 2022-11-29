@@ -42,7 +42,11 @@ const doc = {
         },
           {
             "name": "Rooms",
-            "description": "KYC Endpoints"
+            "description": "Roooms Endpoints"
+        },
+        {
+            "name": "Bookings",
+            "description": "Bookings Endpoints"
         },
         
         

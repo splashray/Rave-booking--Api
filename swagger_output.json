@@ -34,7 +34,11 @@
     },
     {
       "name": "Rooms",
-      "description": "KYC Endpoints"
+      "description": "Roooms Endpoints"
+    },
+    {
+      "name": "Bookings",
+      "description": "Bookings Endpoints"
     }
   ],
   "schemes": [
@@ -575,7 +579,10 @@
         }
       },
       "get": {
-        "description": "",
+        "tags": [
+          "Hotels"
+        ],
+        "description": "Endpoint to get all Hotels.",
         "parameters": [],
         "responses": {
           "200": {
@@ -586,7 +593,10 @@
     },
     "/api/hotels/owners/": {
       "get": {
-        "description": "",
+        "tags": [
+          "Hotels"
+        ],
+        "description": "Endpoint to get Hotels by a specific owner.",
         "parameters": [
           {
             "name": "authorization",
@@ -609,7 +619,10 @@
     },
     "/api/hotels/owners/{hotelid}": {
       "get": {
-        "description": "",
+        "tags": [
+          "Hotels"
+        ],
+        "description": "Endpoint to get a Hotel by an id of a specific owner.",
         "parameters": [
           {
             "name": "hotelid",
@@ -673,7 +686,10 @@
     },
     "/api/hotels/edit/{id}": {
       "put": {
-        "description": "",
+        "tags": [
+          "Hotels"
+        ],
+        "description": "Endpoint to Update Hotel.",
         "parameters": [
           {
             "name": "id",
@@ -741,7 +757,10 @@
         }
       },
       "delete": {
-        "description": "",
+        "tags": [
+          "Hotels"
+        ],
+        "description": "Endpoint to Delete Hotel.",
         "parameters": [
           {
             "name": "id",
@@ -767,7 +786,10 @@
     },
     "/api/hotels/find/{id}": {
       "get": {
-        "description": "",
+        "tags": [
+          "Hotels"
+        ],
+        "description": "Endpoint to get a Hotel by id.",
         "parameters": [
           {
             "name": "id",
@@ -785,7 +807,10 @@
     },
     "/api/hotels/searchresult": {
       "get": {
-        "description": "",
+        "tags": [
+          "Hotels"
+        ],
+        "description": "Endpoint to get Hotels by search queries.",
         "parameters": [],
         "responses": {
           "200": {
@@ -796,7 +821,10 @@
     },
     "/api/hotels/room/{id}": {
       "get": {
-        "description": "",
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Endpoint to get Roooms by a specific hotel.",
         "parameters": [
           {
             "name": "id",
@@ -1189,6 +1217,113 @@
     "/api/kycs/admin/{id}": {
       "get": {
         "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/bookings/": {
+      "post": {
+        "tags": [
+          "Bookings"
+        ],
+        "description": "Endpoint to create booking.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "price": {
+                  "example": "any"
+                },
+                "email": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Bookings"
+        ],
+        "description": "Endpoint to get all booking.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/bookings/{id}": {
+      "get": {
+        "tags": [
+          "Bookings"
+        ],
+        "description": "Endpoint to get a booking by id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Bookings"
+        ],
+        "description": "Endpoint to Delete booking.",
         "parameters": [
           {
             "name": "id",
