@@ -12,6 +12,7 @@ const usersRouter = require('./routes/userRouter')
 const hotelsRouter = require('./routes/hotelRouter')
 const roomsRouter = require('./routes/roomRouter')
 const kycsRouter = require('./routes/kycRouter')
+const bookingsRouter = require('./routes/bookingRouter')
 const notFound = require('./middlewares/not-found')
 
 
@@ -42,6 +43,7 @@ app.use('/api/users', usersRouter);
 app.use('/api/hotels', hotelsRouter);
 app.use('/api/rooms', roomsRouter);
 app.use('/api/kycs', kycsRouter);
+app.use('/api/bookings', bookingsRouter);
 
 
 

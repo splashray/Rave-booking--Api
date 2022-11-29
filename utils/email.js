@@ -20,7 +20,7 @@ transporter.verify((error,success)=>{
 })
 
 
-    //send verification email
+    //send hotel new listing email
 const sendNewHotelRegistrationEmail = ({hotelCustomId,category,hotelBasicInfo, email}, res) => {
         const { hotelName,starRating,contactName,contactPhone,altPhone,ManyHotelOptions,streetAddress,city,state,country } = hotelBasicInfo
             //mail options
@@ -43,20 +43,60 @@ const sendNewHotelRegistrationEmail = ({hotelCustomId,category,hotelBasicInfo, e
                    <p> <b> State </b>: ${state}. </p>
                    <p> <b> Country </b> : ${country}. </p>
                    <p> While you wait for Awuf-booking to verify your <b>${category}</b> Property, 
-                    Check the Terms and Conditions <a href="https://awuf-booking.netlify.app/owners"><b>here</b></a> </p>`,
+                    Check the Terms and Conditions <a href="https://ravebooking.netlify.app/owners"><b>here</b></a> </p>`,
             } 
 
             transporter.sendMail(mailOptions, function(error, info){
                 if (error) {
                   console.log(error);
                 } else {
-                    res.status(200).json({message:"Confirmation Email has been sent"})
+                    res.status(200).json({message:"New Property Confirmation Email has been sent"})
                   console.log('Email sent: ' + info.response);
                 }
               })
               
     }
 
+    
+    //send new booking email
+const sendNewBookingEmail = ({bookingId,email,hotelDetails,roomDetails,userDetails, BookingStatus,paymentStatus }, res) => {
+    const {hotelName, hotelAddress ,hotelCustomId} = hotelDetails
+    const {roomType, noOfRooms, nightsNumber, checkIn, checkOut, guestCount } = roomDetails 
+    const { firstName, lastName, phoneNumber, gender, address} = userDetails 
+    const {cancelReservation, confirmCheckIn, confirmCheckOut} = BookingStatus 
+    const { price } = paymentStatus
+        //mail options
+        const mailOptions = {
+        from: config.AUTH_EMAIL,
+        to: `${email}`,
+        subject: `Booking-${bookingId}: You have a  New Booking from Awuf-booking`,
+        html: `<p>Your new booking is now available with Awuf-booking .</p>
+               <p>Booking details includes of Hotel:<b>${hotelName}</b> , <b>${hotelAddress}</b> , 
+               <b>${hotelCustomId}</b> </p>
+
+               <p>Booking details includes of Room:<b>${roomType}</b> , <b>${noOfRooms}</b> , 
+               <b>${nightsNumber}</b>, <b>${checkIn}</b>, <b>${checkOut}</b>, <b>${guestCount}</b> </p>
+
+               <p>Booking details includes of your Personal details:<b>${firstName}</b> , <b>${lastName}</b> , 
+               <b>${phoneNumber}</b>, <b>${gender}</b>, <b>${address}</b> </p>
+
+               <p>Booking details includes of your Booking status:<b>${cancelReservation}</b> , <b>${confirmCheckIn}</b> , 
+               <b>${confirmCheckOut}</b>, and Payment<b>${price}</b> </p>
+
+                Check the Terms and Conditions <a href="https://ravebooking.netlify.app/owners"><b>here</b></a> </p>`,
+        } 
+
+        transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+                res.status(200).json({message:"Booking Confirmation Email has been sent"})
+              console.log('Email sent: ' + info.response);
+            }
+          })
+          
+}
+
 module.exports ={
-    sendNewHotelRegistrationEmail
+    sendNewHotelRegistrationEmail, sendNewBookingEmail
 }

@@ -21,7 +21,7 @@ const createHotel = async (req, res, next) => {
                 try {
                     newHotel.save()
                     .then(result=>{
-                        // handle account verification
+                        //send hotel new listing email
                         sendNewHotelRegistrationEmail(result, res)
                     }).catch(err =>{
                         console.log(err);
@@ -39,6 +39,8 @@ const createHotel = async (req, res, next) => {
 }
 
 const updateHotel = async (req, res, next)=>{
+    // #swagger.tags = ['Hotels']
+    // #swagger.description = 'Endpoint to Update Hotel.'
     try {
         const updatedHotel = await Hotel.findByIdAndUpdate(
             req.params.id, 
@@ -80,6 +82,8 @@ const OwnersetHotelToBookable = async (req, res, next)=>{
 }
 
 const deleteHotel = async (req, res, next)=>{
+    // #swagger.tags = ['Hotels']
+    // #swagger.description = 'Endpoint to Delete Hotel.'
     try {
         await Hotel.findByIdAndDelete(
             req.params.id
@@ -91,6 +95,8 @@ const deleteHotel = async (req, res, next)=>{
 }
 
 const getHotel = async (req, res, next)=>{
+    // #swagger.tags = ['Hotels']
+    // #swagger.description = 'Endpoint to get a Hotel by id.'
     try {
         const hotel = await Hotel.findById(
             req.params.id
@@ -102,6 +108,8 @@ const getHotel = async (req, res, next)=>{
 }
 
 const getHotels = async (req, res, next)=>{
+    // #swagger.tags = ['Hotels']
+    // #swagger.description = 'Endpoint to get all Hotels.'
       try {
           const hotels = await Hotel.find({})
               res.status(200).json({hotels:hotels})
@@ -111,6 +119,9 @@ const getHotels = async (req, res, next)=>{
   }
 
 const getOwnerHotels = async (req, res, next)=>{
+    	// #swagger.tags = ['Hotels']
+        // #swagger.description = 'Endpoint to get Hotels by a specific owner.'
+
     try {
         // const ownerId = req.params.ownerid
         const hotels = await Hotel.find({user:req.user.id})
@@ -125,6 +136,8 @@ const getOwnerHotels = async (req, res, next)=>{
 }
 
 const getOwnerSingleHotel = async (req, res, next)=>{
+    // #swagger.tags = ['Hotels']
+    // #swagger.description = 'Endpoint to get a Hotel by an id of a specific owner.'
     try {
         const hotel = await Hotel.findOne(
             {_id:req.params.hotelid, user:req.user.id}
@@ -136,6 +149,8 @@ const getOwnerSingleHotel = async (req, res, next)=>{
 }
 
 const getSearchHotels = async (req, res, next)=>{
+    // #swagger.tags = ['Hotels']
+    // #swagger.description = 'Endpoint to get Hotels by search queries.'
       try {
         let data = await Hotel.find(
             {
@@ -213,6 +228,8 @@ const getSearchHotels = async (req, res, next)=>{
 // }
 
 const getHotelRooms = async (req, res, next)=>{
+    // #swagger.tags = ['Rooms']
+    // #swagger.description = 'Endpoint to get Roooms by a specific hotel.'
     try{
         const hotel = await Hotel.findById(req.params.id)
         const list = await Promise.all(hotel.rooms.map(room=>{
