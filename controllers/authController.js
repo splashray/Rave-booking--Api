@@ -22,12 +22,21 @@ const {generateToken} = require('../utils/verifyToken')
         const salt = bcrypt.genSaltSync(10)
         const hash = bcrypt.hashSync(req.body.password, salt)
 
+        // Check if an existing owner has the same email with the new owner
+        const emailExists = await Owner.findOne({ email: req.body.email })
+
+        if(emailExists){
+           return res.status(400).json({message: "The email address provided is in use by an existing owner."}).end()
+        }
+
         const newOwner = new Owner({
             ...req.body,
             password:hash,
         })
+
         await newOwner.save()
-         res.status(200).json({message: "Property Owner has been created."})
+        
+        res.status(200).json({message: "Property Owner has been created."})
     } catch (err) {
         next(err)
     }
@@ -94,7 +103,7 @@ const {generateToken} = require('../utils/verifyToken')
         //empty login parameters
         if(email ==="" || password ==="") return next(createError(400, "password or Email field is Empty!"))
 
-        const  signinUser = await User.findOne({email:email.toLowerCase()}) 
+        const  signinUser = await User.findOne({email:email.toLowerCase()}).exec(); 
         if(!signinUser) return next(createError(404, "User not found"))
         const  isPasswordCorrect = await bcrypt.compare(password, signinUser.password)
         if(!isPasswordCorrect) return next(createError(400, "Wrong password or Email!"))
