@@ -26,10 +26,18 @@ const {generateToken} = require('../utils/verifyToken')
             ...req.body,
             password:hash,
         })
-        await newOwner.save()
+        
+        const saveResult = await newOwner.save()
+
          res.status(200).json({message: "Property Owner has been created."})
     } catch (err) {
-        next(err)
+        console.log(err)
+
+        if(err.code === 11000){
+            res.status(400).json({message: "Email address not available. Please specify another email address."})
+        }else{
+            next(err)
+        }
     }
 }
 
@@ -39,9 +47,13 @@ const {generateToken} = require('../utils/verifyToken')
         //empty login parameters
         
         if(email ==="" || password ==="") return next(createError(400, "password or Email field is Empty!"))
-        const  signinOwner = await Owner.findOne({email:email.toLowerCase()}) 
+        
+        const  signinOwner = await Owner.findOne({email:email.toLowerCase()})
+
         if(!signinOwner) return next(createError(404, "User not found"))
+        
         const  isPasswordCorrect = await bcrypt.compare(password, signinOwner.password)
+        
         if(!isPasswordCorrect) return next(createError(400, "Wrong password or Email!"))
         
         res.status(200).send({
@@ -72,7 +84,7 @@ const {generateToken} = require('../utils/verifyToken')
     }
 }
 
- const userRegister  = async (req, res, next)=>{
+const userRegister  = async (req, res, next)=>{
     try {
         const salt = bcrypt.genSaltSync(10)
         const hash = bcrypt.hashSync(req.body.password, salt)
