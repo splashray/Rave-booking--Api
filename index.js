@@ -18,7 +18,9 @@ const notFound = require('./middlewares/not-found')
 
 const app = express();
 
-mongoose.connect(config.MONGODB_URL, {
+mongoose.connect(config.MONGODB_URL, { 
+  useNewUrlParser: true, 
+  useUnifiedTopology: true
 })
 .then(()=>{
   console.log('Connected to mongodb.');
