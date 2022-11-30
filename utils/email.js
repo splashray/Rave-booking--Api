@@ -13,14 +13,14 @@ transporter.verify((error,success)=>{
     if(error){
         console.log(error);
     }else{
-        console.log("Ready for Massage ");
+        console.log("Ready for Message ");
         console.log(success);
     }
 
 })
 
 
-    //send hotel new listing email
+//send hotel new listing email
 const sendNewHotelRegistrationEmail = ({hotelCustomId,category,hotelBasicInfo, email}, res) => {
         const { hotelName,starRating,contactName,contactPhone,altPhone,ManyHotelOptions,streetAddress,city,state,country } = hotelBasicInfo
             //mail options
@@ -49,6 +49,7 @@ const sendNewHotelRegistrationEmail = ({hotelCustomId,category,hotelBasicInfo, e
             transporter.sendMail(mailOptions, function(error, info){
                 if (error) {
                   console.log(error);
+                  res.status(200).json({ message: "You will receive a confirmation email soon." });
                 } else {
                     res.status(200).json({message:"New Property Confirmation Email has been sent"})
                   console.log('Email sent: ' + info.response);

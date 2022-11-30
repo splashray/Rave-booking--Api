@@ -156,21 +156,59 @@ const getSearchHotels = async (req, res, next)=>{
     // #swagger.tags = ['Hotels']
     // #swagger.description = 'Endpoint to get Hotels by search queries.'
       try {
-        let data = await Hotel.find(
-            {
-                "$or":[
-                    {hotelName:{$regex:req.params.key}},
-                    {city:{$regex:req.params.key}},
-                    {hotelCustomId:{$regex:req.params.key}}
-                ]
-            }
-        )
-              res.send(data)
+        const { searchInput } = req.params
+
+        const searchParamsArr = searchInput.trim().split(' ')
+
+        const hotelCity = searchParamsArr.length === 2 ? searchParamsArr[0] : searchInput
+
+        const hotelName = searchParamsArr.length === 2 ? searchParamsArr[1] : ''
+
+        let data = await Hotel.find({
+            $and: [
+                {'hotelBasicInfo.city': {$regex: hotelCity, $options: 'i'}},
+                {'hotelBasicInfo.hotelName': {$regex: hotelName, $options: 'i'}}
+            ]}
+        ).exec()
+        
+        if(!data){
+            data = await Hotel.find({
+                $or: [{'hotelBasicInfo.city': {$regex: hotelCity, $options: 'i'}},
+                {'hotelBasicInfo.hotelName': {$regex: hotelName, $options: 'i'}} 
+            ]})
+        }
+
+        res.send(data)
+
       } catch (err) {
           next(err)
       }
 }
-  
+
+const getSearchHotelById = async (req, res, next)=>{
+    
+    try {
+    const { hotelCustomId } = req.params    
+
+    const searchResultsArr = []
+
+    let matchedHotel = await Hotel.findOne({ hotelCustomId }).exec()
+    
+    searchResultsArr.push(matchedHotel)
+
+    otherHotels = await Hotel.find({
+        'hotelBasicInfo.city': {$regex: matchedHotel.hotelBasicInfo.city, $options: 'i'}, 
+        hotelCustomId: {$ne : hotelCustomId}
+    })
+    
+    searchResultsArr.push(...otherHotels)
+
+    res.send(searchResultsArr)
+
+    } catch (err) {
+        next(err)
+    }
+}
 
 // const getSearchHotels = async (req, res, next)=>{
 //   const {hotelName, state, ...others}= req.query
@@ -247,5 +285,16 @@ const getHotelRooms = async (req, res, next)=>{
 
 
 module.exports ={
-    createHotel, updateHotel, AdminHotel, OwnersetHotelToBookable, deleteHotel, getHotel, getHotels, getOwnerHotels, getOwnerSingleHotel,getHotelRooms, getSearchHotels
+    createHotel, 
+    updateHotel, 
+    AdminHotel, 
+    OwnersetHotelToBookable, 
+    deleteHotel, 
+    getHotel, 
+    getHotels, 
+    getOwnerHotels, 
+    getOwnerSingleHotel,
+    getHotelRooms, 
+    getSearchHotels,
+    getSearchHotelById
 }
