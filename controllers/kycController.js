@@ -32,6 +32,8 @@ const createKyc  = async (req, res, next)=>{
 }
 
 const updateFailedKycByAdmin = async (req, res, next)=>{
+    // #swagger.tags = ['Kyc']
+    // #swagger.description = 'Endpoint to update (Failed Kyc By Admin) Kyc Details of owner.'
     try {
         const updatedKycStatus = await Kyc.findByIdAndUpdate(
             req.params.id, 
@@ -47,6 +49,8 @@ const updateFailedKycByAdmin = async (req, res, next)=>{
 }
 
 const updateSuccessKycByAdmin = async (req, res, next)=>{
+    // #swagger.tags = ['Kyc']
+    // #swagger.description = 'Endpoint to update (Success Kyc By Admin) Kyc Details of owner.'
     try {
         const updatedKycStatus = await Kyc.findByIdAndUpdate(
             req.params.id, 
@@ -73,6 +77,8 @@ const updateSuccessKycByAdmin = async (req, res, next)=>{
 }
 
 const deleteKycByAdmin = async (req, res, next)=>{
+     // #swagger.tags = ['Kyc']
+    // #swagger.description = 'Endpoint to delete (Delete Kyc By Admin) Kyc Details of owner.'
     try {
        const deleteKyc =  await Kyc.findByIdAndDelete(req.params.id)
        if(!deleteKyc) return next(createError(401, "Kyc Details Not Found'!"))
@@ -83,6 +89,8 @@ const deleteKycByAdmin = async (req, res, next)=>{
 }
 
  const getKyc = async (req, res, next)=>{
+    // #swagger.tags = ['Kyc']
+    // #swagger.description = 'Endpoint to get Kyc Details of owner.'
     try {
         const kycDetails = await Kyc.findById( req.params.id)
          if(!kycDetails) return next(createError(401, "Owner kyc Details Not Found'!"))
@@ -94,6 +102,8 @@ const deleteKycByAdmin = async (req, res, next)=>{
 
 
 const getKycByAdmin = async (req, res, next)=>{
+     // #swagger.tags = ['Kyc']
+    // #swagger.description = 'Endpoint to Get (Get Kyc By Admin) Kyc Details of owner.'
     try {
         const kycDetails = await Kyc.findById( req.params.id)
          if(!kycDetails) return next(createError(401, "Owner kyc Details Not Found'!"))
@@ -104,6 +114,8 @@ const getKycByAdmin = async (req, res, next)=>{
 }
 
 const getAllOwnersKycByAdmin = async (req, res, next)=>{
+    // #swagger.tags = ['Kyc']
+    // #swagger.description = 'Endpoint to Get (get All Owner Kyc By Admin) Kyc Details of owner.'
     try {
         const kycDetails = await Kyc.find()
          if(!kycDetails) return next(createError(401, "Owners kyc Details are Not Found'!"))

@@ -59,12 +59,11 @@ const sendNewHotelRegistrationEmail = ({hotelCustomId,category,hotelBasicInfo, e
 
     
     //send new booking email
-const sendNewBookingEmail = ({bookingId,email,hotelDetails,roomDetails,userDetails, BookingStatus,paymentStatus }, res) => {
+const sendNewBookingEmail = ({bookingId,email,hotelDetails,roomDetails,userDetails, BookingStatus,price }, res) => {
     const {hotelName, hotelAddress ,hotelCustomId} = hotelDetails
     const {roomType, noOfRooms, nightsNumber, checkIn, checkOut, guestCount } = roomDetails 
     const { firstName, lastName, phoneNumber, gender, address} = userDetails 
     const {cancelReservation, confirmCheckIn, confirmCheckOut} = BookingStatus 
-    const { price } = paymentStatus
         //mail options
         const mailOptions = {
         from: config.AUTH_EMAIL,

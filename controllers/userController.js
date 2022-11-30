@@ -4,6 +4,9 @@ const createError = require('../utils/error')
 
 
  const updateUser = async (req, res, next)=>{
+    // #swagger.tags = ['Users']
+    // #swagger.description = 'Endpoint to update User's details.'
+
     try {
         const updatedUser = await User.findByIdAndUpdate(
             req.params.id, 
@@ -17,6 +20,8 @@ const createError = require('../utils/error')
     }
 }
  const updateUserPassword = async (req, res, next)=>{
+    // #swagger.tags = ['Users']
+    // #swagger.description = 'Endpoint to update User's password.'
     try {
         const salt = bcrypt.genSaltSync(10)
         const hash = bcrypt.hashSync(req.body.npassword, salt)
@@ -40,6 +45,8 @@ const createError = require('../utils/error')
 }
 
  const deleteUser = async (req, res, next)=>{
+    // #swagger.tags = ['Users']
+    // #swagger.description = 'Endpoint to Delete User.'
     try {
        const user =  await User.findByIdAndDelete(req.params.id)
        if(!user) return next(createError(401, "User Not Found'!"))
@@ -50,6 +57,8 @@ const createError = require('../utils/error')
 }
 
  const getUser = async (req, res, next)=>{
+    // #swagger.tags = ['Users']
+    // #swagger.description = 'Endpoint to Get a User.'
     try {
         const user = await User.findById( req.params.id)
          if(!user) return next(createError(401, "User Not Found'!"))
@@ -60,6 +69,8 @@ const createError = require('../utils/error')
 }
 
  const getUsers = async (req, res, next)=>{
+    // #swagger.tags = ['Users']
+    // #swagger.description = 'Endpoint to Get all Users.'
     try {
         const users = await User.find()
         if(!users) return next(createError(401, "Users Not Found'!"))

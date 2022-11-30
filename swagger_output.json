@@ -9,6 +9,10 @@
   "basePath": "/",
   "tags": [
     {
+      "name": "Auth",
+      "description": "Authentication Endpoints"
+    },
+    {
       "name": "Hotels",
       "description": "Hotels Endpoints"
     },
@@ -72,7 +76,10 @@
     },
     "/api/auth/owner/register/check": {
       "post": {
-        "description": "",
+        "tags": [
+          "Auth"
+        ],
+        "description": "Endpoint to Check Owner",
         "parameters": [
           {
             "name": "body",
@@ -80,7 +87,7 @@
             "schema": {
               "type": "object",
               "properties": {
-                "email": {
+                "password": {
                   "example": "any"
                 }
               }
@@ -90,16 +97,16 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
           }
         }
       }
     },
     "/api/auth/owner/register": {
       "post": {
-        "description": "",
+        "tags": [
+          "Auth"
+        ],
+        "description": "Endpoint to Register Owner",
         "parameters": [
           {
             "name": "body",
@@ -107,6 +114,9 @@
             "schema": {
               "type": "object",
               "properties": {
+                "email": {
+                  "example": "any"
+                },
                 "password": {
                   "example": "any"
                 }
@@ -123,34 +133,10 @@
     },
     "/api/auth/owner/login": {
       "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "email": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
-                }
-              }
-            }
-          }
+        "tags": [
+          "Auth"
         ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/auth/user/register/check": {
-      "post": {
-        "description": "",
+        "description": "Endpoint to Login Owner",
         "parameters": [
           {
             "name": "body",
@@ -175,9 +161,12 @@
         }
       }
     },
-    "/api/auth/user/register": {
+    "/api/auth/user/register/check": {
       "post": {
-        "description": "",
+        "tags": [
+          "Auth"
+        ],
+        "description": "Endpoint to Check User",
         "parameters": [
           {
             "name": "body",
@@ -199,9 +188,12 @@
         }
       }
     },
-    "/api/auth/user/login": {
+    "/api/auth/user/register": {
       "post": {
-        "description": "",
+        "tags": [
+          "Auth"
+        ],
+        "description": "Endpoint to Register User",
         "parameters": [
           {
             "name": "body",
@@ -226,9 +218,22 @@
         }
       }
     },
+    "/api/auth/user/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "Endpoint to Login User",
+        "parameters": [],
+        "responses": {}
+      }
+    },
     "/api/owners/{id}": {
       "put": {
-        "description": "",
+        "tags": [
+          "Owners"
+        ],
+        "description": "Endpoint to update Owner",
         "parameters": [
           {
             "name": "id",
@@ -252,7 +257,10 @@
         }
       },
       "delete": {
-        "description": "",
+        "tags": [
+          "Owners"
+        ],
+        "description": "Endpoint to Delete a Owner",
         "parameters": [
           {
             "name": "id",
@@ -267,16 +275,16 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          },
           "401": {
             "description": "Unauthorized"
           }
         }
       },
       "get": {
-        "description": "",
+        "tags": [
+          "Owners"
+        ],
+        "description": "Endpoint to Get a Owner",
         "parameters": [
           {
             "name": "id",
@@ -291,9 +299,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          },
           "401": {
             "description": "Unauthorized"
           }
@@ -302,7 +307,10 @@
     },
     "/api/owners/pass/{id}": {
       "put": {
-        "description": "",
+        "tags": [
+          "Owners"
+        ],
+        "description": "Endpoint to update Owner",
         "parameters": [
           {
             "name": "id",
@@ -314,21 +322,6 @@
             "name": "authorization",
             "in": "header",
             "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "npassword": {
-                  "example": "any"
-                },
-                "opassword": {
-                  "example": "any"
-                }
-              }
-            }
           }
         ],
         "responses": {
@@ -343,7 +336,10 @@
     },
     "/api/owners/": {
       "get": {
-        "description": "",
+        "tags": [
+          "Owners"
+        ],
+        "description": "Endpoint to Get all Owners.",
         "parameters": [
           {
             "name": "authorization",
@@ -423,7 +419,10 @@
     },
     "/api/users/{id}": {
       "put": {
-        "description": "",
+        "tags": [
+          "Users"
+        ],
+        "description": "Endpoint to update User",
         "parameters": [
           {
             "name": "id",
@@ -438,16 +437,16 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          },
           "401": {
             "description": "Unauthorized"
           }
         }
       },
       "delete": {
-        "description": "",
+        "tags": [
+          "Users"
+        ],
+        "description": "Endpoint to Delete User.",
         "parameters": [
           {
             "name": "id",
@@ -471,7 +470,10 @@
         }
       },
       "get": {
-        "description": "",
+        "tags": [
+          "Users"
+        ],
+        "description": "Endpoint to Get a User.",
         "parameters": [
           {
             "name": "id",
@@ -497,7 +499,10 @@
     },
     "/api/users/pass/{id}": {
       "put": {
-        "description": "",
+        "tags": [
+          "Users"
+        ],
+        "description": "Endpoint to update User",
         "parameters": [
           {
             "name": "id",
@@ -509,27 +514,9 @@
             "name": "authorization",
             "in": "header",
             "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "npassword": {
-                  "example": "any"
-                },
-                "opassword": {
-                  "example": "any"
-                }
-              }
-            }
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          },
           "401": {
             "description": "Unauthorized"
           }
@@ -538,7 +525,10 @@
     },
     "/api/users/": {
       "get": {
-        "description": "",
+        "tags": [
+          "Users"
+        ],
+        "description": "Endpoint to Get all Users.",
         "parameters": [
           {
             "name": "authorization",
@@ -648,7 +638,10 @@
     },
     "/api/hotels/bookable/{id}": {
       "put": {
-        "description": "",
+        "tags": [
+          "Hotels"
+        ],
+        "description": "Endpoint to Update Owners Hotel to Bookable(Admin to update).",
         "parameters": [
           {
             "name": "id",
@@ -715,7 +708,10 @@
     },
     "/api/hotels/{id}": {
       "put": {
-        "description": "",
+        "tags": [
+          "Hotels"
+        ],
+        "description": "Endpoint to Update(Admin to update) Hotel.",
         "parameters": [
           {
             "name": "id",
@@ -842,7 +838,10 @@
     },
     "/api/rooms/owners/all/{hotelid}": {
       "get": {
-        "description": "",
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Endpoint to Get Owner",
         "parameters": [
           {
             "name": "hotelid",
@@ -862,16 +861,16 @@
           },
           "401": {
             "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       }
     },
     "/api/rooms/one/{hotelid}": {
       "post": {
-        "description": "",
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Endpoint to Create a Room.",
         "parameters": [
           {
             "name": "hotelid",
@@ -900,7 +899,10 @@
     },
     "/api/rooms/{id}": {
       "put": {
-        "description": "",
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Endpoint to Update a Room.",
         "parameters": [
           {
             "name": "id",
@@ -924,7 +926,10 @@
         }
       },
       "get": {
-        "description": "",
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Endpoint to Get a Room.",
         "parameters": [
           {
             "name": "id",
@@ -942,7 +947,10 @@
     },
     "/api/rooms/{id}/{hotelid}": {
       "delete": {
-        "description": "",
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Endpoint to Delete(By an Admin) a Room.",
         "parameters": [
           {
             "name": "id",
@@ -974,7 +982,10 @@
     },
     "/api/rooms/": {
       "get": {
-        "description": "",
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Endpoint to Get(Get all rooms by Admin) all Rooms.",
         "parameters": [
           {
             "name": "authorization",
@@ -994,7 +1005,10 @@
     },
     "/api/rooms/owners/{roomid}/{hotelid}": {
       "get": {
-        "description": "",
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Endpoint to Get Owner",
         "parameters": [
           {
             "name": "roomid",
@@ -1015,9 +1029,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          },
           "401": {
             "description": "Unauthorized"
           }
@@ -1076,7 +1087,10 @@
         }
       },
       "delete": {
-        "description": "",
+        "tags": [
+          "Kyc"
+        ],
+        "description": "Endpoint to delete (Delete Kyc By Admin) Kyc Details of owner.",
         "parameters": [
           {
             "name": "id",
@@ -1100,7 +1114,10 @@
         }
       },
       "get": {
-        "description": "",
+        "tags": [
+          "Kyc"
+        ],
+        "description": "Endpoint to get Kyc Details of owner.",
         "parameters": [
           {
             "name": "id",
@@ -1126,7 +1143,10 @@
     },
     "/api/kycs/failed/{id}": {
       "put": {
-        "description": "",
+        "tags": [
+          "Kyc"
+        ],
+        "description": "Endpoint to update (Failed Kyc By Admin) Kyc Details of owner.",
         "parameters": [
           {
             "name": "id",
@@ -1164,7 +1184,10 @@
     },
     "/api/kycs/success/{id}/{ownerid}": {
       "put": {
-        "description": "",
+        "tags": [
+          "Kyc"
+        ],
+        "description": "Endpoint to update (Success Kyc By Admin) Kyc Details of owner.",
         "parameters": [
           {
             "name": "id",
@@ -1196,7 +1219,10 @@
     },
     "/api/kycs/admin": {
       "get": {
-        "description": "",
+        "tags": [
+          "Kyc"
+        ],
+        "description": "Endpoint to Get (get All Owner Kyc By Admin) Kyc Details of owner.",
         "parameters": [
           {
             "name": "authorization",
@@ -1216,7 +1242,10 @@
     },
     "/api/kycs/admin/{id}": {
       "get": {
-        "description": "",
+        "tags": [
+          "Kyc"
+        ],
+        "description": "Endpoint to Get (Get Kyc By Admin) Kyc Details of owner.",
         "parameters": [
           {
             "name": "id",
@@ -1248,15 +1277,17 @@
         "description": "Endpoint to create booking.",
         "parameters": [
           {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
                 "price": {
-                  "example": "any"
-                },
-                "email": {
                   "example": "any"
                 }
               }
@@ -1266,6 +1297,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -1620,6 +1654,102 @@
         "rating": {
           "type": "number",
           "example": 5
+        }
+      }
+    },
+    "Booking": {
+      "type": "object",
+      "properties": {
+        "hotelDetails": {
+          "type": "object",
+          "properties": {
+            "hotelId": {
+              "type": "string",
+              "example": "63856ebfc92910673c8a412f"
+            },
+            "hotelCustomId": {
+              "type": "string",
+              "example": "AOW17519787"
+            },
+            "hotelName": {
+              "type": "string",
+              "example": "Grid Hotel"
+            },
+            "hotelAddress": {
+              "type": "string",
+              "example": "Amazona street, ikorodu lagos"
+            }
+          }
+        },
+        "roomDetails": {
+          "type": "object",
+          "properties": {
+            "roomType": {
+              "type": "string",
+              "example": "Double Arena Room"
+            },
+            "noOfRooms": {
+              "type": "number",
+              "example": 2
+            },
+            "nightsNumber": {
+              "type": "number",
+              "example": 5
+            },
+            "checkIn": {
+              "type": "string",
+              "example": "25/11/2022"
+            },
+            "checkOut": {
+              "type": "string",
+              "example": "30/11/2022"
+            },
+            "guestCount": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "picked": {
+                    "type": "string",
+                    "example": "Children"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "example": 5
+                  }
+                }
+              }
+            }
+          }
+        },
+        "userDetails": {
+          "type": "object",
+          "properties": {
+            "firstName": {
+              "type": "string",
+              "example": "John"
+            },
+            "lastName": {
+              "type": "string",
+              "example": "Tayo"
+            },
+            "phoneNumber": {
+              "type": "string",
+              "example": "09031874139"
+            },
+            "gender": {
+              "type": "string",
+              "example": "Male"
+            },
+            "address": {
+              "type": "string",
+              "example": "32, Toke street, ikorodu"
+            }
+          }
+        },
+        "price": {
+          "type": "number",
+          "example": 39000
         }
       }
     }

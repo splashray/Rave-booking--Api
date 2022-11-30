@@ -11,13 +11,15 @@ const createBooking = async (req, res, next) => {
         //search for availability of generated id
         const search = await Booking.findOne({bookingId:genbookingCustomId})
             if(!search){
-                var number = req.body.price;
-                var percentToGet = 10;
-                var percentCom = (percentToGet / 100) * number;   
+                var number = req.body.price;  // room price
+                var percentToGet = 10;    //company percentage 
+                var percentCom = (percentToGet / 100) * number;  //Commission
+
                 const newBooking = new Booking({
                     ...req.body, 
+                    user: req.user.id, 
+                    email:req.user.email,
                     bookingId: `DA${genbookingCustomId}`,  
-                    email: req.body.email,
                     commission: percentCom
                 })
                 try {

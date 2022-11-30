@@ -17,6 +17,10 @@ const doc = {
     produces: ['application/json'],
     tags: [
         {
+            "name": "Auth",
+            "description": "Authentication Endpoints"
+        },
+        {
             "name": "Hotels",
             "description": "Hotels Endpoints"
         },
@@ -138,7 +142,34 @@ const doc = {
             desc:"best hotel in with diverse features",
             rating:5
 
-        }
+        },
+        Booking:{
+            hotelDetails:{
+                hotelId:"63856ebfc92910673c8a412f",
+                hotelCustomId:"AOW17519787",
+                hotelName:"Grid Hotel",
+                hotelAddress:"Amazona street, ikorodu lagos"
+            },
+        
+            roomDetails:{
+                roomType:"Double Arena Room",
+                noOfRooms:2,
+                nightsNumber:5,
+                checkIn:"25/11/2022",
+                checkOut:"30/11/2022",
+                guestCount:  [{picked: "Adults", amount:2 },{ picked: "Children", amount:5 }]
+            },
+        
+            userDetails:{
+                firstName:"John",
+                lastName:"Tayo",
+                phoneNumber:"09031874139",
+                gender:"Male",
+                address:"32, Toke street, ikorodu"
+            },
+            price: 39000
+        },
+        
         
     }
 
