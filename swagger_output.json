@@ -89,6 +89,9 @@
               "properties": {
                 "password": {
                   "example": "any"
+                },
+                "email": {
+                  "example": "any"
                 }
               }
             }
@@ -97,6 +100,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           }
         }
       }
@@ -801,13 +807,41 @@
         }
       }
     },
-    "/api/hotels/searchresult": {
+    "/api/hotels/searchresult/{searchInput}": {
       "get": {
         "tags": [
           "Hotels"
         ],
         "description": "Endpoint to get Hotels by search queries.",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "searchInput",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/hotels/searchbyid/{hotelCustomId}": {
+      "get": {
+        "tags": [
+          "Hotels"
+        ],
+        "description": "Endpoint to get Hotels by search of Id.",
+        "parameters": [
+          {
+            "name": "hotelCustomId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
