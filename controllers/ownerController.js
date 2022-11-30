@@ -3,6 +3,8 @@ const Owner = require('../models/ownerModel')
 const createError = require('../utils/error')
 
  const updateOwner = async (req, res, next)=>{
+    // #swagger.tags = ['Owners']
+    // #swagger.description = 'Endpoint to update Owner's Details.'
     try {
         const updatedOwner = await Owner.findByIdAndUpdate(
             req.params.id, 
@@ -16,6 +18,8 @@ const createError = require('../utils/error')
     }
 }
  const updateOwnerPassword = async (req, res, next)=>{
+    // #swagger.tags = ['Owners']
+    // #swagger.description = 'Endpoint to update Owner's Password.'
     try {
         const salt = bcrypt.genSaltSync(10)
         const hash = bcrypt.hashSync(req.body.npassword, salt)
@@ -38,8 +42,9 @@ const createError = require('../utils/error')
     }
 }
 
-
  const deleteOwner = async (req, res, next)=>{
+    // #swagger.tags = ['Owners']
+    // #swagger.description = 'Endpoint to Delete  a Owner's Details.'
     try {
         const owner =  await Owner.findByIdAndDelete(req.params.id )
         if(!owner) return next(createError(401, "Owner Not Found'!"))
@@ -50,6 +55,8 @@ const createError = require('../utils/error')
 }
 
  const getOwner = async (req, res, next)=>{
+    // #swagger.tags = ['Owners']
+    // #swagger.description = 'Endpoint to Get a Owner's Details.'
     try {
         const owner = await Owner.findById(req.params.id)
         if(!owner) return next(createError(401, "Owner Not Found'!"))
@@ -60,7 +67,8 @@ const createError = require('../utils/error')
 }
 
  const getOwners = async (req, res, next)=>{
-
+    // #swagger.tags = ['Owners']
+    // #swagger.description = 'Endpoint to Get all Owners.'
     try {
         const owners = await Owner.find()
         if(!owners) return next(createError(401, "Owner Not Found'!"))

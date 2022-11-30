@@ -3,6 +3,8 @@ const Hotel = require('../models/hotelModel')
 const createError = require('../utils/error')
 
 const createRoom =  async(req,res, next) =>{
+    // #swagger.tags = ['Rooms']
+    // #swagger.description = 'Endpoint to Create a Room.'
     const generateId = async() => {
                 // generateCustomId 
                 var generateCustomId = Math.floor(Math.random() * 10000000) + 10000000
@@ -40,6 +42,8 @@ const createRoom =  async(req,res, next) =>{
 }
 
 const updateRoom = async (req, res, next)=>{
+    // #swagger.tags = ['Rooms']
+    // #swagger.description = 'Endpoint to Update a Room.'
     try {
         const updatedRoom = await Room.findByIdAndUpdate(
             req.params.id, 
@@ -52,6 +56,8 @@ const updateRoom = async (req, res, next)=>{
     }
 }
 const deleteRoom = async (req, res, next)=>{
+      // #swagger.tags = ['Rooms']
+    // #swagger.description = 'Endpoint to Delete(By an Admin) a Room.'
     const hotelId = req.params.hotelid
     try {
         await Room.findByIdAndDelete(req.params.id)
@@ -70,6 +76,8 @@ const deleteRoom = async (req, res, next)=>{
     }
 }
 const getRoom = async (req, res, next)=>{
+    // #swagger.tags = ['Rooms']
+    // #swagger.description = 'Endpoint to Get a Room.'
     try {
         const room = await Room.findById(
             req.params.id
@@ -81,6 +89,8 @@ const getRoom = async (req, res, next)=>{
 }
 
 const getRooms = async (req, res, next)=>{
+    // #swagger.tags = ['Rooms']
+    // #swagger.description = 'Endpoint to Get(Get all rooms by Admin) all Rooms.'
     try {
         const rooms = await Room.find()
             res.status(200).json({rooms:rooms})
@@ -90,6 +100,8 @@ const getRooms = async (req, res, next)=>{
 }
 
 const getOwnerRooms = async (req, res, next)=>{
+    // #swagger.tags = ['Rooms']
+    // #swagger.description = 'Endpoint to Get Owner's Rooms.'
     try {
         const hotelId = req.params.hotelid
         const rooms = await Room.find({user:req.user.id, hotelId:hotelId})
@@ -104,6 +116,8 @@ const getOwnerRooms = async (req, res, next)=>{
 }
 
 const getOwnerSingleRoom = async (req, res, next)=>{
+    // #swagger.tags = ['Rooms']
+    // #swagger.description = 'Endpoint to Get Owner's Single Rooms.'
     const hotelId = req.params.hotelid
     try {
         const room = await Room.findOne({_id:req.params.roomid, user:req.user.id, hotelId:hotelId})

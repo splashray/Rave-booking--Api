@@ -54,6 +54,8 @@ const updateHotel = async (req, res, next)=>{
 }
 
 const AdminHotel = async (req, res, next)=>{
+    // #swagger.tags = ['Hotels']
+    // #swagger.description = 'Endpoint to Update(Admin to update) Hotel.'
     try {
         const updatedHotel = await Hotel.findByIdAndUpdate(
             req.params.id, 
@@ -67,6 +69,8 @@ const AdminHotel = async (req, res, next)=>{
 }
 
 const OwnersetHotelToBookable = async (req, res, next)=>{
+    // #swagger.tags = ['Hotels']
+    // #swagger.description = 'Endpoint to Update Owners Hotel to Bookable(Admin to update).'
     try {
         const updatedHotel = await Hotel.findByIdAndUpdate(
             req.params.id, 

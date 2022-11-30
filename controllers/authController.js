@@ -7,6 +7,8 @@ const {generateToken} = require('../utils/verifyToken')
 
 //Only Owner sections
  const checkEmail  = async (req, res, next)=>{
+    // #swagger.tags = ['Auth']
+    // #swagger.description = 'Endpoint to Check Owner's Email.'
         try {
             const {email} = req.body
            const cEmail = await Owner.findOne({email:email})
@@ -18,6 +20,8 @@ const {generateToken} = require('../utils/verifyToken')
 }
 
  const ownerRegister  = async (req, res, next)=>{
+    // #swagger.tags = ['Auth']
+    // #swagger.description = 'Endpoint to Register Owner's Account.'
     try {
         const salt = bcrypt.genSaltSync(10)
         const hash = bcrypt.hashSync(req.body.password, salt)
@@ -42,6 +46,8 @@ const {generateToken} = require('../utils/verifyToken')
 }
 
  const ownerLogin  = async (req, res, next)=>{
+    // #swagger.tags = ['Auth']
+    // #swagger.description = 'Endpoint to Login Owner's Account.'
     try { 
         const {email, password} = req.body
         //empty login parameters
@@ -74,6 +80,8 @@ const {generateToken} = require('../utils/verifyToken')
 
 //Only Users/Admin sections
  const checkUserEmail  = async (req, res, next)=>{
+    // #swagger.tags = ['Auth']
+    // #swagger.description = 'Endpoint to Check User's Account.'
     try {
         const {email} = req.body
        const cEmail = await User.findOne({email:email})
@@ -84,7 +92,9 @@ const {generateToken} = require('../utils/verifyToken')
     }
 }
 
-const userRegister  = async (req, res, next)=>{
+ const userRegister  = async (req, res, next)=>{
+    // #swagger.tags = ['Auth']
+    // #swagger.description = 'Endpoint to Register User's Account.'
     try {
         const salt = bcrypt.genSaltSync(10)
         const hash = bcrypt.hashSync(req.body.password, salt)
@@ -101,6 +111,8 @@ const userRegister  = async (req, res, next)=>{
 }
 
  const userLogin  = async (req, res, next)=>{
+     // #swagger.tags = ['Auth']
+    // #swagger.description = 'Endpoint to Login User's Account.'
     try {
         const {email, password} = req.body
         //empty login parameters
