@@ -155,30 +155,55 @@ const getOwnerSingleHotel = async (req, res, next)=>{
 const getSearchHotels = async (req, res, next)=>{
     // #swagger.tags = ['Hotels']
     // #swagger.description = 'Endpoint to get Hotels by search queries.'
-      try {
-        const { searchInput } = req.params
 
-        const searchParamsArr = searchInput.trim().split(' ')
-
-        const hotelCity = searchParamsArr.length === 2 ? searchParamsArr[0] : searchInput
-
-        const hotelName = searchParamsArr.length === 2 ? searchParamsArr[1] : ''
-
-        let data = await Hotel.find({
-            $and: [
-                {'hotelBasicInfo.city': {$regex: hotelCity, $options: 'i'}},
-                {'hotelBasicInfo.hotelName': {$regex: hotelName, $options: 'i'}}
-            ]}
-        ).exec()
+    const { searchInput } = req.params
+    
+    const searchParamsArr = searchInput.trim().split(' ').map(searchParam => (new RegExp(searchParam, 'i')))
+    
+    function getCombinations(valuesArray){
+    
+        var combi = [];
+        var temp = [];
+        var slent = Math.pow(2, valuesArray.length);
         
-        if(!data){
-            data = await Hotel.find({
-                $or: [{'hotelBasicInfo.city': {$regex: hotelCity, $options: 'i'}},
-                {'hotelBasicInfo.hotelName': {$regex: hotelName, $options: 'i'}} 
-            ]})
+        for (var i = 0; i < slent; i++)
+        {
+            temp = [];
+            for (var j = 0; j < valuesArray.length; j++)
+            {
+                if ((i & Math.pow(2, j)))
+                {
+                    temp.push(valuesArray[j]);
+                }
+            }
+            if (temp.length == searchParamsArr.length)
+            {
+                combi.push({$and: temp});
+            }
+        }
+        
+        return combi;
+    }
+
+      try {
+
+        const queryOptionsArr = [
+            {'hotelBasicInfo.city':  {$in: searchParamsArr}},
+            {'hotelBasicInfo.hotelName':  {$in: searchParamsArr}},
+            {'hotelBasicInfo.state':  {$in: searchParamsArr}},
+            {'hotelBasicInfo.country':  {$in: searchParamsArr}},
+            {'hotelBasicInfo.streetAddress':  {$in: searchParamsArr}} 
+        ]
+
+        const allQueryCombinations = []
+
+        for(let x = 0; x < searchParamsArr.length; x++){
+            allQueryCombinations.push(...getCombinations(queryOptionsArr))
         }
 
-        res.send(data)
+        data = await Hotel.find({ $or: allQueryCombinations }).exec()
+
+        res.status(200).send(data)
 
       } catch (err) {
           next(err)
@@ -199,13 +224,13 @@ const getSearchHotelById = async (req, res, next)=>{
     searchResultsArr.push(matchedHotel)
 
     otherHotels = await Hotel.find({
-        'hotelBasicInfo.city': {$regex: matchedHotel.hotelBasicInfo.city, $options: 'i'}, 
+        'hotelBasicInfo.city': {$regex: matchedHotel.hotelBasicInfo.city.trim(), $options: 'i'}, 
         hotelCustomId: {$ne : hotelCustomId}
     })
     
     searchResultsArr.push(...otherHotels)
 
-    res.send(searchResultsArr)
+    res.status(200).send(searchResultsArr)
 
     } catch (err) {
         next(err)
