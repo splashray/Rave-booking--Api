@@ -1,8 +1,14 @@
 const Owner = require('../models/ownerModel')
 const User = require('../models/userModel')
+const Verification = require('../models/verificationModel')
+const PasswordReset = require('../models/passwordResetModel')
 const bcrypt = require('bcryptjs')
+const crypto = require('crypto')
+const UUID = require('pure-uuid')
+const mongoose = require('mongoose')
 const createError = require('../utils/error')
 const {generateToken} = require('../utils/verifyToken')
+const { sendOwnerVerificationEmail, sendChangePasswordEmail } = require('../utils/email')
 
 
 //Only Owner sections
@@ -38,9 +44,34 @@ const {generateToken} = require('../utils/verifyToken')
             password:hash,
         })
 
-        await newOwner.save()
+        const verificationId = new UUID(4)
+
+        let ownerSaved = null
+
+        // Create a transaction to execute the two queries below
+        const session = await mongoose.startSession()
+
+        const transaction = await session.withTransaction( async () => {
+
+            ownerSaved = await newOwner.save({session: session})            
+            
+            //Save the verificationId alongside the registered owner's email
+            await new Verification({ verificationId, email: ownerSaved.email }).save({session: session})
+            
+        })
+
+        session.endSession()
         
-        res.status(200).json({message: "Property Owner has been created."})
+        if(transaction && transaction.ok){
+
+            const verificationUrl = `${process.env.SITE_URL}/pages/verify.html?token=${verificationId}`
+            
+            sendOwnerVerificationEmail(ownerSaved, res, verificationUrl)
+            
+            return
+        }
+        
+        res.status(500).json({message: "Failed to create owner"})
     } catch (err) {
         console.log(err)
 
@@ -125,7 +156,7 @@ const {generateToken} = require('../utils/verifyToken')
         //empty login parameters
         if(email ==="" || password ==="") return next(createError(400, "password or Email field is Empty!"))
 
-        const  signinUser = await User.findOne({email:email.toLowerCase()}).exec(); 
+        const  signinUser = await User.findOne({email:email.toLowerCase()}).exec() 
         if(!signinUser) return next(createError(404, "User not found"))
         const  isPasswordCorrect = await bcrypt.compare(password, signinUser.password)
         if(!isPasswordCorrect) return next(createError(400, "Wrong password or Email!"))
@@ -145,6 +176,107 @@ const {generateToken} = require('../utils/verifyToken')
     }
 } 
 
+const ownerVerification = async (req, res, next) => {
+    /**
+       #swagger.tags = ['Auth']
+       #swagger.description = 'Endpoint for owner verification'
+       #swagger.parameters['body'] = {
+          in: 'body',
+          required: true,
+          schema: {
+            $token : '42e2a46a-e56f-4e4d-be0e-0675b7026f58'
+          }
+       }
+     */
+
+    const { token } = req.body
+
+    if(!token) return res.status(400).json({ error: true, message: "Invalid verification token" })
+
+    const verificationDoc = await Verification.findOneAndDelete({ token }, { email: true }).exec()
+
+    if(!verificationDoc) return res.status(400).json({error: true, message: "Token not found"})
+
+    // Set the owner's verified status to true
+    const ownerVerified = await Owner.findOneAndUpdate({ email: verificationDoc.email }, {isVerified: true}).exec()
+
+    if(!ownerVerified) return res.status(500).json({error: true, message: "Internal server error"})
+
+    res.status(200).json({ error: false, message: 'Verification successful'})
+}
+
+const forgotPassword = async (req, res, next) => {
+    /**
+       #swagger.tags = ['Auth']
+       #swagger.description = 'Endpoint for forgot password'
+       #swagger.parameters['body'] = {
+          in: 'body',
+          required: true,
+          schema: {
+            $email : 'test-user@mail.com'
+          }
+       }
+     */
+    const { email } = req.body
+
+    if(!email) return res.status(400).json({error: true, message: 'No email was provided'})
+
+    const userFound = await User.findOne({ email }).exec()
+
+    if(!userFound) return res.status(400).json({error: true, message: 'No user account matches with the provided email' })
+
+    const token = crypto.randomBytes(10).toString("hex")
+
+    const link = `${process.env.SITE_URL}/changepassword/${token}`
+
+    // Save the token and id of user in database
+    const passResetToken = await new PasswordReset({userId: userFound._id, token}).save()
+
+    if(!passResetToken) return res.status(500).json(handleResponse({}, "Operation failed"))
+
+    const emailSent = await sendChangePasswordEmail({ email, link })
+
+    if(emailSent) return res.status(200).json(handleResponse({}, "password reset link sent to your email account"))
+
+    // If email was not sent, remove the saved token
+    await PasswordReset.findByIdAndDelete(passResetToken._id).exec()
+
+    return res.status(500).json(handleResponse({}, "Operation failed"))
+} 
+
+const changePassword = async (req, res) => {
+    /**
+       #swagger.tags = ['Auth']
+       #swagger.description = 'Endpoint for change password'
+       #swagger.parameters['path'] = {
+          in: 'path',
+          required: true,
+          schema: {
+            $token : '42e2a46a-e56f-4e4d-be0e-0675b7026f58'
+          }
+       }
+     */
+    const { token } = req.params
+  
+    if (!token) return res.status(400).json(handleResponse({}, "token is required"))
+
+    const { newpassword, confirmpassword } = req.body
+  
+    if (!newpassword || !confirmpassword) return res.status(400).json(handleResponse({}, "newpassword and confirmpassword are required"))
+  
+    if (newpassword != confirmpassword) return res.status(400).json(handleResponse({}, "Both passwords do not match"))
+  
+    const passResetDoc = await PasswordReset.findOneAndDelete({token}).exec()
+
+    const user = await User.findById(passResetDoc.userId)
+  
+    user.password = await bcrypt.hash(newpassword, 10)
+  
+    await user.save()
+  
+    res.status(200).json(handleResponse({}, "password successfully changed"))
+  }
+
 module.exports ={
-    checkEmail, ownerRegister, ownerLogin, checkUserEmail, userRegister, userLogin
+    checkEmail, ownerRegister, ownerLogin, checkUserEmail, userRegister, userLogin, ownerVerification, forgotPassword, changePassword
 }

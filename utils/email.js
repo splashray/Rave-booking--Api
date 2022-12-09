@@ -1,5 +1,7 @@
 const nodemailer = require('nodemailer')
 const config = require('./../utils/config')
+const hbs = require('nodemailer-express-handlebars')
+const path = require('path')
 
 let transporter = nodemailer.createTransport({
     service: "gmail",
@@ -8,6 +10,18 @@ let transporter = nodemailer.createTransport({
         pass: config.AUTH_PASS,
     }
 })
+
+const handlebarOptions = {
+  viewEngine:{
+    defaultLayout: false,
+    extName: '.handlebars',
+    partialsDir: path.resolve(__dirname, '..', 'email-templates')
+  },
+  viewPath: path.resolve(__dirname, '..', 'email-templates'),
+  extName: '.handlebars'
+}
+
+transporter.use('compile', hbs(handlebarOptions))
 
 transporter.verify((error,success)=>{
     if(error){
@@ -97,6 +111,67 @@ const sendNewBookingEmail = ({bookingId,email,hotelDetails,roomDetails,userDetai
           
 }
 
+//send new owner verification email
+const sendOwnerVerificationEmail = (ownerDetails, res, verificationUrl) => {
+      const {firstName, lastName} = ownerDetails
+
+      //mail options
+      const mailOptions = {
+        from: config.AUTH_EMAIL,
+        to: `${ownerDetails.email}`,
+        subject: `Verification email from Ravebooking`,
+        template: 'ownerVerification',
+        context: {
+          verificationUrl,
+          firstName,
+          lastName
+        },
+      } 
+
+      transporter.sendMail(mailOptions, function(error, info){
+          if (error) {
+            console.log(error);
+            res.status(200).json({message: "You will receive a verification email shortly"})
+          } else {
+            res.status(200).json({message:"Verification Email has been sent"})
+            console.log('Email sent: ' + info.response);
+          }
+        })
+            
+}
+
+//send new owner verification email
+const sendChangePasswordEmail = ({email, link}) => {
+  const {firstName, lastName} = ownerDetails
+
+  //mail options
+  const mailOptions = {
+    from: config.AUTH_EMAIL,
+    to: `${ownerDetails.email}`,
+    subject: `Change password from Ravebooking`,
+    template: 'forgotPassword',
+    context: {
+      email,
+      link
+    },
+  } 
+
+  return new Promise((resolve, reject) => {
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+        resolve(false)
+      } else {
+        console.log('Email sent: ' + info.response);
+        resolve(true)
+      }
+    })
+  })
+}
+
 module.exports ={
-    sendNewHotelRegistrationEmail, sendNewBookingEmail
+  sendNewHotelRegistrationEmail, 
+  sendNewBookingEmail, 
+  sendOwnerVerificationEmail,
+  sendChangePasswordEmail
 }

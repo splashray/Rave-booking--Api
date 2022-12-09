@@ -14,7 +14,8 @@ const roomsRouter = require('./routes/roomRouter')
 const kycsRouter = require('./routes/kycRouter')
 const bookingsRouter = require('./routes/bookingRouter')
 const notFound = require('./middlewares/not-found')
-
+const path = require('path')
+const { expressHbs } = require('express-handlebars')
 
 const app = express();
 
