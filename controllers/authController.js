@@ -116,66 +116,7 @@ const { sendOwnerVerificationEmail, sendChangePasswordEmail } = require('../util
     }
 } 
 
-//Only Users/Admin sections
- const checkUserEmail  = async (req, res, next)=>{
-    // #swagger.tags = ['Auth']
-    // #swagger.description = 'Endpoint to Check User's Account.'
-    try {
-        const {email} = req.body
-       const cEmail = await User.findOne({email:email})
-       if(!cEmail){ res.status(200).json({message: "Email address available."})  }
-       else{ res.status(400).json({message: "Email address already existed, choose another one."}) }
-    } catch (err) {
-        next(err)
-    }
-}
-
- const userRegister  = async (req, res, next)=>{
-    // #swagger.tags = ['Auth']
-    // #swagger.description = 'Endpoint to Register User's Account.'
-    try {
-        const salt = bcrypt.genSaltSync(10)
-        const hash = bcrypt.hashSync(req.body.password, salt)
-
-        const newOwner = new User({
-            ...req.body,
-            password:hash,
-        })
-        await newOwner.save()
-        res.status(200).json({message: "User has been created."})
-    } catch (err) {
-        next(err)
-    }
-}
-
- const userLogin  = async (req, res, next)=>{
-     // #swagger.tags = ['Auth']
-    // #swagger.description = 'Endpoint to Login User's Account.'
-    try {
-        const {email, password} = req.body
-        //empty login parameters
-        if(email ==="" || password ==="") return next(createError(400, "password or Email field is Empty!"))
-
-        const  signinUser = await User.findOne({email:email.toLowerCase()}).exec() 
-        if(!signinUser) return next(createError(404, "User not found"))
-        const  isPasswordCorrect = await bcrypt.compare(password, signinUser.password)
-        if(!isPasswordCorrect) return next(createError(400, "Wrong password or Email!"))
-
-        res.status(200).send({
-            _id: signinUser._id,
-            firstName: signinUser.firstName,
-            lastName: signinUser.lastName,
-            phoneNumber: signinUser.phoneNumber,
-            email: signinUser.email,
-            isAdmin: signinUser.isAdmin,
-            token: generateToken(signinUser),
-        })
-
-    } catch (err) {
-        next(err)
-    }
-} 
-
+//other owners sections
 const ownerVerification = async (req, res, next) => {
     /**
        #swagger.tags = ['Auth']
@@ -276,6 +217,68 @@ const changePassword = async (req, res) => {
   
     res.status(200).json(handleResponse({}, "password successfully changed"))
   }
+
+
+  //Only Users/Admin sections (users and Admin controller are the same)
+ const checkUserEmail  = async (req, res, next)=>{
+    // #swagger.tags = ['Auth']
+    // #swagger.description = 'Endpoint to Check User's Account.'
+    try {
+        const {email} = req.body
+       const cEmail = await User.findOne({email:email})
+       if(!cEmail){ res.status(200).json({message: "Email address available."})  }
+       else{ res.status(400).json({message: "Email address already existed, choose another one."}) }
+    } catch (err) {
+        next(err)
+    }
+}
+
+ const userRegister  = async (req, res, next)=>{
+    // #swagger.tags = ['Auth']
+    // #swagger.description = 'Endpoint to Register User's Account.'
+    try {
+        const salt = bcrypt.genSaltSync(10)
+        const hash = bcrypt.hashSync(req.body.password, salt)
+
+        const newOwner = new User({
+            ...req.body,
+            password:hash,
+        })
+        await newOwner.save()
+        res.status(200).json({message: "User has been created."})
+    } catch (err) {
+        next(err)
+    }
+}
+
+ const userLogin  = async (req, res, next)=>{
+     // #swagger.tags = ['Auth']
+    // #swagger.description = 'Endpoint to Login User's Account.'
+    try {
+        const {email, password} = req.body
+        //empty login parameters
+        if(email ==="" || password ==="") return next(createError(400, "password or Email field is Empty!"))
+
+        const  signinUser = await User.findOne({email:email.toLowerCase()}).exec() 
+        if(!signinUser) return next(createError(404, "User not found"))
+        const  isPasswordCorrect = await bcrypt.compare(password, signinUser.password)
+        if(!isPasswordCorrect) return next(createError(400, "Wrong password or Email!"))
+
+        res.status(200).send({
+            _id: signinUser._id,
+            firstName: signinUser.firstName,
+            lastName: signinUser.lastName,
+            phoneNumber: signinUser.phoneNumber,
+            email: signinUser.email,
+            isAdmin: signinUser.isAdmin,
+            token: generateToken(signinUser),
+        })
+
+    } catch (err) {
+        next(err)
+    }
+} 
+
 
 module.exports ={
     checkEmail, ownerRegister, ownerLogin, checkUserEmail, userRegister, userLogin, ownerVerification, forgotPassword, changePassword
