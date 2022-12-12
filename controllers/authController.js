@@ -9,6 +9,7 @@ const mongoose = require('mongoose')
 const createError = require('../utils/error')
 const {generateToken} = require('../utils/verifyToken')
 const { sendOwnerVerificationEmail, sendChangePasswordEmail } = require('../utils/email')
+const config = require('./../utils/config')
 
 
 //Only Owner sections
@@ -64,7 +65,7 @@ const { sendOwnerVerificationEmail, sendChangePasswordEmail } = require('../util
         
         if(transaction && transaction.ok){
 
-            const verificationUrl = `${process.env.SITE_URL}/pages/verify.html?token=${verificationId}`
+            const verificationUrl = `${config.SITE_URL}/pages/verify.html?token=${verificationId}`
             
             sendOwnerVerificationEmail(ownerSaved, res, verificationUrl)
             
