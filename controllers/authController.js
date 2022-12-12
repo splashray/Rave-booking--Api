@@ -65,7 +65,7 @@ const config = require('./../utils/config')
         
         if(transaction && transaction.ok){
 
-            const verificationUrl = `${config.SITE_URL}/pages/verify.html?token=${verificationId}`
+            const verificationUrl = `https://ravebooking.netlify.app/pages/verify.html?token=${verificationId}`
             
             sendOwnerVerificationEmail(ownerSaved, res, verificationUrl)
             
