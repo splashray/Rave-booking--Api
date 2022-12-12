@@ -25,6 +25,7 @@
     "nodemon": "^2.0.20",
     "passport": "^0.6.0",
     "passport-google-oauth2": "^0.2.0",
+    "pure-uuid": "^1.6.2",
     "swagger-autogen": "^2.22.0",
     "swagger-ui-express": "^4.6.0"
   },
