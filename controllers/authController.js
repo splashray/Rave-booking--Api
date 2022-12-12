@@ -220,7 +220,7 @@ const forgotPassword = async (req, res, next) => {
     const { email } = req.body
 
     if(!email) return res.status(400).json({error: true, message: 'No email was provided'})
-
+       console.log(email, await User.find({}).exec())
     const userFound = await User.findOne({ email }).exec()
 
     if(!userFound) return res.status(400).json({error: true, message: 'No user account matches with the provided email' })
@@ -232,16 +232,16 @@ const forgotPassword = async (req, res, next) => {
     // Save the token and id of user in database
     const passResetToken = await new PasswordReset({userId: userFound._id, token}).save()
 
-    if(!passResetToken) return res.status(500).json(handleResponse({}, "Operation failed"))
+    if(!passResetToken) return res.status(500).json({ error: true,  message: "Operation failed"})
 
     const emailSent = await sendChangePasswordEmail({ email, link })
 
-    if(emailSent) return res.status(200).json(handleResponse({}, "password reset link sent to your email account"))
+    if(emailSent) return res.status(200).json({error: false, message: "password reset link sent to your email account"})
 
     // If email was not sent, remove the saved token
     await PasswordReset.findByIdAndDelete(passResetToken._id).exec()
 
-    return res.status(500).json(handleResponse({}, "Operation failed"))
+    return res.status(500).json({error: true, message: "Operation failed"})
 } 
 
 const changePassword = async (req, res) => {

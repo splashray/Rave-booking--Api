@@ -7,7 +7,7 @@ const createRoom =  async(req,res, next) =>{
     // #swagger.description = 'Endpoint to Create a Room.'
     const generateId = async() => {
                 // generateCustomId 
-                var generateCustomId = Math.floor(Math.random() * 10000000) + 10000000
+                var generateCustomId = Math.floor(Math.random() * 100000) + 100000
                 //search for availability of generated id
                 const search = await Room.findOne({roomCustomId:generateCustomId})
 
@@ -16,7 +16,7 @@ const createRoom =  async(req,res, next) =>{
                             const hotelId = req.params.hotelid
                             const searchHotel = await Hotel.findOne({_id:hotelId})
                             if(searchHotel){
-                                const newRoom = new Room({...req.body, roomCustomId:`RN${generateCustomId}`, user: req.user.id, hotelId:hotelId})
+                                const newRoom = new Room({...req.body, roomCustomId:`R${generateCustomId}`, user: req.user.id, hotelId:hotelId})
                                 const savedRoom = await newRoom.save()
                                 try {
                                     await Hotel.findByIdAndUpdate(hotelId,{

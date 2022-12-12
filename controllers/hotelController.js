@@ -8,13 +8,13 @@ const createHotel = async (req, res, next) => {
 
     const generateId = async() => {
         // genhotelCustomId 
-        var genhotelCustomId = Math.floor(Math.random() * 10000000) + 10000000
+        var genhotelCustomId = Math.floor(Math.random() * 100000) + 100000
         //search for availability of generated id
         const search = await Hotel.findOne({hotelCustomId:genhotelCustomId})
             if(!search){
                 const newHotel = new Hotel({
                     ...req.body, 
-                    hotelCustomId: `AOW${genhotelCustomId}`,  
+                    hotelCustomId: `H-${genhotelCustomId}`,  
                     user: req.user.id, 
                     email:req.user.email 
                 })
