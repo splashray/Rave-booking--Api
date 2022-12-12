@@ -1,5 +1,7 @@
 const nodemailer = require('nodemailer')
 const config = require('./../utils/config')
+const hbs = require('nodemailer-express-handlebars')
+const path = require('path')
 
 let transporter = nodemailer.createTransport({
     service: "gmail",
@@ -8,7 +10,6 @@ let transporter = nodemailer.createTransport({
         pass: config.AUTH_PASS,
     }
 })
-
 transporter.verify((error,success)=>{
     if(error){
         console.log(error);
@@ -19,37 +20,38 @@ transporter.verify((error,success)=>{
 
 })
 
+const handlebarOptions = {
+  viewEngine:{
+    defaultLayout: false,
+    extName: '.handlebars',
+    partialsDir: path.resolve(__dirname, '..', 'email-templates')
+  },
+  viewPath: path.resolve(__dirname, '..', 'email-templates'),
+  extName: '.handlebars'
+}
+
+transporter.use('compile', hbs(handlebarOptions))
 
 //send hotel new listing email
 const sendNewHotelRegistrationEmail = ({hotelCustomId,category,hotelBasicInfo, email}, res) => {
-        const { hotelName,starRating,contactName,contactPhone,altPhone,ManyHotelOptions,streetAddress,city,state,country } = hotelBasicInfo
+        const { hotelName,contactName } = hotelBasicInfo
             //mail options
             const mailOptions = {
             from: config.AUTH_EMAIL,
             to: `${email}`,
-            subject: `Confirmation-${hotelCustomId}: Application for New ${category} Listing with Awuf-booking`,
-            html: `<p>Thank you for adding a new property with Awuf-booking .</p>
-                   <p>Ensure the following basic information about your entries are correct or else, Contact the support immediately .</p>
-                   <p> <b> Hotel Registration Number </b>: ${hotelCustomId}. </p>
-                   <p> <b> Category Type </b>: ${category}. </p>
-                   <p> <b> Hotel Name </b>: ${hotelName}. </p>
-                   <p> <b> Star Rating </b>: ${starRating}. </p>
-                   <p> <b> Contact Name </b>: ${contactName}. </p>
-                   <p> <b> Contact Phone </b>: ${contactPhone}. </p>
-                   <p> <b> Alt Phone </b>: ${altPhone}. </p>
-                   <p> <b> ManyHotelOptions </b>: ${ManyHotelOptions}. </p>
-                   <p> <b> Street Address </b>: ${streetAddress}. </p>
-                   <p> <b> City </b>: ${city}. </p>
-                   <p> <b> State </b>: ${state}. </p>
-                   <p> <b> Country </b> : ${country}. </p>
-                   <p> While you wait for Awuf-booking to verify your <b>${category}</b> Property, 
-                    Check the Terms and Conditions <a href="https://ravebooking.netlify.app/owners"><b>here</b></a> </p>`,
+            subject: `Confirmation-${hotelCustomId}: Application for New ${category} Listing with Rave-booking`,
+            template: 'hotelCreated',
+            context: {
+              Hotel_Name: `${hotelName}`,
+              Hotel_Registration_Number : `${hotelCustomId}`,
+              contactName : `${contactName}`
+            }
             } 
 
             transporter.sendMail(mailOptions, function(error, info){
                 if (error) {
                   console.log(error);
-                  res.status(200).json({ message: "You will receive a confirmation email soon." });
+                  res.status(200).json({ message: "Email not sent." });
                 } else {
                     res.status(200).json({message:"New Property Confirmation Email has been sent"})
                   console.log('Email sent: ' + info.response);
@@ -58,7 +60,63 @@ const sendNewHotelRegistrationEmail = ({hotelCustomId,category,hotelBasicInfo, e
               
     }
 
-    
+    //send hotel verified  email
+const sendNewHotelVerifiedEmail = ({hotelCustomId,category,hotelBasicInfo, email}, res) => {
+  const { hotelName,contactName, } = hotelBasicInfo
+      //mail options 
+      const mailOptions = {
+      from: config.AUTH_EMAIL,
+      to: `${email}`,
+      subject: `Property ${category} Listed with Rave-booking is Verified!`,
+      template: 'hotelVerified',
+      context: {
+        Hotel_Name: `${hotelName}`,
+        Hotel_Registration_Number : `${hotelCustomId}`,
+        contactName : `${contactName}`
+      }
+      } 
+
+      transporter.sendMail(mailOptions, function(error, info){
+          if (error) {
+            console.log(error);
+            res.status(200).json({ message: "Email not sent ." });
+          } else {
+              res.status(200).json({message:"The property has been Verified successfully, Email has been sent!"})
+            console.log('Email sent: ' + info.response);
+          }
+        })
+        
+}
+
+   //send hotel failed  email
+const sendNewHotelFailedEmail = ({hotelCustomId,category,hotelBasicInfo, email}, res) => {
+    const { hotelName,contactName, } = hotelBasicInfo
+        //mail options 
+        const mailOptions = {
+        from: config.AUTH_EMAIL,
+        to: `${email}`,
+        subject: `Property ${category} Listed with Rave-booking has Failed!`,
+        template: 'hotelFailed',
+        context: {
+          Hotel_Name: `${hotelName}`,
+          Hotel_Registration_Number : `${hotelCustomId}`,
+          contactName : `${contactName}`,
+          reason : `Fewer Amenties available at property.`
+        }
+        } 
+  
+        transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+              res.status(200).json({ message: "Email not sent ." });
+            } else {
+                res.status(200).json({message:"The property has been Failed successfully, Email has been sent!"})
+              console.log('Email sent: ' + info.response);
+            }
+          })
+          
+  }
+
     //send new booking email
 const sendNewBookingEmail = ({bookingId,email,hotelDetails,roomDetails,userDetails, BookingStatus,price }, res) => {
     const {hotelName, hotelAddress ,hotelCustomId} = hotelDetails
@@ -69,7 +127,7 @@ const sendNewBookingEmail = ({bookingId,email,hotelDetails,roomDetails,userDetai
         const mailOptions = {
         from: config.AUTH_EMAIL,
         to: `${email}`,
-        subject: `Booking-${bookingId}: You have a  New Booking from Awuf-booking`,
+        subject: `Booking-${bookingId}: You have a  New Booking from Rave-booking`,
         html: `<p>Your new booking is now available with Awuf-booking .</p>
                <p>Booking details includes of Hotel:<b>${hotelName}</b> , <b>${hotelAddress}</b> , 
                <b>${hotelCustomId}</b> </p>
@@ -98,5 +156,5 @@ const sendNewBookingEmail = ({bookingId,email,hotelDetails,roomDetails,userDetai
 }
 
 module.exports ={
-    sendNewHotelRegistrationEmail, sendNewBookingEmail
+    sendNewHotelRegistrationEmail, sendNewHotelVerifiedEmail, sendNewHotelFailedEmail, sendNewBookingEmail,
 }

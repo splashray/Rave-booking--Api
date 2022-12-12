@@ -7,7 +7,7 @@ const createBooking = async (req, res, next) => {
 
     const generateId = async() => {
         // genbookingCustomId 
-        var genbookingCustomId = Math.floor(Math.random() * 10000000) + 10000000
+        var genbookingCustomId = Math.floor(Math.random() * 1000000) + 1000000
         //search for availability of generated id
         const search = await Booking.findOne({bookingId:genbookingCustomId})
             if(!search){
@@ -19,7 +19,7 @@ const createBooking = async (req, res, next) => {
                     ...req.body, 
                     user: req.user.id, 
                     email:req.user.email,
-                    bookingId: `DA${genbookingCustomId}`,  
+                    bookingId: `${genbookingCustomId}`,  
                     commission: percentCom
                 })
                 try {
