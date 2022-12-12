@@ -6,7 +6,7 @@ const config = {
     MONGODB_URL: process.env.MONGODB_URL,
     JWT_SECRET: process.env.JWT_SECRET,
     AUTH_EMAIL: process.env.AUTH_EMAIL,
-    AUTH_PASS: process.env.AUTH_PASS
-
+    AUTH_PASS: process.env.AUTH_PASS,
+    SITE_URL: process.env.SITE_URL
 }
 module.exports = config
