@@ -7,6 +7,6 @@ const config = {
     JWT_SECRET: process.env.JWT_SECRET,
     AUTH_EMAIL: process.env.AUTH_EMAIL,
     AUTH_PASS: process.env.AUTH_PASS,
-    SITE_URL: process.env.SITE_URL
+    SITE_URL: process.env.SITE_URL,
 }
 module.exports = config
