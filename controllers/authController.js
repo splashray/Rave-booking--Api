@@ -59,7 +59,7 @@ const config = require('./../utils/config')
             ownerSaved = await newOwner.save({session: session})            
             
             //Save the verificationId alongside the registered owner's email
-            await new Verification({ verificationId: hashedVerificationId, userId: ownerSaved._id }).save({session: session})
+            await new Verification({ verificationId: hashedVerificationId, userId: ownerSaved._id, expiresAt: Date.now() + 21600000 }).save({session: session})
             
         })
 
@@ -147,8 +147,17 @@ const ownerVerification = async (req, res, next) => {
     if(!token || !userId) return res.status(400).json({ error: true, message: "Invalid verification link" })
 
     const verificationDoc = await Verification.findOne({ userId }).exec()
-
+    
     if(!verificationDoc) return res.status(400).json({error: true, message: "Invalid verification details"})
+
+    // If verification link has expired delete the owner details and verification record
+    if(verificationDoc.expiresAt < Date.now()){
+        await Verification.findByIdAndDelete( verificationDoc._id ).exec()
+
+        await Owner.findByIdAndDelete(verificationDoc.userId).exec()
+
+        return res.status(400).json({message: "Verification link has expired. Please signup again."})
+    }
 
     const tokenMatch = bcrypt.compareSync(token, verificationDoc.verificationId);
 
