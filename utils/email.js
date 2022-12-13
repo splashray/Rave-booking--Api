@@ -172,15 +172,17 @@ const sendOwnerVerificationEmail = (ownerDetails, res, verificationUrl) => {
         },
       } 
 
-      transporter.sendMail(mailOptions, function(error, info){
+      return new Promise((resolve, reject) => {
+        transporter.sendMail(mailOptions, function(error, info){
           if (error) {
             console.log(error);
-            res.status(200).json({message: "You will receive a verification email shortly"})
+            resolve(false)
           } else {
-            res.status(200).json({message:"Verification Email has been sent"})
             console.log('Email sent: ' + info.response);
+            resolve(true);
           }
         })
+      })
             
 }
 
