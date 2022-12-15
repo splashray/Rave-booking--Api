@@ -45,7 +45,9 @@ const config = require('./../utils/config')
             password:hash,
         })
 
-        const verificationId = new UUID(4)
+        const verificationId = crypto.randomBytes(20).toString('hex')
+
+        const hashedVerificationId = bcrypt.hashSync(verificationId, 10);
 
         let ownerSaved = null
 
@@ -57,7 +59,7 @@ const config = require('./../utils/config')
             ownerSaved = await newOwner.save({session: session})            
             
             //Save the verificationId alongside the registered owner's email
-            await new Verification({ verificationId, email: ownerSaved.email }).save({session: session})
+            await new Verification({ verificationId: hashedVerificationId, userId: ownerSaved._id, expiresAt: Date.now() + 21600000 }).save({session: session})
             
         })
 
@@ -65,14 +67,22 @@ const config = require('./../utils/config')
         
         if(transaction && transaction.ok){
 
-            const verificationUrl = `https://ravebooking.netlify.app/pages/verify.html?token=${verificationId}`
+            const verificationUrl = `https://ravebooking.netlify.app/owners/confirmation.html?verify=true&token=${verificationId}&userId=${ownerSaved._id}`
             
-            sendOwnerVerificationEmail(ownerSaved, res, verificationUrl)
+            const emailSent = await sendOwnerVerificationEmail(ownerSaved, res, verificationUrl)
+
+            if(!emailSent){
+                await Verification.findOneAndDelete({ userId:ownerSaved._id }).exec()
+
+                await Owner.findByIdAndDelete(ownerSaved._id).exec();
+
+                return res.status(500).json({message: "Registration failed"})
+            }
             
-            return
+            res.status(200).json({message: "Verification email has been sent"})
         }
         
-        res.status(500).json({message: "Failed to create owner"})
+        
     } catch (err) {
         console.log(err)
 
@@ -127,20 +137,39 @@ const ownerVerification = async (req, res, next) => {
           required: true,
           schema: {
             $token : '42e2a46a-e56f-4e4d-be0e-0675b7026f58'
+            $userId: '63984b5022a619a24fd5f033'
           }
        }
      */
 
-    const { token } = req.body
+    const { token, userId } = req.body
 
-    if(!token) return res.status(400).json({ error: true, message: "Invalid verification token" })
+    if(!token || !userId) return res.status(400).json({ error: true, message: "Invalid verification link" })
 
-    const verificationDoc = await Verification.findOneAndDelete({ token }, { email: true }).exec()
+    const verificationDoc = await Verification.findOne({ userId }).exec()
+    
+    if(!verificationDoc) return res.status(400).json({error: true, message: "Invalid verification details"})
 
-    if(!verificationDoc) return res.status(400).json({error: true, message: "Token not found"})
+    // If verification link has expired delete the owner details and verification record
+    if(verificationDoc.expiresAt < Date.now()){
+        await Verification.findByIdAndDelete( verificationDoc._id ).exec()
 
-    // Set the owner's verified status to true
-    const ownerVerified = await Owner.findOneAndUpdate({ email: verificationDoc.email }, {isVerified: true}).exec()
+        await Owner.findByIdAndDelete(verificationDoc.userId).exec()
+
+        return res.status(400).json({message: "Verification link has expired. Please signup again."})
+    }
+
+    const tokenMatch = bcrypt.compareSync(token, verificationDoc.verificationId);
+
+    const ownerVerified = false;
+
+    if(tokenMatch){
+
+        await Verification.findByIdAndDelete( verificationDoc._id ).exec()
+
+        // Set the owner's verified status to true
+        ownerVerified = await Owner.findOneAndUpdate({ _id: verificationDoc.userId }, {isVerified: true}).exec()
+    }
 
     if(!ownerVerified) return res.status(500).json({error: true, message: "Internal server error"})
 
@@ -162,7 +191,7 @@ const forgotPassword = async (req, res, next) => {
     const { email } = req.body
 
     if(!email) return res.status(400).json({error: true, message: 'No email was provided'})
-       console.log(email, await User.find({}).exec())
+       
     const userFound = await User.findOne({ email }).exec()
 
     if(!userFound) return res.status(400).json({error: true, message: 'No user account matches with the provided email' })
