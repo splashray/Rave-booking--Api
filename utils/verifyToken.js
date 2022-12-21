@@ -14,7 +14,8 @@ const generateToken = (user) => {
         isVerified: user.isVerified ? user.isVerified :``,
         isKyc: user.isKyc ? user.isKyc :``
     },
-      config.JWT_SECRET
+      config.JWT_SECRET,
+       { expiresIn: "10h" }
     );
   };
   

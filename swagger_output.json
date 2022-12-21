@@ -5,7 +5,7 @@
     "title": "Awuf-Booking API",
     "description": "Documentation for Awuf-Boking automatically generated </b> module."
   },
-  "host": "awuf-booking.cyclic.app",
+  "host": "localhost:3000",
   "basePath": "/",
   "tags": [
     {
@@ -98,6 +98,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK"
+          },
           "400": {
             "description": "Bad Request"
           },
@@ -117,18 +120,19 @@
           {
             "name": "body",
             "in": "body",
-            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "token": {
-                  "type": "string",
-                  "example": "42e2a46a-e56f-4e4d-be0e-0675b7026f58"
+                "in": {
+                  "example": "any"
+                },
+                "required": {
+                  "example": "any"
+                },
+                "schema": {
+                  "example": "any"
                 }
-              },
-              "required": [
-                "token"
-              ]
+              }
             }
           }
         ],
@@ -268,42 +272,7 @@
           "Auth"
         ],
         "description": "Endpoint to Login User",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "email": {
-                  "type": "string",
-                  "example": "test-user@mail.com"
-                }
-              },
-              "required": [
-                "email"
-              ]
-            }
-          },
-          {
-            "name": "path",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "token": {
-                  "type": "string",
-                  "example": "42e2a46a-e56f-4e4d-be0e-0675b7026f58"
-                }
-              },
-              "required": [
-                "token"
-              ]
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {}
       }
     },
@@ -1579,6 +1548,122 @@
           "200": {
             "description": "OK"
           },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/bookings/usersbook/all": {
+      "get": {
+        "tags": [
+          "Bookings"
+        ],
+        "description": "Endpoint to get all users booking.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/bookings/usersbook/{bookid}": {
+      "get": {
+        "tags": [
+          "Bookings"
+        ],
+        "description": "Endpoint to get single user",
+        "parameters": [
+          {
+            "name": "bookid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/bookings/ownersbooking/{hotelid}": {
+      "get": {
+        "tags": [
+          "Bookings"
+        ],
+        "description": "Endpoint to get all owners booking.",
+        "parameters": [
+          {
+            "name": "hotelid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/bookings/ownersbooking/{hotelid}/{bookingid}": {
+      "get": {
+        "tags": [
+          "Bookings"
+        ],
+        "description": "Endpoint to get single owner",
+        "parameters": [
+          {
+            "name": "hotelid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "bookingid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
           "401": {
             "description": "Unauthorized"
           }

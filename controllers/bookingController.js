@@ -85,7 +85,81 @@ const getBookings = async (req, res, next)=>{
   }
 
 
-// const updateHotel = async (req, res, next)=>{
+const getOwnerBoookings = async (req, res, next)=>{
+    // #swagger.tags = ['Bookings']
+    // #swagger.description = 'Endpoint to get all owners booking.'
+
+    try {
+        const hotelid = req.params.hotelid
+        const bookings = await Booking.find({'hotelDetails.hotelId':hotelid})
+        if(bookings){
+            res.status(200).json({Bookings:bookings})
+        }else{
+            res.status(404).send({message: 'No Booking associated with account'})
+        }
+    } catch (err) {
+        next(err)
+    }
+}
+
+const getOwnerSingleBookings = async (req, res, next)=>{
+    // #swagger.tags = ['Bookings']
+    // #swagger.description = 'Endpoint to get single owner's booking.'
+
+    try {
+        const hotelid = req.params.hotelid
+        const bookingid = req.params.bookingid
+        const booking = await Booking.findOne(
+            {_id:bookingid, 'hotelDetails.hotelId':hotelid}
+            )
+        if(booking){
+             res.status(200).json({Boooking:booking})
+
+        }else{
+                res.status(404).send({message: `No Booking associated with hotel or no booking with id ${bookingid}`})
+        }
+
+    } catch (err) {
+        next(err)
+    }
+}
+
+const getUserBoookings = async (req, res, next)=>{
+    // #swagger.tags = ['Bookings']
+    // #swagger.description = 'Endpoint to get all users booking.'
+
+    try {
+        const booking = await Booking.find({user:req.user.id})
+        if(booking){
+            res.status(200).json({userbooking:booking})
+        }else{
+            res.status(404).send({message: `You haven't created Booking yet`})
+        }
+    } catch (err) {
+        next(err)
+    }
+}
+
+const getUserSingleBookings = async (req, res, next)=>{
+    // #swagger.tags = ['Bookings']
+    // #swagger.description = 'Endpoint to get single user's booking.'
+
+    try {
+        const bookid = req.params.bookid
+        const booking = await Booking.findOne(
+            {_id:bookid, user:req.user.id}
+            )
+            if(booking){
+                res.status(200).json({Boooking:booking})
+           }else{
+                   res.status(404).send({message: `Booking with id ${bookingid} cannot be found`})
+           }
+    } catch (err) {
+        next(err)
+    }
+}
+
+// const updateBooking = async (req, res, next)=>{
 //     try {
 //         const updatedHotel = await Hotel.findByIdAndUpdate(
 //             req.params.id, 
@@ -112,47 +186,6 @@ const getBookings = async (req, res, next)=>{
 // }
 
 
-// const OwnersetHotelToBookable = async (req, res, next)=>{
-//     try {
-//         const updatedHotel = await Hotel.findByIdAndUpdate(
-//             req.params.id, 
-//             {$set: {bookable:req.body.bookable, featured:true}},
-//             {new: true}
-//             )
-//             if(!updatedHotel) return next(createError(401, "Hotel Not Found'!"))
-
-//             res.status(200).json(updatedHotel)
-//     } catch (err) {
-//         next(err)
-//     }
-// }
-
-
-// const getOwnerHotels = async (req, res, next)=>{
-//     try {
-//         // const ownerId = req.params.ownerid
-//         const hotels = await Hotel.find({user:req.user.id})
-//         if(hotels){
-//             res.status(200).json({hotels:hotels})
-//         }else{
-//             res.status(404).send({message: 'hotels created are empty, add atleast one'})
-//         }
-//     } catch (err) {
-//         next(err)
-//     }
-// }
-
-// const getOwnerSingleHotel = async (req, res, next)=>{
-//     try {
-//         const hotel = await Hotel.findOne(
-//             {_id:req.params.hotelid, user:req.user.id}
-//             )
-//             res.status(200).json({hotel:hotel})
-//     } catch (err) {
-//         next(err)
-//     }
-// }
-
 module.exports ={
-    createBooking, deleteBooking, getBooking, getBookings, 
+    createBooking, deleteBooking, getBooking, getBookings, getOwnerBoookings, getOwnerSingleBookings, getUserBoookings,  getUserSingleBookings
 }

@@ -120,7 +120,7 @@ const sendNewHotelFailedEmail = ({hotelCustomId,category,hotelBasicInfo, email},
     //send new booking email
 const sendNewBookingEmail = ({bookingId,email,hotelDetails,roomDetails,userDetails, BookingStatus,price }, res) => {
     const {hotelName, hotelAddress ,hotelCustomId} = hotelDetails
-    const {roomType, noOfRooms, nightsNumber, checkIn, checkOut, guestCount } = roomDetails 
+    const { noOfRooms, nightsNumber, checkIn, checkOut, guestCount } = roomDetails 
     const { firstName, lastName, phoneNumber, gender, address} = userDetails 
     const {cancelReservation, confirmCheckIn, confirmCheckOut} = BookingStatus 
         //mail options
@@ -132,7 +132,7 @@ const sendNewBookingEmail = ({bookingId,email,hotelDetails,roomDetails,userDetai
                <p>Booking details includes of Hotel:<b>${hotelName}</b> , <b>${hotelAddress}</b> , 
                <b>${hotelCustomId}</b> </p>
 
-               <p>Booking details includes of Room:<b>${roomType}</b> , <b>${noOfRooms}</b> , 
+               <p>Booking details includes of Room:<b>${noOfRooms}</b> , 
                <b>${nightsNumber}</b>, <b>${checkIn}</b>, <b>${checkOut}</b>, <b>${guestCount}</b> </p>
 
                <p>Booking details includes of your Personal details:<b>${firstName}</b> , <b>${lastName}</b> , 

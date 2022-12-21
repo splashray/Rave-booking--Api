@@ -12,12 +12,12 @@ const BookingSchema = new mongoose.Schema({
     },
 
     roomDetails:{
-        roomType:{type: String, required: true},
         noOfRooms:{type: Number, required: true},
         nightsNumber:{type: Number, required: true},
         checkIn:{type: String, required: true},
         checkOut:{ type: String, required: true},
         guestCount:  [{ picked: String, amount: Number}],
+        oneRoom: [{roomType: String, singlePrice: Number}]
     },
 
     userDetails:{
