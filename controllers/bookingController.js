@@ -18,7 +18,7 @@ const createBooking = async (req, res, next) => {
                 const newBooking = new Booking({
                     ...req.body, 
                     user: req.user.id, 
-                    email:req.user.email,
+                  
                     bookingId: `${genbookingCustomId}`,  
                     commission: percentCom
                 })
