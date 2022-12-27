@@ -151,7 +151,7 @@ const sendNewBookingEmail = ({_id,bookingId,email,hotelDetails,roomDetails,userD
                 res.status(200).json({
                   id: _id, 
                   customId: bookingId, 
-                  bokingemail: email,
+                  bookingemail: email,
                   message:"Booking Confirmation Email has been sent"
                 })
               console.log('Email sent: ' + info.response);
