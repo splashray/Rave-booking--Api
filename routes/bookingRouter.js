@@ -4,7 +4,7 @@ const router = express.Router()
 
 const { isKycOwner, isVerifiedOwner, verifyAdmin, verifyToken } = require("../utils/verifyToken");
 
-// create hotel by everyone
+// create booking by everyone
 router.post("/", verifyToken, createBooking)
 
 //get

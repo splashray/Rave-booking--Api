@@ -5,7 +5,7 @@
     "title": "Awuf-Booking API",
     "description": "Documentation for Awuf-Boking automatically generated </b> module."
   },
-  "host": "localhost:3000",
+  "host": "awuf-booking.cyclic.app",
   "basePath": "/",
   "tags": [
     {
@@ -43,6 +43,10 @@
     {
       "name": "Bookings",
       "description": "Bookings Endpoints"
+    },
+    {
+      "name": "Review",
+      "description": "Reviews Endpoints"
     }
   ],
   "schemes": [
@@ -1669,6 +1673,244 @@
           }
         }
       }
+    },
+    "/api/reviews/{bookingid}": {
+      "post": {
+        "tags": [
+          "Review"
+        ],
+        "description": "Endpoint to create Review for a hotel through booking.",
+        "parameters": [
+          {
+            "name": "bookingid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/reviews/usersreview/{email}/all": {
+      "get": {
+        "tags": [
+          "Review"
+        ],
+        "description": "Endpoint to Get Reviews of all booking by users.",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/reviews/usersreview/{email}/{reviewid}": {
+      "get": {
+        "tags": [
+          "Review"
+        ],
+        "description": "Endpoint to Get single Review of booking by users.",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "reviewid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/reviews/ownersreview/{hotelid}": {
+      "get": {
+        "tags": [
+          "Review"
+        ],
+        "description": "Endpoint to Get Reviews of all booking of a particular owner.",
+        "parameters": [
+          {
+            "name": "hotelid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/reviews/ownersreview/{hotelid}/{reviewid}": {
+      "get": {
+        "tags": [
+          "Review"
+        ],
+        "description": "Endpoint to Get single Review of booking of a particular owner.",
+        "parameters": [
+          {
+            "name": "hotelid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "reviewid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/reviews/adminreview": {
+      "get": {
+        "tags": [
+          "Review"
+        ],
+        "description": "Endpoint to Get Reviews of all booking by users.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/reviews/adminreview/{reviewid}": {
+      "get": {
+        "tags": [
+          "Review"
+        ],
+        "description": "Endpoint to Get single Review of booking by users.",
+        "parameters": [
+          {
+            "name": "reviewid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/reviews/{reviewid}": {
+      "delete": {
+        "tags": [
+          "Review"
+        ],
+        "description": "Endpoint to Delete Review of a booking by users.",
+        "parameters": [
+          {
+            "name": "reviewid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -2039,6 +2281,189 @@
         "price": {
           "type": "number",
           "example": 39000
+        }
+      }
+    },
+    "Kyc": {
+      "type": "object",
+      "properties": {
+        "PropertyDetails": {
+          "type": "object",
+          "properties": {
+            "fullNameOfTheAccommodation": {
+              "type": "string",
+              "example": "DKN suite"
+            },
+            "addressStreetName": {
+              "type": "string",
+              "example": "14, Shola street"
+            },
+            "zipCode": {
+              "type": "string",
+              "example": "3433"
+            },
+            "townCity": {
+              "type": "string",
+              "example": "ilorin"
+            },
+            "country": {
+              "type": "string",
+              "example": "Nigeria"
+            }
+          }
+        },
+        "ownerOfProperty": {
+          "type": "object",
+          "properties": {
+            "propertyOwner": {
+              "type": "string",
+              "example": "businessEntity"
+            },
+            "businessEntity": {
+              "type": "object",
+              "properties": {
+                "fullNameOfBusinessEntity": {
+                  "type": "string",
+                  "example": "GLK Suites"
+                },
+                "operationOfBusinessName": {
+                  "type": "string",
+                  "example": "GKL Limited"
+                },
+                "bnRc": {
+                  "type": "string",
+                  "example": "Gwej3j"
+                },
+                "addressOfBusinessEntity": {
+                  "type": "string",
+                  "example": "ikorodu road, lagos"
+                },
+                "unitNumberOfBusinessEntity": {
+                  "type": "number",
+                  "example": 243435
+                },
+                "cityOfBusinessEntity": {
+                  "type": "string",
+                  "example": "lagos"
+                },
+                "zipCodeOfBusinessEntity": {
+                  "type": "number",
+                  "example": 353513
+                },
+                "countryOfBusinessEntity": {
+                  "type": "string",
+                  "example": "Nigeria"
+                },
+                "firstNameOfBeneficialOwner": {
+                  "type": "string",
+                  "example": "John"
+                },
+                "lastNameOfBeneficialOwner": {
+                  "type": "string",
+                  "example": "Tayo"
+                },
+                "dobOfBeneficialOwner": {
+                  "type": "string",
+                  "example": "23-10-1984"
+                }
+              }
+            }
+          }
+        },
+        "managerOfProperty": {
+          "type": "object",
+          "properties": {
+            "propertyManagerType": {
+              "type": "string",
+              "example": "managementCompany"
+            },
+            "ManagementCompany": {
+              "type": "object",
+              "properties": {
+                "fullNameOfManagementCompany": {
+                  "type": "string",
+                  "example": "Splashray creations suite"
+                },
+                "addressOfManagementCompany": {
+                  "type": "string",
+                  "example": "splashray limited"
+                },
+                "unitNumberOfManagementCompany": {
+                  "type": "number",
+                  "example": 24235
+                },
+                "cityOfManagementCompany": {
+                  "type": "string",
+                  "example": "ikeja "
+                },
+                "zipCodeOfManagementCompany": {
+                  "type": "number",
+                  "example": 24124
+                },
+                "countryOfManagementCompany": {
+                  "type": "string",
+                  "example": "Nigeria"
+                },
+                "firstNameOfManagementCompany": {
+                  "type": "string",
+                  "example": "John"
+                },
+                "lastNameOfManagementCompany": {
+                  "type": "string",
+                  "example": "Tayo"
+                },
+                "dobOfManagementCompany": {
+                  "type": "string",
+                  "example": "20/10/2022"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Review": {
+      "type": "object",
+      "properties": {
+        "bookingid": {
+          "type": "string",
+          "example": "623fh2fhfwej33"
+        },
+        "user": {
+          "type": "string",
+          "example": "672dqqh3h24du12"
+        },
+        "email": {
+          "type": "string",
+          "example": "test@gmail.com"
+        },
+        "hotelId": {
+          "type": "string",
+          "example": "6920fh23hsj323"
+        },
+        "hotelName": {
+          "type": "string",
+          "example": "HMAS Hotel"
+        },
+        "hotelAddress": {
+          "type": "string",
+          "example": "ilorin, kwara state"
+        },
+        "image": {
+          "type": "string",
+          "example": "img.jpg"
+        },
+        "firstName": {
+          "type": "string",
+          "example": "John-doe"
+        },
+        "content": {
+          "type": "string",
+          "example": "Food are expensive"
+        },
+        "starRating": {
+          "type": "number",
+          "example": 4
         }
       }
     }

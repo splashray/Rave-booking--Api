@@ -15,7 +15,7 @@ const generateToken = (user) => {
         isKyc: user.isKyc ? user.isKyc :``
     },
       config.JWT_SECRET,
-       { expiresIn: "10h" }
+       { expiresIn: "24h" }
     );
   };
   
@@ -45,7 +45,7 @@ const  verifyAdmin  = (req, res, next) =>{
     }
   }
 
-  const  isVerifiedOwner  = (req, res, next) =>{
+const  isVerifiedOwner  = (req, res, next) =>{
     if(req.user && req.user.isVerified){
       next()
     }else{
@@ -53,7 +53,7 @@ const  verifyAdmin  = (req, res, next) =>{
     }
   }
 
-  const  isKycOwner  = (req, res, next) =>{
+const  isKycOwner  = (req, res, next) =>{
     if(req.user && req.user.isKyc){
       next()
     }else{

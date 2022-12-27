@@ -15,6 +15,14 @@ const doc = {
     schemes: ['https'],
     consumes: ['application/json'],
     produces: ['application/json'],
+    securityDefinitions: {
+        bearerAuth: {
+            type: 'apiKey',
+            name: 'Authorization',
+            scheme: 'bearer',
+            in: 'header',
+        },
+    },
     tags: [
         {
             "name": "Auth",
@@ -52,20 +60,13 @@ const doc = {
             "name": "Bookings",
             "description": "Bookings Endpoints"
         },
-        
+        {
+            "name": "Review",
+            "description": "Reviews Endpoints"
+        },
         
         
     ],
-     securityDefinitions: {
-            bearerAuth: {
-                type: 'apiKey',
-                name: 'Authorization',
-                scheme: 'bearer',
-                in: 'header',
-            },
-    },
-      
-    
     definitions: {
         User: {
             firstName: "John",
@@ -169,7 +170,60 @@ const doc = {
             },
             price: 39000
         },
-        
+        Kyc:{
+                "PropertyDetails": {
+                "fullNameOfTheAccommodation": "DKN suite",
+                "addressStreetName": "14, Shola street",
+                "zipCode": "3433",
+                "townCity": "ilorin",
+                "country":  "Nigeria"
+                },
+                "ownerOfProperty":{
+                    "propertyOwner": "businessEntity",
+            
+                    "businessEntity":{
+                        "fullNameOfBusinessEntity":"GLK Suites",
+                        "operationOfBusinessName": "GKL Limited",
+                        "bnRc" : "Gwej3j",
+                        "addressOfBusinessEntity" : "ikorodu road, lagos",
+                        "unitNumberOfBusinessEntity" : 243435,
+                        "cityOfBusinessEntity" : "lagos",
+                        "zipCodeOfBusinessEntity" : 353513,
+                        "countryOfBusinessEntity" : "Nigeria",
+                        "firstNameOfBeneficialOwner": "John",
+                        "lastNameOfBeneficialOwner": "Tayo",
+                        "dobOfBeneficialOwner": "23-10-1984"
+                    }
+                },
+
+                "managerOfProperty":{
+                    "propertyManagerType": "managementCompany",
+                        "ManagementCompany":{
+                        "fullNameOfManagementCompany":"Splashray creations suite",
+                        "addressOfManagementCompany" : "splashray limited",
+                        "unitNumberOfManagementCompany" : 24235,
+                        "cityOfManagementCompany" : "ikeja ",
+                        "zipCodeOfManagementCompany" : 24124,
+                        "countryOfManagementCompany" : "Nigeria",
+                        "firstNameOfManagementCompany": "John",
+                        "lastNameOfManagementCompany": "Tayo",
+                        "dobOfManagementCompany": "20/10/2022"
+                    }
+                }
+      
+             },
+             Review: {
+                "bookingid": "623fh2fhfwej33",
+                "user": "672dqqh3h24du12",
+                "email": "test@gmail.com",
+                "hotelId" : "6920fh23hsj323",
+                "hotelName" :  "HMAS Hotel",
+                "hotelAddress": "ilorin, kwara state",
+                "image" :  "img.jpg",
+                "firstName" :  "John-doe",
+                "content" :  "Food are expensive",
+                "starRating" :  4,             
+             }
         
     }
 

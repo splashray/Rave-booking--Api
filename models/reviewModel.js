@@ -1,30 +1,18 @@
 const mongoose = require('mongoose')
 
 const ReviewSchema = new mongoose.Schema({
-    // user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    // email:{type: String, required: true},
-    // PropertyDetails: {
-    //     fullNameOfTheAccommodation: {type: String, required: true},
-    //     addressStreetName: {type: String, required: true},
-    //     zipCode: {type: String, required: true},
-    //     townCity: {type: String, required: true},
-    //     country:  {type: String, required: true},
-    // },
-    // ownerOfProperty:{type: String, required: true},
-    // managerOfProperty:{type: String, required: true},
-
-
-    
-    // VerificationMessage:{type: String, default:`Processing`},
-    // submitted:{
-    //     type: Boolean,
-    //     default: false,
-    // },
-    // verified:{
-    //     type: Boolean,
-    //     default: false,
-    // },
-
+    bookingid: {type:String, required: true, unique: true},
+    user: { type: String, required: true },
+    email:{type: String, required: true},
+    hotelId :  {type: String, required: true},
+    hotelName :  {type: String, required: true},
+    hotelAddress: {type: String, required: true},
+    image :  {type: String, required: true},
+    firstName :  {type: String, required: true},
+    content :  {type: String, required: true},
+    starRating :  {type: Number, required: true},
+    submitted:{ type: Boolean, default: false },
+ 
 },{timestamps:true})
 
 module.exports = mongoose.model('reviews', ReviewSchema)

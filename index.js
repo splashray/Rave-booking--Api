@@ -13,6 +13,7 @@ const hotelsRouter = require('./routes/hotelRouter')
 const roomsRouter = require('./routes/roomRouter')
 const kycsRouter = require('./routes/kycRouter')
 const bookingsRouter = require('./routes/bookingRouter')
+const reviewsRouter = require('./routes/reviewRouter')
 const notFound = require('./middlewares/not-found')
 const path = require('path')
 const { expressHbs } = require('express-handlebars')
@@ -48,7 +49,7 @@ app.use('/api/hotels', hotelsRouter);
 app.use('/api/rooms', roomsRouter);
 app.use('/api/kycs', kycsRouter);
 app.use('/api/bookings', bookingsRouter);
-
+app.use('/api/reviews', reviewsRouter);
 
 
 app.use((err, req, res, next)=>{
