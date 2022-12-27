@@ -118,7 +118,7 @@ const sendNewHotelFailedEmail = ({hotelCustomId,category,hotelBasicInfo, email},
   }
 
     //send new booking email
-const sendNewBookingEmail = ({bookingId,email,hotelDetails,roomDetails,userDetails, BookingStatus,price }, res) => {
+const sendNewBookingEmail = ({_id,bookingId,email,hotelDetails,roomDetails,userDetails, BookingStatus,price }, res) => {
     const {hotelName, hotelAddress ,hotelCustomId} = hotelDetails
     const { noOfRooms, nightsNumber, checkIn, checkOut, guestCount } = roomDetails 
     const { firstName, lastName, phoneNumber, gender, address} = userDetails 
@@ -148,7 +148,12 @@ const sendNewBookingEmail = ({bookingId,email,hotelDetails,roomDetails,userDetai
             if (error) {
               console.log(error);
             } else {
-                res.status(200).json({message:"Booking Confirmation Email has been sent"})
+                res.status(200).json({
+                  id: _id, 
+                  customId: bookingId, 
+                  bokingemail: email,
+                  message:"Booking Confirmation Email has been sent"
+                })
               console.log('Email sent: ' + info.response);
             }
           })
