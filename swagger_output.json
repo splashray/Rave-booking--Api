@@ -93,20 +93,41 @@
               "properties": {
                 "password": {
                   "example": "any"
-                },
-                "email": {
-                  "example": "any"
                 }
               }
             }
           }
         ],
         "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/auth/owner/sendOwnerOtp/{ownerId}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "ownerId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
           "200": {
             "description": "OK"
           },
-          "400": {
-            "description": "Bad Request"
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
           },
           "500": {
             "description": "Internal Server Error"
@@ -116,10 +137,7 @@
     },
     "/api/auth/owner/verify": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
-        "description": "Endpoint for owner verification",
+        "description": "",
         "parameters": [
           {
             "name": "body",
@@ -127,13 +145,10 @@
             "schema": {
               "type": "object",
               "properties": {
-                "in": {
+                "email": {
                   "example": "any"
                 },
-                "required": {
-                  "example": "any"
-                },
-                "schema": {
+                "otp": {
                   "example": "any"
                 }
               }
@@ -144,8 +159,11 @@
           "200": {
             "description": "OK"
           },
-          "400": {
-            "description": "Bad Request"
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
           },
           "500": {
             "description": "Internal Server Error"
@@ -193,24 +211,39 @@
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "email": {
-                  "example": "any"
+                  "type": "string",
+                  "example": "test-user@mail.com"
                 }
-              }
+              },
+              "required": [
+                "email"
+              ]
+            }
+          },
+          {
+            "name": "path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "example": "42e2a46a-e56f-4e4d-be0e-0675b7026f58"
+                }
+              },
+              "required": [
+                "token"
+              ]
             }
           }
         ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
+        "responses": {}
       }
     },
     "/api/auth/user/register/check": {
@@ -276,8 +309,28 @@
           "Auth"
         ],
         "description": "Endpoint to Login User",
-        "parameters": [],
-        "responses": {}
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
       }
     },
     "/api/auth/forgotpassword": {
@@ -1446,13 +1499,19 @@
         }
       }
     },
-    "/api/bookings/": {
+    "/api/bookings/{hotelId}": {
       "post": {
         "tags": [
           "Bookings"
         ],
         "description": "Endpoint to create booking.",
         "parameters": [
+          {
+            "name": "hotelId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
           {
             "name": "authorization",
             "in": "header",
@@ -1466,20 +1525,61 @@
               "properties": {
                 "price": {
                   "example": "any"
+                },
+                "email": {
+                  "example": "any"
+                },
+                "noOfRooms": {
+                  "example": "any"
+                },
+                "nightsNumber": {
+                  "example": "any"
+                },
+                "checkIn": {
+                  "example": "any"
+                },
+                "checkOut": {
+                  "example": "any"
+                },
+                "guestCount": {
+                  "example": "any"
+                },
+                "oneRoom": {
+                  "example": "any"
+                },
+                "firstName": {
+                  "example": "any"
+                },
+                "lastName": {
+                  "example": "any"
+                },
+                "phoneNumber": {
+                  "example": "any"
+                },
+                "title": {
+                  "example": "any"
+                },
+                "address": {
+                  "example": "any"
                 }
               }
             }
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "201": {
+            "description": "Created"
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
-      },
+      }
+    },
+    "/api/bookings/": {
       "get": {
         "tags": [
           "Bookings"
@@ -1498,67 +1598,14 @@
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
       }
     },
-    "/api/bookings/{id}": {
-      "get": {
-        "tags": [
-          "Bookings"
-        ],
-        "description": "Endpoint to get a booking by id.",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Bookings"
-        ],
-        "description": "Endpoint to Delete booking.",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      }
-    },
-    "/api/bookings/usersbook/all": {
+    "/api/bookings/usersbooking/{userId}": {
       "get": {
         "tags": [
           "Bookings"
@@ -1566,6 +1613,12 @@
         "description": "Endpoint to get all users booking.",
         "parameters": [
           {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
             "name": "authorization",
             "in": "header",
             "type": "string"
@@ -1584,7 +1637,7 @@
         }
       }
     },
-    "/api/bookings/usersbook/{bookid}": {
+    "/api/bookings/usersbooking/{userId}/{bookingId}": {
       "get": {
         "tags": [
           "Bookings"
@@ -1592,7 +1645,13 @@
         "description": "Endpoint to get single user",
         "parameters": [
           {
-            "name": "bookid",
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "bookingId",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1610,7 +1669,7 @@
         }
       }
     },
-    "/api/bookings/ownersbooking/{hotelid}": {
+    "/api/bookings/ownersbooking/{hotelId}": {
       "get": {
         "tags": [
           "Bookings"
@@ -1618,7 +1677,7 @@
         "description": "Endpoint to get all owners booking.",
         "parameters": [
           {
-            "name": "hotelid",
+            "name": "hotelId",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1638,11 +1697,14 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
     },
-    "/api/bookings/ownersbooking/{hotelid}/{bookingid}": {
+    "/api/bookings/ownersbooking/{hotelId}/{bookingId}": {
       "get": {
         "tags": [
           "Bookings"
@@ -1650,13 +1712,13 @@
         "description": "Endpoint to get single owner",
         "parameters": [
           {
-            "name": "hotelid",
+            "name": "hotelId",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "bookingid",
+            "name": "bookingId",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1670,6 +1732,44 @@
         "responses": {
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/bookings/getBookingAdmin/{userId}/{bookingId}": {
+      "get": {
+        "tags": [
+          "Bookings"
+        ],
+        "description": "Endpoint to get a booking by id.",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "bookingId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
       }
