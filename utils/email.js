@@ -117,43 +117,70 @@ const sendNewHotelFailedEmail = ({hotelCustomId,category,hotelBasicInfo, email},
           
   }
 
-    //send new booking email
-const sendNewBookingEmail = ({_id,bookingId,email,hotelDetails,roomDetails,userDetails, BookingStatus,price }, res) => {
-    const {hotelName, hotelAddress ,hotelCustomId} = hotelDetails
-    const { noOfRooms, nightsNumber, checkIn, checkOut, guestCount } = roomDetails 
-    const { firstName, lastName, phoneNumber, gender, address} = userDetails 
-    const {cancelReservation, confirmCheckIn, confirmCheckOut} = BookingStatus 
+    //send new booking email to users
+const sendNewBookingEmailToUser = ({price, bookingId,email,hotelDetails,roomDetails,userDetails }, res) => {
+    const {hotelName, hotelAddress ,hotelEmail} = hotelDetails
+
+    const { noOfRooms, nightsNumber, checkIn, checkOut, guestCount, oneRoom} = roomDetails
+
+    const { firstName, lastName, phoneNumber, title, address} = userDetails 
+    
         //mail options
         const mailOptions = {
         from: config.AUTH_EMAIL,
         to: `${email}`,
-        subject: `Booking-${bookingId}: You have a  New Booking from Rave-booking`,
-        html: `<p>Your new booking is now available with Awuf-booking .</p>
-               <p>Booking details includes of Hotel:<b>${hotelName}</b> , <b>${hotelAddress}</b> , 
-               <b>${hotelCustomId}</b> </p>
+        subject: `You have made a booking at ${hotelName}`,
+        template: 'newBooking',
+        context: {
+          hotelName,hotelAddress, hotelEmail,
 
-               <p>Booking details includes of Room:<b>${noOfRooms}</b> , 
-               <b>${nightsNumber}</b>, <b>${checkIn}</b>, <b>${checkOut}</b>, <b>${guestCount}</b> </p>
+          firstName, lastName, phoneNumber, title, address,
 
-               <p>Booking details includes of your Personal details:<b>${firstName}</b> , <b>${lastName}</b> , 
-               <b>${phoneNumber}</b>, <b>${gender}</b>, <b>${address}</b> </p>
-
-               <p>Booking details includes of your Booking status:<b>${cancelReservation}</b> , <b>${confirmCheckIn}</b> , 
-               <b>${confirmCheckOut}</b>, and Payment<b>${price}</b> </p>
-
-                Check the Terms and Conditions <a href="https://ravebooking.netlify.app/owners"><b>here</b></a> </p>`,
+          noOfRooms, nightsNumber,guestCount,price, bookingId,
+          checkOut:checkOut.toLocaleDateString('en-GB'),
+          checkIn: checkIn.toLocaleDateString('en-GB'),
+          oneRoom: oneRoom.map(room => ({
+            roomType: room.roomType,
+            singlePrice: room.singlePrice
+          })),
+          guestCount: guestCount.map(guest => ({
+            picked: guest.picked,
+            amount: guest.amount
+          })),
+        },
         } 
 
         transporter.sendMail(mailOptions, function(error, info){
             if (error) {
               console.log(error);
             } else {
-                res.status(200).json({
-                  id: _id, 
-                  customId: bookingId, 
-                  bookingemail: email,
-                  message:"Booking Confirmation Email has been sent"
-                })
+              console.log('Email sent: ' + info.response);
+            }
+          })
+          
+}
+
+   //send new booking email to owners
+   const sendNewBookingEmailToOwner = ({price, bookingId,hotelDetails,commission,userDetails }, res) => {
+    const {hotelName, hotelEmail} = hotelDetails
+    const { firstName, lastName, phoneNumber }= userDetails 
+    
+        //mail options
+        const mailOptions = {
+        from: config.AUTH_EMAIL,
+        to: `${hotelEmail}`,
+        subject: `${firstName} made a booking at one of your property - ${hotelName}`,
+        template: 'newBookingToOwner',
+        context: {
+          hotelName,firstName, lastName, phoneNumber,price, bookingId, commission
+       
+        },
+        } 
+
+        transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
               console.log('Email sent: ' + info.response);
             }
           })
@@ -161,19 +188,19 @@ const sendNewBookingEmail = ({_id,bookingId,email,hotelDetails,roomDetails,userD
 }
 
 //send new owner verification email
-const sendOwnerVerificationEmail = (ownerDetails, res, verificationUrl) => {
-      const {firstName, lastName} = ownerDetails
-
+const sendOwnerVerificationEmail = ({firstName, lastName, email, newOtp, link}, res ) => {
       //mail options
       const mailOptions = {
         from: config.AUTH_EMAIL,
-        to: `${ownerDetails.email}`,
+        // to: `splashraycreations@gmail.com`,
+        to: `${email}`,
         subject: `Verification email from Ravebooking`,
         template: 'ownerVerification',
         context: {
-          verificationUrl,
-          firstName,
-          lastName
+          firstName, 
+          lastName,
+          newOtp,
+          link,
         },
       } 
 
@@ -191,7 +218,40 @@ const sendOwnerVerificationEmail = (ownerDetails, res, verificationUrl) => {
             
 }
 
-//send new owner verification email
+//send new owner verification success email
+const sendOwnerVerificationSuccessEmail = ({email, owner}, res ) => {
+  const {firstName, lastName} = owner
+  //mail options
+  const mailOptions = {
+    from: config.AUTH_EMAIL,
+    // to: `splashraycreations@gmail.com`,
+    to: `${email}`,
+    subject: `Email Address Successfully Verified - RaveBooking`,
+    template: 'ownerVerificationSuccess',
+    context: {
+      firstName, 
+      lastName,
+    },
+
+  } 
+
+  return new Promise((resolve, reject) => {
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+        resolve(false)
+      } else {
+        console.log('Email sent: ' + info.response);
+        // res.status(200).json({ message: 'Owner verified successfully' });
+        resolve(true);
+
+      }
+    })
+  })
+        
+}
+
+//send change password email
 const sendChangePasswordEmail = ({email, link}) => {
 
   //mail options
@@ -220,5 +280,5 @@ const sendChangePasswordEmail = ({email, link}) => {
 }
 
 module.exports ={
-    sendNewHotelRegistrationEmail, sendNewHotelVerifiedEmail, sendNewHotelFailedEmail, sendNewBookingEmail, sendOwnerVerificationEmail, sendChangePasswordEmail
+    sendNewHotelRegistrationEmail, sendNewHotelVerifiedEmail, sendNewHotelFailedEmail, sendNewBookingEmailToUser, sendNewBookingEmailToOwner, sendOwnerVerificationEmail,sendOwnerVerificationSuccessEmail, sendChangePasswordEmail 
 }

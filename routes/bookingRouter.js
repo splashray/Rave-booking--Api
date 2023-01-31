@@ -1,32 +1,32 @@
 const express = require('express');
-const { createBooking, getBooking, getBookings, deleteBooking, getOwnerSingleBookings, getOwnerBoookings, getUserSingleBookings, getUserBoookings } = require('../controllers/bookingController');
+const { createBooking, getBooking, getBookings, getOwnerSingleBookings, getOwnerBoookings, getUserSingleBookings, getUserBoookings } = require('../controllers/bookingController');
 const router = express.Router()
 
 const { isKycOwner, isVerifiedOwner, verifyAdmin, verifyToken } = require("../utils/verifyToken");
 
-// create booking by everyone
-router.post("/", verifyToken, createBooking)
+// create booking by everyone --
+router.post("/:hotelId", verifyToken, createBooking)
 
-//get
-router.get("/:id", verifyToken, verifyAdmin, getBooking)
-
-//get all
+//get all booking by an admin--
 router.get("/",verifyToken, verifyAdmin, getBookings)
 
 // get users personal all boooking
-router.get("/usersbook/all", verifyToken, getUserBoookings)
+router.get("/usersbooking/:userId", verifyToken, getUserBoookings)
 
-// Get users perosnal  id of a booking
-router.get("/usersbook/:bookid", verifyToken, getUserSingleBookings)
+// Get users personal  id of a booking
+router.get("/usersbooking/:userId/:bookingId", verifyToken, getUserSingleBookings)
 
-// get owners all boooking
-router.get("/ownersbooking/:hotelid", verifyToken, isKycOwner, getOwnerBoookings)
+// get all owner's boooking
+router.get("/ownersbooking/:hotelId", verifyToken, isKycOwner, getOwnerBoookings)
 
-// Get owners id of a booking
-router.get("/ownersbooking/:hotelid/:bookingid", verifyToken, isKycOwner, getOwnerSingleBookings)
+// Get booking by owner
+router.get("/ownersbooking/:hotelId/:bookingId", verifyToken, isKycOwner, getOwnerSingleBookings)
+
+//get a single booking by an admin
+router.get("/getBookingAdmin/:userId/:bookingId", verifyToken, verifyAdmin, getBooking)
 
 // // Delete 
-router.delete("/:id",verifyToken, deleteBooking)
+// router.delete("/:bookingId",verifyToken, verifyAdmin,  deleteBooking)
 
 
 

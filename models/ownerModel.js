@@ -1,38 +1,37 @@
-const mongoose = require('mongoose')
-
-const OwnerSchema = new mongoose.Schema({
-    firstName:{
+const mongoose = require('mongoose');
+const ownerSchema = new mongoose.Schema({
+    firstName: {
         type: String,
         required: true,
     },
-    lastName:{
+    lastName: {
         type: String,
         required: true,
     },
-    email:{
+    email: {
         type: String,
         required: true,
         unique: true,
     },
-    phoneNumber:{
+    phoneNumber: {
         type: String,
         required: true,
     },
-    password:{
+    password: {
         type: String,
         required: true,
     },
-    image:{
+    image: {
         type: String,
     },
-    isVerified:{
+    isVerified: {
         type: Boolean,
         default: false,
     },
-    isKyc:{
+    isKyc: {
         type: Boolean,
         default: false,
-    },
+    }
 },{timestamps:true})
 
-module.exports = mongoose.model('Owner',OwnerSchema)
+module.exports = mongoose.model('Owner', ownerSchema);
