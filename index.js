@@ -39,7 +39,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended: false}));
 
 app.get('/', (req, res) => {
-    res.send('Welcome to Awuf-Booking Api')
+    res.send(`Welcome to Rave-Booking Api - https://rave-booking.onrender.com/doc`)
 });
 
 app.use('/api/auth', authRouter);

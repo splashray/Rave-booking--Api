@@ -6,15 +6,14 @@ const otpSchema = new mongoose.Schema({
         required: true,
     },
     otp: {
-        type: Number,
+        type: String,
         required: true,
     },
     expires: {
         type: Date, 
         default: Date.now, 
-        // expires: 300
-        expireAfterSeconds: 120 // 2 mins
-    }, // 5 mins
+        expires: 300
+    }, 
     
 });
 module.exports = mongoose.model('Otp', otpSchema);

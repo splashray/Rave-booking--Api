@@ -158,42 +158,58 @@ const config = require('./../utils/config')
     // });
     // The cron expression 0 0 0 * * 1 means that the task will run every Sunday at midnight (00:00:00).
 
+//  const owner = await Owner.findOne({ ownerId }).select('email firstName lastName isVerified').exec();
+
+
 //other owners sections
 const sendOwnerOtp = async (req, res, next) => {
     try {
-        const ownerId = req.params.ownerId
-        const owner = await Owner.findOne({ ownerId }).exec();
-        if (!owner) {
-            return res.status(404).send({ error: "No Owner with this Id" });
-        }
-        if(owner.isVerified) {
-            return res.status(401).send({ error: "Owner is already verified" });
+    const ownerId = req.params.ownerId;
+    console.log(ownerId);
+
+    const owner = await Owner.findOne({ _id: ownerId }).exec();
+    if (!owner || owner.isVerified) {
+    return res.status(401).send({ error: !owner ? "No Owner with this Id" : "Owner is already verified" });
+    }
+    const { email, firstName, lastName } = owner;
+        // Check to see if we already have an OTP for this owner
+        const existingOtp = await Otp.findOne({ owner: ownerId }).exec();
+    
+        let newOtp;
+        let otp;
+        // Only generate a new OTP if one does not already exist
+        if (!existingOtp) {
+            newOtp = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
+            // const otp = crypto.randomBytes(3).toString('hex');
+            otp = await Otp.create({
+                owner: ownerId,
+                otp: newOtp
+            })
+        } else {
+            // Use existing OTP
+            newOtp = existingOtp.otp;
+            otp = existingOtp;
         }
 
-        const newOtp = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
-        // const otp = crypto.randomBytes(3).toString('hex');
-        const email = owner.email
-        const firstName = owner.firstName
-        const lastName = owner.lastName
-        const otp = await Otp.create({
-            owner: ownerId,
-            otp: newOtp
-        })
-        
-        const link = `${config.SITE_URL}/verifyEmail`
+    const link = `${config.SITE_URL}/owners/verifyEmail`;
+    senderHandler(email, firstName, lastName, newOtp, link,  otp,  res);
+
+    } catch (err) {
+        console.log(err); 
+        res.status(500).send({error:"Operation failed, Can't send otp to owner"})
+    }
+}
+
+    const senderHandler = async (email, firstName, lastName, newOtp, link, otp, res) => {
         console.log(firstName, lastName, email, newOtp);
-        const emailSent = await sendOwnerVerificationEmail({ firstName, lastName, email, newOtp, link, res })
-        
+        const emailSent = await sendOwnerVerificationEmail({ firstName, lastName, email, newOtp, link}, res);    
         if (!emailSent) {
-            Otp.findByIdAndDelete(otp._id).exec
+            Otp.findByIdAndDelete(otp._id).exec;
             return res.status(500).send({error:"Operation failed"})
         }
         return res.status(200).json({message: "OTP has been sent to your email" })
-    } catch (err) {
-        console.log(err); 
     }
 
-}
 
 const ownerVerification = async (req, res, next) => {
     try {
@@ -201,8 +217,8 @@ const ownerVerification = async (req, res, next) => {
         const owner = await Owner.findOne({ email });
         if (!owner) return res.status(404).json({ message: 'Owner not found' });
 
-        const otpDoc = await Otp.findOne({ owner: owner._id });
-        if (!otpDoc) return res.status(404).json({ message: 'OTP not found' });
+        const otpDoc = await Otp.findOne({ owner: owner._id }).exec()
+        if (!otpDoc) return res.status(404).json({ message: 'OTP not found or Expired' });
 
         if (otpDoc.otp !== otp) return res.status(401).json({ message: 'Invalid or Expired OTP' });
         // if (otpDoc.expires < new Date()) return res.status(401).json({ message: 'OTP expired' });

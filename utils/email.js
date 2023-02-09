@@ -3,6 +3,17 @@ const config = require('./../utils/config')
 const hbs = require('nodemailer-express-handlebars')
 const path = require('path')
 
+
+// configure the SMTP server details
+// let transporter = nodemailer.createTransport({
+//   host: "smtp-relay.sendinblue.com",
+//   port: 587,
+//   auth: {
+//   user: "",
+//   pass: ""
+//   }
+// });
+
 let transporter = nodemailer.createTransport({
     service: "gmail",
     auth:{
@@ -32,7 +43,7 @@ const handlebarOptions = {
 
 transporter.use('compile', hbs(handlebarOptions))
 
-//send hotel new listing email
+// send hotel new listing email
 const sendNewHotelRegistrationEmail = ({hotelCustomId,category,hotelBasicInfo, email}, res) => {
         const { hotelName,contactName } = hotelBasicInfo
             //mail options
@@ -187,34 +198,34 @@ const sendNewBookingEmailToUser = ({price, bookingId,email,hotelDetails,roomDeta
           
 }
 
-//send new owner verification email
-const sendOwnerVerificationEmail = ({firstName, lastName, email, newOtp, link}, res ) => {
-      //mail options
-      const mailOptions = {
-        from: config.AUTH_EMAIL,
-        // to: `splashraycreations@gmail.com`,
-        to: `${email}`,
-        subject: `Verification email from Ravebooking`,
-        template: 'ownerVerification',
-        context: {
-          firstName, 
-          lastName,
-          newOtp,
-          link,
-        },
-      } 
 
-      return new Promise((resolve, reject) => {
-        transporter.sendMail(mailOptions, function(error, info){
-          if (error) {
-            console.log(error);
-            resolve(false)
-          } else {
-            console.log('Email sent: ' + info.response);
-            resolve(true);
-          }
-        })
-      })
+// send new owner verification email
+const sendOwnerVerificationEmail = ({firstName, lastName, email, newOtp, link}, res) => {
+  //mail options
+  const mailOptions = {
+    from: config.AUTH_EMAIL,
+    to: `${email}`,
+    subject: `Verification email from Ravebooking`,
+    template: 'ownerVerification',
+    context: {
+      firstName,
+      lastName,
+      newOtp,
+      link
+    },
+  } 
+
+  return new Promise((resolve, reject) => {
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+        reject(false)
+      } else {
+        console.log('Email sent: ' + info.response);
+        resolve(true);
+      }
+    })
+  })
             
 }
 
@@ -224,7 +235,6 @@ const sendOwnerVerificationSuccessEmail = ({email, owner}, res ) => {
   //mail options
   const mailOptions = {
     from: config.AUTH_EMAIL,
-    // to: `splashraycreations@gmail.com`,
     to: `${email}`,
     subject: `Email Address Successfully Verified - RaveBooking`,
     template: 'ownerVerificationSuccess',
