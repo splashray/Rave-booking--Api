@@ -9,9 +9,9 @@ Owners Registration/Login with CRUD
 Hotel Managemnt with CRUD
 
 ## Fetch Api with the following instructions:
-Use the root api [link](https://awuf-booking.azurewebsites.net/) to begin.
+Use the root api [link](https://rave-booking.onrender.com/doc/) to begin.
 
-link = https://awuf-booking.azurewebsites.net/
+link = https://rave-booking.onrender.com/doc/
 
 
 ## Users/Admin Accounts
