@@ -1,8 +1,10 @@
 const mongoose = require('mongoose')
 
 const KycSchema = new mongoose.Schema({
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    email:{type: String, required: true},
+    //kyc will be attached to hotels and not user again
+    hotelId: { type: mongoose.Schema.Types.ObjectId, ref: 'Hotel', required: true },
+    ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Owner', required: true },
+    ownerEmail:{type: String, required: true},
     PropertyDetails: {
         fullNameOfTheAccommodation: {type: String, required: true},
         addressStreetName: {type: String, required: true},
@@ -53,18 +55,7 @@ const KycSchema = new mongoose.Schema({
         }
     },
 
-
-    
-    VerificationMessage:{type: String, default:`Processing`},
-    submitted:{
-        type: Boolean,
-        default: false,
-    },
-    verified:{
-        type: Boolean,
-        default: false,
-    },
-
+    VerificationMessage:{type: String, default:`Kyc is been Processed`},
 },{timestamps:true})
 
 module.exports = mongoose.model('Kyc-Details', KycSchema)

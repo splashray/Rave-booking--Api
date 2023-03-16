@@ -3,17 +3,6 @@ const config = require('./../utils/config')
 const hbs = require('nodemailer-express-handlebars')
 const path = require('path')
 
-
-// configure the SMTP server details
-// let transporter = nodemailer.createTransport({
-//   host: "smtp-relay.sendinblue.com",
-//   port: 587,
-//   auth: {
-//   user: "",
-//   pass: ""
-//   }
-// });
-
 let transporter = nodemailer.createTransport({
     service: "gmail",
     auth:{
@@ -43,14 +32,15 @@ const handlebarOptions = {
 
 transporter.use('compile', hbs(handlebarOptions))
 
-// send hotel new listing email
+/////////// Hotel verifications email  /////////////
+    // send hotel new listing email
 const sendNewHotelRegistrationEmail = ({hotelCustomId,category,hotelBasicInfo, email}, res) => {
         const { hotelName,contactName } = hotelBasicInfo
             //mail options
             const mailOptions = {
             from: config.AUTH_EMAIL,
             to: `${email}`,
-            subject: `Confirmation-${hotelCustomId}: Application for New ${category} Listing with Rave-booking`,
+            subject: `Confirmation- ${hotelCustomId}: Application for New ${category} Listing with Rave-booking`,
             template: 'hotelCreated',
             context: {
               Hotel_Name: `${hotelName}`,
@@ -62,9 +52,9 @@ const sendNewHotelRegistrationEmail = ({hotelCustomId,category,hotelBasicInfo, e
             transporter.sendMail(mailOptions, function(error, info){
                 if (error) {
                   console.log(error);
-                  res.status(200).json({ message: "Email not sent." });
+                  res.status(500).json({ message: "Email not sent." });
                 } else {
-                    res.status(200).json({message:"New Property Confirmation Email has been sent"})
+                    res.status(201).json({newHotel: {hotelCustomId,category,hotelBasicInfo, email}, message:"New Property Confirmation Email has been sent"})
                   console.log('Email sent: ' + info.response);
                 }
               })
@@ -90,7 +80,7 @@ const sendNewHotelVerifiedEmail = ({hotelCustomId,category,hotelBasicInfo, email
       transporter.sendMail(mailOptions, function(error, info){
           if (error) {
             console.log(error);
-            res.status(200).json({ message: "Email not sent ." });
+            res.status(500).json({ message: "Email not sent ." });
           } else {
               res.status(200).json({message:"The property has been Verified successfully, Email has been sent!"})
             console.log('Email sent: ' + info.response);
@@ -112,7 +102,7 @@ const sendNewHotelFailedEmail = ({hotelCustomId,category,hotelBasicInfo, email},
           Hotel_Name: `${hotelName}`,
           Hotel_Registration_Number : `${hotelCustomId}`,
           contactName : `${contactName}`,
-          reason : `Fewer Amenties available at property.`
+          reason : `Less expected property information submitted.`
         }
         } 
   
@@ -127,7 +117,103 @@ const sendNewHotelFailedEmail = ({hotelCustomId,category,hotelBasicInfo, email},
           })
           
   }
+/////////// Hotel verification email ends/////////////
 
+
+
+/////////// Hotel KYC email  /////////////
+   //send hotel's new KYC email
+const sendNewHotelKycEmail = ({hotelCustomId,category,hotelBasicInfo, email}, res) => {
+  const { hotelName,contactName, } = hotelBasicInfo
+      //mail options 
+      const mailOptions = {
+      from: config.AUTH_EMAIL,
+      to: `${email}`,
+      subject: `Property ${category} Listed with Rave-booking Kyc details has been received`,
+      template: 'newKyc',
+      context: {
+        Hotel_Name: `${hotelName}`,
+        Hotel_Registration_Number : `${hotelCustomId}`,
+        contactName : `${contactName}`
+      }
+      } 
+
+      transporter.sendMail(mailOptions, function(error, info){
+          if (error) {
+            console.log(error);
+            res.status(500).json({ message: "Email not sent ." });
+          } else {
+              // res.status(200).json({message:"The property has been Verified successfully, Email has been sent!"})
+            console.log('Email sent: ' + info.response);
+          }
+        })
+        
+}  
+
+  //send hotel's new KYC Verified email
+const sendHotelKycVerfiedEmail = ({hotelCustomId,hotelBasicInfo, email},verification_message, res) => {
+  const { hotelName,contactName, } = hotelBasicInfo
+      //mail options 
+      const mailOptions = {
+      from: config.AUTH_EMAIL,
+      to: `${email}`,
+      subject: `${hotelName}'s KYC has been Verified`,
+      template: 'kycVerified',
+      context: {
+        Hotel_Name: `${hotelName}`,
+        Hotel_Registration_Number : `${hotelCustomId}`,
+        contactName : `${contactName}`,
+        verification_message
+      }
+
+      } 
+
+      transporter.sendMail(mailOptions, function(error, info){
+          if (error) {
+            console.log(error);
+            res.status(500).json({ message: "Email not sent ." });
+          } else {
+              // res.status(200).json({message:"The property has been Verified successfully, Email has been sent!"})
+            console.log('Email sent: ' + info.response);
+          }
+        })
+        
+}  
+
+  //send hotel's new KYC failed email
+  const sendHotelKycFailedEmail = ({hotelCustomId,hotelBasicInfo, email},verification_message, res) => {
+    const { hotelName,contactName, } = hotelBasicInfo
+        //mail options 
+        const mailOptions = {
+        from: config.AUTH_EMAIL,
+        to: `${email}`,
+        subject: `${hotelName}'s KYC failed 😣`,
+        template: 'kycFailed',
+        context: {
+          Hotel_Name: `${hotelName}`,
+          Hotel_Registration_Number : `${hotelCustomId}`,
+          contactName : `${contactName}`,
+          verification_message
+        }
+  
+        } 
+  
+        transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+              res.status(500).json({ message: "Email not sent ." });
+            } else {
+                // res.status(200).json({message:"The property has been Verified successfully, Email has been sent!"})
+              console.log('Email sent: ' + info.response);
+            }
+          })
+          
+  }  
+/////////// Hotel KYC email  ends/////////////
+
+
+
+/////////// Booking email  /////////////
     //send new booking email to users
 const sendNewBookingEmailToUser = ({price, bookingId,email,hotelDetails,roomDetails,userDetails }, res) => {
     const {hotelName, hotelAddress ,hotelEmail} = hotelDetails
@@ -174,7 +260,7 @@ const sendNewBookingEmailToUser = ({price, bookingId,email,hotelDetails,roomDeta
    //send new booking email to owners
    const sendNewBookingEmailToOwner = ({price, bookingId,hotelDetails,commission,userDetails }, res) => {
     const {hotelName, hotelEmail} = hotelDetails
-    const { firstName, lastName, phoneNumber }= userDetails 
+    const { firstName, lastName }= userDetails 
     
         //mail options
         const mailOptions = {
@@ -183,7 +269,7 @@ const sendNewBookingEmailToUser = ({price, bookingId,email,hotelDetails,roomDeta
         subject: `${firstName} made a booking at one of your property - ${hotelName}`,
         template: 'newBookingToOwner',
         context: {
-          hotelName,firstName, lastName, phoneNumber,price, bookingId, commission
+          hotelName,firstName, lastName, price, bookingId, commission
        
         },
         } 
@@ -197,8 +283,11 @@ const sendNewBookingEmailToUser = ({price, bookingId,email,hotelDetails,roomDeta
           })
           
 }
+/////////// Booking email ends /////////////
 
 
+
+/////////// Owner Account email  /////////////
 // send new owner verification email
 const sendOwnerVerificationEmail = ({firstName, lastName, email, newOtp, link}, res) => {
   //mail options
@@ -236,7 +325,7 @@ const sendOwnerVerificationSuccessEmail = ({email, owner}, res ) => {
   const mailOptions = {
     from: config.AUTH_EMAIL,
     to: `${email}`,
-    subject: `Email Address Successfully Verified - RaveBooking`,
+    subject: `Account Successfully Verified - RaveBooking`,
     template: 'ownerVerificationSuccess',
     context: {
       firstName, 
@@ -288,7 +377,9 @@ const sendChangePasswordEmail = ({email, link}) => {
     })
   })
 }
+/////////// Owner Account email  ends /////////////
 
 module.exports ={
-    sendNewHotelRegistrationEmail, sendNewHotelVerifiedEmail, sendNewHotelFailedEmail, sendNewBookingEmailToUser, sendNewBookingEmailToOwner, sendOwnerVerificationEmail,sendOwnerVerificationSuccessEmail, sendChangePasswordEmail 
+    sendNewHotelRegistrationEmail,sendNewHotelVerifiedEmail, sendNewHotelFailedEmail,  sendNewHotelKycEmail, 
+    sendHotelKycVerfiedEmail, sendHotelKycFailedEmail, sendNewBookingEmailToUser, sendNewBookingEmailToOwner, sendOwnerVerificationEmail,sendOwnerVerificationSuccessEmail, sendChangePasswordEmail 
 }

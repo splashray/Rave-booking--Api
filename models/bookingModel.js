@@ -40,10 +40,10 @@ const BookingSchema = new mongoose.Schema({
             // Booking Status details
             BookingStatus:{
                 hotelStatus:{type: String,
-                    enum: ['Pending','Confirmed','Check-In','Check-Out','Cancelled','Expired','No-Show'],
+                    enum: ['Pending','Confirmed','Check-In','Check-Out','Cancelled','Expired'],
                     default: "Pending"
                 },
-
+                // Each part need to be updated
                 Confirmed:[{ 
                     status: {type:Boolean, default: false},
                     date:{type: Date, default:Date.now } 
@@ -60,11 +60,11 @@ const BookingSchema = new mongoose.Schema({
                     status: {type:Boolean, default: false},
                     date:{type: Date, default:Date.now } 
                 }],
-                isReview: [{ 
-                    status: {type:Boolean, default: false},
-                    date:{type: Date, default:Date.now } 
-                }],
             },
+            isReview: [{ 
+                status: {type:Boolean, default: false},
+                date:{type: Date, default:Date.now } 
+            }],
             
         }
 

@@ -16,7 +16,7 @@ const createBooking = async (req, res, next) => {
             const price = parseFloat(req.body.price);  
             if (isNaN(price)) {
                 console.log('Price is not a number');
-                return;
+                return res.status(403).json({error:"Price is not valid"})
             }        
             const percentToTheBookingCompany = 10;    //company percentage 
             const commission = (percentToTheBookingCompany / 100) * price // Commission
@@ -176,8 +176,14 @@ const getOwnerBoookings = async (req, res, next)=>{
         const hotelId = req.params.hotelId;
         if(!hotelId) return res.status(404).json({error: "Hotel id not found"})
 
+        //check if the hotel with the id has a verified kyc 
+        const checkKyc = await Hotel.findOne({_id:hotelId, isKyc: true})
+        if (!checkKyc) {
+            return res.status(404).json({ msg: 'KYC not verified || Hotel Verification not returned' });
+        }
+
+        // Check equivalent bookings
         const bookings = await Booking.find({ 'bookingRecords.hotelDetails.hotelId': hotelId });
-    
         if (!bookings) {
           return res.status(404).json({ msg: 'No bookings found for the given hotelId' });
         }
@@ -206,8 +212,15 @@ const getOwnerSingleBookings = async (req, res, next)=>{
         if(!hotelId && bookingId) return res.status(404).json({error: "hotelId and booking id not found"})
 
         try {
+
+         //check if the hotel with the id has a verified kyc 
+         const checkKyc = await Hotel.findOne({_id:hotelId, isKyc: true})
+         if (!checkKyc) {
+             return res.status(404).json({ msg: 'KYC not verified || Hotel Verification not returned' });
+         }
+         
+        // Check equivalent booking 
           const booking = await Booking.findOne({ "bookingRecords.hotelDetails.hotelId": hotelId});
-        
           if (!booking) {return res.status(404).send({ error: "Owner's hotel not found" })}
       
           const bookingRecord = booking.bookingRecords.find(
@@ -270,12 +283,28 @@ const checkinBooking = async (req, res, next)=>{
             }},
             {new: true}
             )
+        // Perform a commission transaction taged as unpaid
+        // Perform a debit transactions to the hotel owners wallet
+            res.status(200).json(checkin)
+    } catch (err) {
+        next(err)
+    }
+}
+
+const checkoutBooking = async (req, res, next)=>{
+
+    try {
+        const checkin = await Booking.findByIdAndUpdate(
+            req.params.id, 
+            {$set: {
+                hasCheckedin: true,
+
+            }},
+            {new: true}
+            )
         // Perform a commission transaction 
         // Perform a debit transactions to the hotel owners wallet
-
-
             res.status(200).json(checkin)
-
     } catch (err) {
         next(err)
     }
@@ -284,5 +313,5 @@ const checkinBooking = async (req, res, next)=>{
 
 
 module.exports ={
-    createBooking, getBooking, getBookings, getOwnerBoookings, getOwnerSingleBookings, getUserBoookings,  getUserSingleBookings, checkinBooking
+    createBooking, getBooking, getBookings, getOwnerBoookings, getOwnerSingleBookings, getUserBoookings,  getUserSingleBookings, checkinBooking, checkoutBooking
 }

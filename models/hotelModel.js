@@ -6,7 +6,7 @@ const HotelSchema = new mongoose.Schema({
         default: `hotel`
     },
     hotelCustomId:{type: String, required: true},
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'Owner', required: true },
     email:{type: String, required: true},
     hotelBasicInfo: {
         hotelName:    {type: String, required: true},
@@ -68,6 +68,19 @@ const HotelSchema = new mongoose.Schema({
     featured:{
         type: Boolean,
         default: false,
+    },
+    isKyc:{
+        type: Boolean,
+        default: false,
+    },
+    submittedKyc:{
+        type: String,
+        enum: ["not-submitted", "in-Review", "failed", "success"],
+        default: "not-submitted"
+    },
+    hotelKycId: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Kyc-Details'
     },
 
 },{timestamps:true})

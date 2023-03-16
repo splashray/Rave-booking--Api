@@ -1,42 +1,59 @@
 const Hotel = require('../models/hotelModel')
 const Room = require('../models/roomModel')
-const {sendNewHotelRegistrationEmail} = require('../utils/email')
+const Commission =  require('../models/commissionWalletModel')
+const {sendNewHotelRegistrationEmail, sendNewHotelVerifiedEmail, sendNewHotelFailedEmail} = require('../utils/email')
+
+// generate a random hotelCustomId
+const generateId = async() => {
+    // genhotelCustomId 
+    var genhotelCustomId = Math.floor(Math.random() * 100000) + 100000
+    // search for availability of generated id
+    const search = await Hotel.findOne({hotelCustomId:genhotelCustomId})
+        if(!search){
+            return  {hotelCustomId: `H${genhotelCustomId}`} 
+       }else{
+            generateId()
+       }
+}
 
 const createHotel = async (req, res, next) => {
-    	// #swagger.tags = ['Hotels']
-        // #swagger.description = 'Endpoint to create Hotel.'
+    // #swagger.tags = ['Hotels']
+    // #swagger.description = 'Endpoint to create Hotel.'
+   
 
-    const generateId = async() => {
-        // genhotelCustomId 
-        var genhotelCustomId = Math.floor(Math.random() * 100000) + 100000
-        //search for availability of generated id
-        const search = await Hotel.findOne({hotelCustomId:genhotelCustomId})
-            if(!search){
-                const newHotel = new Hotel({
-                    ...req.body, 
-                    hotelCustomId: `H-${genhotelCustomId}`,  
-                    user: req.user.id, 
-                    email:req.user.email 
-                })
-                try {
-                    newHotel.save()
-                    .then(result=>{
-                        //send hotel new listing email
-                        sendNewHotelRegistrationEmail(result, res)
-                    }).catch(err =>{
-                        console.log(err);
-                        res.json({status:"FAILED", message:"An error occurred while saving hotel details"})
-                    })
-                }catch (err) {
-                    next(err)
-                }
-            }else{
-                generateId()
-            }
+    // merge request body with random generated hotelCustomId
+    const genId = await generateId();
+    const newHotel = new Hotel({
+        ...req.body, 
+        user: req.user.id, 
+        email:req.user.email,
+        // hotelCustomId: `H${genhotelCustomId}`,
+        ...genId
+    });
+    const result = await newHotel.save();
+    console.log("New Hotel Created");
+    // create commission wallet for new hotel
+    const newCommission = new Commission({
+        hotelId: result._id,
+        commissionYetToPay : 0,
+        commissionPaidToCompany : 0,
+        commissionRecords: [],
+        TransactionRecords: []
+    });
+    await newCommission.save();
+    console.log("and the hotel's Wallet is Created");
+
+    // send hotel new listing email and check 
+    if (newCommission) {
+        sendNewHotelRegistrationEmail(result, res);
+    } else {
+        // delete the newly created hotel if commission wallet fails to create
+        console.log("but the hotel's Wallet not Created");
+        await Hotel.findOneAndDelete({_id:result._id});
+        res.status(500).json({message:"Commission wallet not created and hotel created has been deleted"});
     }
-
-    generateId()
 }
+
 
 const updateHotel = async (req, res, next)=>{
     // #swagger.tags = ['Hotels']
@@ -62,7 +79,19 @@ const AdminHotel = async (req, res, next)=>{
             {$set: {...req.body, featured:req.body.featured, verified:req.body.verified , bookable:req.body.bookable   }},
             {new: true}
             )
-            res.status(200).json(updatedHotel)
+        if(!updatedHotel) return next(createError(400, "Hotel Not Updated'!"))
+            switch (updatedHotel.verified) {
+                case true:
+                    sendNewHotelVerifiedEmail(updatedHotel, res);
+                    break;
+                case false:
+                    sendNewHotelFailedEmail(updatedHotel, res);
+                    break;
+                default:
+                    break;
+            }
+    
+        res.status(200).json({updatedHotel, message: "email sent"})
     } catch (err) {
         next(err)
     }
@@ -74,7 +103,7 @@ const OwnersetHotelToBookable = async (req, res, next)=>{
     try {
         const updatedHotel = await Hotel.findByIdAndUpdate(
             req.params.id, 
-            {$set: {bookable:req.body.bookable, featured:true}},
+            {$set: {bookable:req.body.bookable}},
             {new: true}
             )
             if(!updatedHotel) return next(createError(401, "Hotel Not Found'!"))

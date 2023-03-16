@@ -79,8 +79,8 @@ const config = require('./../utils/config')
         try {
             const {email} = req.body
            const cEmail = await Owner.findOne({email:email})
-           if(!cEmail){ res.status(200).json({message: "Email address available."})  }
-           else{ res.status(400).json({message: "Email address already existed, choose another one."}) }
+           if(!cEmail) return res.status(200).json({message: "Email address available."})  
+           res.status(400).json({message: "Email address already existed, choose another one."}) 
         } catch (err) {
             next(err)
         }
@@ -93,12 +93,6 @@ const config = require('./../utils/config')
         // const { firstName, lastName, email, phoneNumber, password } = req.body;
         const salt = bcrypt.genSaltSync(10)
         const hash = bcrypt.hashSync(req.body.password, salt)
-
-        // Check if an existing owner has the same email with the new owner
-        // const emailExists = await Owner.findOne({ email: req.body.email }).exec()
-        // if(emailExists){
-        //    return res.status(400).json({message: "The email address provided is in use by an existing owner."}).end()
-        // }
 
         const newOwner = new Owner({ ...req.body, password:hash})
         await newOwner.save();
@@ -156,9 +150,10 @@ const config = require('./../utils/config')
     //         }
     //     });
     // });
-    // The cron expression 0 0 0 * * 1 means that the task will run every Sunday at midnight (00:00:00).
 
-//  const owner = await Owner.findOne({ ownerId }).select('email firstName lastName isVerified').exec();
+  // The cron expression 0 0 0 * * 1 means that the task will run every Sunday at midnight (00:00:00).
+
+// const owner = await Owner.findOne({ ownerId }).select('email firstName lastName isVerified').exec();
 
 
 //other owners sections

@@ -2,7 +2,7 @@ const express = require('express');
 const { createBooking, getBooking, getBookings, getOwnerSingleBookings, getOwnerBoookings, getUserSingleBookings, getUserBoookings } = require('../controllers/bookingController');
 const router = express.Router()
 
-const { isKycOwner, isVerifiedOwner, verifyAdmin, verifyToken } = require("../utils/verifyToken");
+const {isVerifiedOwner, verifyAdmin, verifyToken } = require("../utils/verifyToken");
 
 // create booking by everyone --
 router.post("/:hotelId", verifyToken, createBooking)
@@ -16,11 +16,11 @@ router.get("/usersbooking/:userId", verifyToken, getUserBoookings)
 // Get users personal  id of a booking
 router.get("/usersbooking/:userId/:bookingId", verifyToken, getUserSingleBookings)
 
-// get all owner's boooking
-router.get("/ownersbooking/:hotelId", verifyToken, isKycOwner, getOwnerBoookings)
+// get all owner's boooking    --check hotel kyc
+router.get("/ownersbooking/:hotelId", verifyToken, isVerifiedOwner, getOwnerBoookings)
 
-// Get booking by owner
-router.get("/ownersbooking/:hotelId/:bookingId", verifyToken, isKycOwner, getOwnerSingleBookings)
+// Get booking by owner     --check hotel kyc
+router.get("/ownersbooking/:hotelId/:bookingId", verifyToken, isVerifiedOwner, getOwnerSingleBookings)
 
 //get a single booking by an admin
 router.get("/getBookingAdmin/:userId/:bookingId", verifyToken, verifyAdmin, getBooking)
