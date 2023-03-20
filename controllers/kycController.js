@@ -89,7 +89,7 @@ const updateFailedKycByAdmin = async (req, res, next)=>{
     try {
         const updatedKycStatus = await Kyc.findByIdAndUpdate(
             req.params.id, 
-            {$set: {...req.body,
+            {$set: {
             VerificationMessage:req.body.VerificationMessage||`KYC Verification Failed`
             }},
             {new: true}
@@ -141,7 +141,9 @@ const updateSuccessKycByAdmin = async (req, res, next)=>{
             const updatedKycOwner = await Hotel.findByIdAndUpdate(
                 hotelId, 
                 {$set: {isKyc: true,
-                    submittedKyc:"success"
+                    submittedKyc:"success",
+                    bookable: true,
+                    featured: true   
                 }},
                 {new: true}
              )
