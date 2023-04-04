@@ -58,7 +58,7 @@ const createKyc  = async (req, res, next)=>{
         const updatedKyc = await Kyc.findByIdAndUpdate(
             hotelKycId, 
             {$set: {...req.body, 
-                VerificationMessage: `KYC Details has been resent for Verification`,
+                VerificationMessage: `Kyc is been Processed`,
               }},
             {new: true}
         )
