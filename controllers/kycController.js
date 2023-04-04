@@ -57,7 +57,9 @@ const createKyc  = async (req, res, next)=>{
 
         const updatedKyc = await Kyc.findByIdAndUpdate(
             hotelKycId, 
-            {$set: req.body},
+            {$set: {...req.body, 
+                VerificationMessage: `KYC Details has been resent for Verification`,
+              }},
             {new: true}
         )
         if(!updatedKyc){ return next(createError(401, "KYC form Not Found'!"))
