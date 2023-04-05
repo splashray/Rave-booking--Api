@@ -1,11 +1,17 @@
 const express = require('express');
-const { createBooking, getBooking, getBookings, getOwnerSingleBookings, getOwnerBoookings, getUserSingleBookings, getUserBoookings } = require('../controllers/bookingController');
+const { createBooking, getBooking, getBookings, getOwnerSingleBookings, getOwnerBoookings, getUserSingleBookings, getUserBoookings, validatePaymentType, paymentVerification, paymentRegeneration } = require('../controllers/bookingController');
 const router = express.Router()
 
 const {isVerifiedOwner, verifyAdmin, verifyToken } = require("../utils/verifyToken");
 
 // create booking by everyone --
-router.post("/:hotelId", verifyToken, createBooking)
+router.post("/:hotelId", verifyToken, validatePaymentType, createBooking)
+
+//payment verification
+router.post('/paystack/verify', verifyToken,  paymentVerification)
+
+//payment url regeneration
+router.post('/paystack/regenerate', verifyToken, paymentRegeneration)
 
 //get all booking by an admin--
 router.get("/",verifyToken, verifyAdmin, getBookings)

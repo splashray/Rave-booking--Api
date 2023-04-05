@@ -234,8 +234,12 @@ const sendNewBookingEmailToUser = ({price, bookingId,email,hotelDetails,roomDeta
           firstName, lastName, phoneNumber, title, address,
 
           noOfRooms, nightsNumber,guestCount,price, bookingId,
-          checkOut:checkOut.toLocaleDateString('en-GB'),
-          checkIn: checkIn.toLocaleDateString('en-GB'),
+          // checkOut:checkOut.toLocaleDateString('en-GB'),
+
+          checkOut:checkOut,
+          // checkIn: checkIn.toLocaleDateString('en-GB'),
+          checkIn: checkIn,
+
           oneRoom: oneRoom.map(room => ({
             roomType: room.roomType,
             singlePrice: room.singlePrice

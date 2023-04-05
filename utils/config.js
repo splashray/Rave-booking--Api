@@ -8,5 +8,6 @@ const config = {
     AUTH_EMAIL: process.env.AUTH_EMAIL,
     AUTH_PASS: process.env.AUTH_PASS,
     SITE_URL: process.env.SITE_URL,
+    PAYSTACK_CLIENT_ID: process.env.PAYSTACK_CLIENT_ID
 }
 module.exports = config
