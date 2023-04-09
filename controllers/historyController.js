@@ -5,7 +5,7 @@ const path = require('path')
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const PDFDocument = require('pdfkit');
 const streamToBlob = require('stream-to-blob');
-const fetch = require('node-fetch');
+// const fetch = require('node-fetch');
 
 
 const createUserPaymentHistoryCsv = async (req, res) => {
@@ -143,63 +143,63 @@ const createUserPaymentHistoryCsv = async (req, res) => {
 //   }
 // }
 
-const createUserPaymentHistoryPdf = async (req, res) => {
-  try {
-    const payments = await Payment.findOne({ userId: req.params.userId }).populate('paymentRecords.bookingId');
-    if (!payments) {
-      return res.status(404).send({ message: 'User payment record not found' });
-    }
+ const createUserPaymentHistoryPdf = async (req, res) => {
+//   try {
+//     const payments = await Payment.findOne({ userId: req.params.userId }).populate('paymentRecords.bookingId');
+//     if (!payments) {
+//       return res.status(404).send({ message: 'User payment record not found' });
+//     }
 
-    const pdfDoc = new PDFDocument({ bufferPages: true });
+//     const pdfDoc = new PDFDocument({ bufferPages: true });
 
-    // set response headers for PDF download
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=${payments.userId}-payment-record.pdf`);
+//     // set response headers for PDF download
+//     res.setHeader('Content-Type', 'application/pdf');
+//     res.setHeader('Content-Disposition', `attachment; filename=${payments.userId}-payment-record.pdf`);
 
-    // generate the PDF content
-    pdfDoc.text(`Transaction History for User ${payments.userId}`, {
-      align: 'center',
-      font: 'Helvetica-Bold',
-      fontSize: 18,
-    });
+//     // generate the PDF content
+//     pdfDoc.text(`Transaction History for User ${payments.userId}`, {
+//       align: 'center',
+//       font: 'Helvetica-Bold',
+//       fontSize: 18,
+//     });
 
-    pdfDoc.moveDown();
+//     pdfDoc.moveDown();
 
-    pdfDoc.fontSize(12).font('Helvetica');
+//     pdfDoc.fontSize(12).font('Helvetica');
 
-    pdfDoc.text('Booking ID', { bold: true });
-    pdfDoc.text('Amount', { bold: true });
-    pdfDoc.text('Status', { bold: true });
-    pdfDoc.text('Payment Type', { bold: true });
-    pdfDoc.text('Transaction ID', { bold: true });
-    pdfDoc.text('Date', { bold: true });
-    pdfDoc.moveDown();
+//     pdfDoc.text('Booking ID', { bold: true });
+//     pdfDoc.text('Amount', { bold: true });
+//     pdfDoc.text('Status', { bold: true });
+//     pdfDoc.text('Payment Type', { bold: true });
+//     pdfDoc.text('Transaction ID', { bold: true });
+//     pdfDoc.text('Date', { bold: true });
+//     pdfDoc.moveDown();
 
-    payments.paymentRecords.forEach(record => {
-      pdfDoc.text(record.customBookingId);
-      pdfDoc.text(record.amount.toString());
-      pdfDoc.text(record.status);
-      pdfDoc.text(record.paymentType);
-      pdfDoc.text(record.transactionId);
-      pdfDoc.text(record.date.toISOString());
-      pdfDoc.moveDown();
-    });
+//     payments.paymentRecords.forEach(record => {
+//       pdfDoc.text(record.customBookingId);
+//       pdfDoc.text(record.amount.toString());
+//       pdfDoc.text(record.status);
+//       pdfDoc.text(record.paymentType);
+//       pdfDoc.text(record.transactionId);
+//       pdfDoc.text(record.date.toISOString());
+//       pdfDoc.moveDown();
+//     });
 
-    // finalize the PDF and send the response
-    pdfDoc.end();
+//     // finalize the PDF and send the response
+//     pdfDoc.end();
 
-    const chunks = [];
-    pdfDoc.on('data', chunk => chunks.push(chunk));
-    pdfDoc.on('end', async () => {
-      const response = await fetch('https://api.github.com/repos/node-fetch/node-fetch');
-      const blobPolyfill = await response.blob();
-      const blob = await streamToBlob(new blobPolyfill.constructor(chunks, { type: 'application/pdf' }));
-      res.send(blob);
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send({ message: 'Internal server error' });
-  }
+//     const chunks = [];
+//     pdfDoc.on('data', chunk => chunks.push(chunk));
+//     pdfDoc.on('end', async () => {
+//       const response = await fetch('https://api.github.com/repos/node-fetch/node-fetch');
+//       const blobPolyfill = await response.blob();
+//       const blob = await streamToBlob(new blobPolyfill.constructor(chunks, { type: 'application/pdf' }));
+//       res.send(blob);
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send({ message: 'Internal server error' });
+//   }
 }
 
 module.exports = {

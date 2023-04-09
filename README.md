@@ -1,4 +1,4 @@
-# Awuf-Booking-Api
+# Rave-Booking-Api
 
 API contains: 
 
