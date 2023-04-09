@@ -244,7 +244,7 @@ const handleSuccessfulPayment = async (paymentStatus, clientPaymentdata, respons
     // If user doesn't have a payment  model on the DB, create one and add the payment record to it
     if (!userPaymentDetails) {
       userPaymentDetails = await Payment.create({
-        userId: user,
+        userId: userId,
         paymentRecords: paymentData
       });
       console.log("New user payment data");
