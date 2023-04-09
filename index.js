@@ -8,6 +8,8 @@ const helmet = require('helmet');
 const connectDB = require("./utils/dbConn");
 const config = require('./utils/config')
 const notFound = require('./middlewares/not-found')
+const bookingCronJobs = require('./utils/bookingCronJobs'); 
+
 //import Swagger ui
 const swaggerUi = require('swagger-ui-express')
 const swaggerFile = require('./swagger_output.json')
@@ -88,6 +90,9 @@ mongoose.connection.once("open", () => {
   });
 });
 //with this setup, app won't listen until mongoDB is cconnected. Helps avoid future error
+
+bookingCronJobs.task.start(); // call the function to start the task for booking cron Jobs functions
+
 
 
 

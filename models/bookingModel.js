@@ -10,10 +10,8 @@ const BookingSchema = new mongoose.Schema({
             price:{type: Number, required: true},
             commission:{type: Number, required: true, default: 0},
             paymentStatus: {type:Boolean, default: false},
-            paymentType:{
-                type:String, enum: ['online','onsite'],
-                default: "onsite"
-            },
+            paymentType:{ type:String, enum: ['online','onsite'], default: "onsite" },
+
                 // hotel details 
                 hotelDetails: { 
                     hotelId: {type: mongoose.Schema.Types.ObjectId, ref: 'Hotel', required:true}, 
@@ -26,8 +24,27 @@ const BookingSchema = new mongoose.Schema({
                 roomDetails:{
                     noOfRooms:{type: Number, required: true},
                     nightsNumber:{type: Number, required: true},
-                    checkIn:{type: Date, required: true},
-                    checkOut:{ type: Date, required: true},
+                    checkIn:{
+                        type: Date,
+                        required: true,
+                        // validate: {
+                        //   async validator(value) {
+                        //     const currentDate = new Date();
+                        //     return value >= currentDate;
+                        //   },
+                        //   message: props => `Check-in date (${props.value}) must not be before the current date.`
+                        // }
+                    },
+                    checkOut:{
+                        type: Date,
+                        required: true,
+                        // validate: {
+                        //     async validator(value) {
+                        //         return value >= this.checkIn;
+                        //     },
+                        //     message: props => `Check-out date (${props.value}) must not be before check-in date.`
+                        // }
+                    },
                     guestCount:  [{ picked: String, amount: Number}],
                     oneRoom: [{roomType: String, singlePrice: Number}],
                 }, 
@@ -50,23 +67,23 @@ const BookingSchema = new mongoose.Schema({
                     // Each part need to be updated
                     cancelReservation:[{ 
                         status: {type:Boolean, default: false},
-                        date:{type: Date, default:Date.now } 
+                        date:{type: Date,  } 
                     }],
                     isExpired:[{ 
                         status: {type:Boolean, default: false},
-                        date:{type: Date, default:Date.now } 
+                        date:{type: Date,  } 
                     }],
                     isCheckIn:[{ 
                         status: {type:Boolean, default: false},
-                        date:{type: Date, default:Date.now } 
+                        date:{type: Date, } 
                     }],
                     isCheckOut:[{ 
                         status: {type:Boolean, default: false},
-                        date:{type: Date, default:Date.now } 
+                        date:{type: Date, } 
                     }],
                     isReview: [{ 
                         status: {type:Boolean, default: false},
-                        date:{type: Date, default:Date.now } 
+                        date:{type: Date, } 
                     }],                
                 },  
         }
@@ -74,5 +91,6 @@ const BookingSchema = new mongoose.Schema({
     ],
     
 },{timestamps:true})
+
 
 module.exports = mongoose.model("Bookings", BookingSchema)

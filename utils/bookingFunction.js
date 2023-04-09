@@ -1,5 +1,6 @@
 const axios = require("axios");
 const crypto = require("crypto");
+
 const Booking = require('../models/bookingModel')
 const Payment = require('../models/paymentModel')
 const {sendNewBookingEmailToUser, sendNewBookingEmailToOwner} = require('../utils/email')
