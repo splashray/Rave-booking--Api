@@ -17,6 +17,8 @@ const roomsRouter = require('./routes/roomRouter')
 const kycsRouter = require('./routes/kycRouter')
 const bookingsRouter = require('./routes/bookingRouter')
 const reviewsRouter = require('./routes/reviewRouter')
+const historyRouter = require('./routes/historyRouter')
+
 
 
 const app = express();
@@ -39,6 +41,7 @@ app.use('/api/rooms', roomsRouter);
 app.use('/api/kycs', kycsRouter);
 app.use('/api/bookings', bookingsRouter);
 app.use('/api/reviews', reviewsRouter);
+app.use('/api/historys', historyRouter)
 
 
 app.use((err, req, res, next)=>{

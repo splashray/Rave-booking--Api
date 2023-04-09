@@ -11,7 +11,7 @@ router.post("/:hotelId", verifyToken, validatePaymentType, createBooking)
 router.post('/paystack/verify', verifyToken,  paymentVerification)
 
 //payment url regeneration
-router.post('/paystack/regenerate', verifyToken, paymentRegeneration)
+router.post('/paystack/regenerate/:id', verifyToken, paymentRegeneration)
 
 //get all booking by an admin--
 router.get("/",verifyToken, verifyAdmin, getBookings)

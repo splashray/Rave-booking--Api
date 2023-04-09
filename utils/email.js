@@ -215,7 +215,7 @@ const sendHotelKycVerfiedEmail = ({hotelCustomId,hotelBasicInfo, email},verifica
 
 /////////// Booking email  /////////////
     //send new booking email to users
-const sendNewBookingEmailToUser = ({price, bookingId,email,hotelDetails,roomDetails,userDetails }, res) => {
+const sendNewBookingEmailToUser = ({price, bookingId,email,hotelDetails,roomDetails,userDetails, paymentType }, res) => {
     const {hotelName, hotelAddress ,hotelEmail} = hotelDetails
 
     const { noOfRooms, nightsNumber, checkIn, checkOut, guestCount, oneRoom} = roomDetails
@@ -229,7 +229,7 @@ const sendNewBookingEmailToUser = ({price, bookingId,email,hotelDetails,roomDeta
         subject: `You have made a booking at ${hotelName}`,
         template: 'newBooking',
         context: {
-          hotelName,hotelAddress, hotelEmail,
+          hotelName,hotelAddress, hotelEmail, paymentType,
 
           firstName, lastName, phoneNumber, title, address,
 

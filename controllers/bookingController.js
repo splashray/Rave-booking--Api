@@ -12,7 +12,8 @@ const paystackConfig = {
     }
 };
 
-const {sendNewBookingEmailToUser, sendNewBookingEmailToOwner} = require('../utils/email')
+const {generateBookingCustomId, createBookingRecord,  processPaymentType, handleSuccessfulPayment, handleFailedOrPendingPayment, handleGeneralPaymentStatus} = require('../utils/bookingFunction');
+
 
 const validatePaymentType = (req, res, next) => {
     const { paymentType } = req.body;
@@ -25,7 +26,6 @@ const validatePaymentType = (req, res, next) => {
     next();
 }
 
-  
 const createBooking = async (req, res, next) => {
     	// #swagger.tags = ['Bookings']
         // #swagger.description = 'Endpoint to create booking.'  
@@ -44,148 +44,33 @@ const createBooking = async (req, res, next) => {
         }        
         const percentToTheBookingCompany = 10;    //company percentage 
         const commission = (percentToTheBookingCompany / 100) * price // Commission
-        console.log(commission);
-        // generate unique booking ID
-        function generateCustomId() {
-            return Math.floor(Math.random() * 10000000);
-        }
-            
-        async function createUniqueId() {
-            let bookingId = generateCustomId();
-            let idExists = await Booking.exists({'bookingRecords.bookingId': bookingId});
-            while (idExists) {
-                bookingId = generateCustomId();
-                idExists = await Booking.exists({ bookingId });
-            }
-            console.log(bookingId);
-            return bookingId;
+        console.log(`commission: ${commission}`);
+
+        // generate unique booking ID in the generateBookingCustomId function
+        const genbookingCustomId = await generateBookingCustomId();
+
+        // lastbookingRecord in the createBookingRecord function
+        const lastBookingRecord = await createBookingRecord(genbookingCustomId, price, commission, email, paymentType, hotel, firstName, lastName, phoneNumber, title, address, noOfRooms, nightsNumber, checkIn, checkOut, guestCount, oneRoom, user);
+
+        // processing of paymentType according to user's option in the processPaymentType function
+        const { clientPaymentdata, savedPayment } = await processPaymentType(paymentType, lastBookingRecord, user, res);
+
+
+        if (!clientPaymentdata && !savedPayment) {
+        //the user lastbookingRecord has been deleted before returning here, since the payment can't be processed
+            return res.status(500).json({error:"Payment processing failed", status: "Failed"});
         }
 
-        const genbookingCustomId = await createUniqueId();
-
-        // prepare the booking record array to be appended to the user booking model 
-        const bookingRecords = [{
-            bookingId: `${genbookingCustomId}`, 
-            price,
-            commission,
-            email:email,
-            paymentType,
-            hotelDetails: {
-                hotelId: hotel._id,
-                hotelEmail: hotel.email,
-                hotelName: hotel.hotelBasicInfo.hotelName,
-                hotelAddress: hotel.hotelBasicInfo.streetAddress
-            },
-            userDetails: {
-                firstName: firstName,
-                lastName: lastName,
-                phoneNumber: phoneNumber,
-                title: title,
-                address: address
-            },
-            roomDetails: {
-                noOfRooms: noOfRooms,
-                nightsNumber: nightsNumber,
-                checkIn: checkIn,
-                checkOut: checkOut,
-                guestCount: guestCount.map(cnt => {
-                    return {
-                        picked: cnt.picked,
-                        amount: cnt.amount 
-                    }
-                }),
-                oneRoom: oneRoom.map(orm=>{
-                    return{
-                        roomType: orm.roomType, 
-                        singlePrice: orm.singlePrice 
-                    }
-                })
-            }
-        }];
-        
-        // find a user booking model
-        let userbookingDetails = await Booking.findOne({ userId: user });
-        
-        // If user doesn't have a booking model on the DB, create one and add the booking record to it
-        if (!userbookingDetails) {
-            userbookingDetails = await Booking.create({
-                userId: user, 
-                bookingRecords: bookingRecords
-            });
-            console.log("New user Booking");
+        if (clientPaymentdata) {
+            return res.status(200).json({ clientPaymentdata ,lastBookingRecord});
         } else {
-        // Else, append the booking record to the booking model of such user
-            userbookingDetails.bookingRecords = [...userbookingDetails.bookingRecords, ...bookingRecords];
-            await userbookingDetails.save();
-            console.log("Old user Booking");
-        }
-        const lastBookingRecord = userbookingDetails.bookingRecords[userbookingDetails.bookingRecords.length - 1];
-
-        if (paymentType === 'online') {
-            console.log("online");
-
-            const paymentData = {
-                amount: lastBookingRecord.price * 100, 
-                email: lastBookingRecord.email,
-                currency: "NGN",
-                callback_url: 'http://localhost:5000', //user will be directed to this route when payment is successful
-                metadata: {
-                    cancel_action: "http://localhost:5000", //user will be directed to this route once payment fails
-                    bookingId: lastBookingRecord._id,
-                    bookingInfo: lastBookingRecord
-                },
-
-            };
-
-            //we are going to return a url which user will be redirected to on the frontend to make payment
-            let clientPaymentdata 
-            try {
-                const response = await axios.post(
-                "https://api.paystack.co/transaction/initialize",
-                paymentData,
-                paystackConfig
-                );
-                clientPaymentdata = response.data
-
-            } catch (error) {
-                console.log(error);
-            }
-
-            if (!clientPaymentdata) return res.status(500).json({error:"could not initialize payment", status: "Failed"});
-
-        //Todo: delete the booking saved and restart since clientpayment Data wasn't successful
-
-            res.status(200).json({ clientPaymentdata ,lastBookingRecord});
-
-        }else{
-            console.log("onsite");
-            // Save new Payment info into the Payment model
-                const paymentData = {
-                    bookingId: lastBookingRecord._id,
-                    amount: lastBookingRecord.price,
-                    status: 'unpaid',
-                    paymentType: 'onsite',
-                    transactionId: '',
-                };
-                const paymentRecord = new Payment(paymentData);
-                const savedPayment = await paymentRecord.save();
-                
-                if(!savedPayment)return res.status(404).json("Payment info not saved")
-
-            // send email of the latest booking to user Email address provided
-            sendNewBookingEmailToUser(lastBookingRecord, res);
-
-            // send email of the latest booking to owner Email address provided
-            sendNewBookingEmailToOwner(lastBookingRecord, res);
-
             return res.status(201).json({
-            status: "SUCCESS",
-            messageToUser: "Booking created successfully and Confirmation Email has been sent",
-            messageToOwner: "Booking sent to your hotel successfully",
-            booking: lastBookingRecord,
-            PaymentInfo: savedPayment
+                status: "SUCCESS",
+                messageToUser: "Booking created successfully and Confirmation Email has been sent",
+                messageToOwner: "Booking sent to your hotel successfully",
+                booking: lastBookingRecord,
+                PaymentInfo: savedPayment
             });
-
         }
 
     } catch (err) {
@@ -217,65 +102,39 @@ const paymentVerification = async (req, res, next) => {
         let response;
         const paymentStatus = clientPaymentdata.data.status; 
 
-    //check if verification has been previously ran successfully
-    const ifPaymentCheckOperationExist = await Payment.findOne({
-        transactionId: reference,
-    });
-    if (!ifPaymentCheckOperationExist) {
-        switch (status) {
-            case true:
-            response = true;
-            if(paymentStatus === 'success'){
-                const paymentData = {
-                    bookingId: clientPaymentdata.data.metadata.bookingId,
-                    amount: clientPaymentdata.data.amount / 100,
-                    status: 'success',
-                    paymentType: 'online',
-                    transactionId: clientPaymentdata.data.reference,
-                };
-                const paymentRecord = new Payment(paymentData);
-                const savedPayment = await paymentRecord.save();
-                const lastBookingRecord = clientPaymentdata.data.metadata.bookingInfo
+        //check if verification has been previously ran successfully
+        const ifPaymentCheckOperationExist = await Payment.findOne({
+            'paymentRecords.transactionId': reference,
+        });
+        if (!ifPaymentCheckOperationExist) {
+            switch (status) {
+                case true:
+                response = true;
+                    if(paymentStatus === 'success'){
+                        return handleSuccessfulPayment(paymentStatus, clientPaymentdata, response,  res);
+                    }else if (paymentStatus === 'failed' || paymentStatus === 'pending'){
+                    //Todo: perform actions on the failed and pending transactions
+                        return handleFailedOrPendingPayment(paymentStatus, response, res);
+                    }else{
+                    //Todo: perform general action on the paymentstatus
+                        return handleGeneralPaymentStatus(paymentStatus, response, res);
+                    } 
 
-                     // send email of the latest booking to user Email address provided
-                    sendNewBookingEmailToUser(lastBookingRecord, res);
+                case false:
+                response = false;
+                throw res.status(404).json({ error: 'Transaction failed.', responseFromVerification : response});
 
-                    // send email of the latest booking to the owner Email address provided
-                    sendNewBookingEmailToOwner(lastBookingRecord, res);
-                        console.log('payment success and saved to the payment model');
-
-                    return res.status(201).json({
-                        status: "SUCCESS",
-                        messageToUser: "Booking created successfully and Confirmation Email has been sent",
-                        messageToOwner: "Booking sent to your hotel successfully",
-                        booking: lastBookingRecord,
-                        PaymentInfo: savedPayment
-                    });
-
-            }else if(paymentStatus==='failed'||'pending'){
-            //Todo: perform actions on the failed and pending transactions
-            console.log(paymentStatus);
+                default:
+                response = false;
+                throw res.status(404).json({ error: 'Transaction failed.', responseFromVerification : response});
             }
-            else{
-                //Todo: perform general action on the paymentstatus
-                console.log(paymentStatus);
-            }
-             res.status(200).json({paymentStatus});
-             
-            break;
-            case false:
-            response = false;
-            res.status(404).json({ error: 'Transaction failed.', response});
-
-            break;
-            default:
-            response = false;
-            throw res.status(404).json({ error: 'Transaction failed.', response });
+        
+        } else {
+            return res.status(200).json({
+                        message: "verification successful already",
+                        responseFromVerification : response
+                    }).end();
         }
-  
-    } else {
-    res.status(200).json({message: "verification successful already", response}).end();
-    }
 
     } catch (error) {
       console.error(error);
@@ -286,7 +145,57 @@ const paymentVerification = async (req, res, next) => {
 }
 
 const paymentRegeneration = async (req, res, next) => {
-   
+  // Todo: paymentType must be "online" before regeneration of url for payment 
+  const bookingId = req.params.id
+  const userId = req.user.id
+
+  if(!userId && bookingId) return res.status(404).json({error: "userId and booking id not found"})
+
+ const bookingRecord = await Booking.findOne({ userId: userId }, { bookingRecords: 1 })
+    if (!bookingRecord) return res.status(404).json({ message: "Booking record not found" });
+    const booking =  bookingRecord.bookingRecords.find((record) => record._id.toString() === bookingId);
+
+    if (!booking){
+        return res.status(404).json({ error: "Booking not found" });
+    }
+    else if (booking.paymentType === 'online' && booking.paymentStatus === false) {
+            console.log("payment Type: online and have not been paid before... Generating Payment Url");
+
+            const paymentData = {
+                amount: booking.price * 100, 
+                email: booking.email,
+                currency: "NGN",
+                callback_url: 'http://localhost:5000', //user will be directed to this route when payment is successful
+                metadata: {
+                    cancel_action: "http://localhost:5000", //user will be directed to this route once payment fails
+                    userId: userId,
+                    bookingId: booking._id,
+                    bookingInfo: booking
+                },
+            };
+
+            //we are going to return a url which user will be redirected to on the frontend to make payment
+            let clientPaymentdata;
+            try {
+                const response = await axios.post(
+                    "https://api.paystack.co/transaction/initialize",
+                    paymentData,
+                    paystackConfig
+                );
+                clientPaymentdata = response.data;
+            } catch (error) {
+                console.log(error);
+            }
+
+            if (!clientPaymentdata) {
+               return res.status(200).json({ clientPaymentdata: null, GeneratedBooking: booking })
+            } else {
+                return res.status(200).json({ clientPaymentdata, GeneratedBooking: booking });
+            }
+    }else{
+        return res.status(400).json({ error: "Booking has been paid or Payment method choosen is onsite" });
+    }
+    
 }
 
 const getBooking = async (req, res, next)=>{
@@ -323,7 +232,6 @@ const getBookings = async (req, res, next)=>{
           next(err)
       }
 }
-
 
 const getOwnerBoookings = async (req, res, next)=>{
     // #swagger.tags = ['Bookings']

@@ -4,25 +4,16 @@ const BookingSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true,  unique: true},
     bookingRecords:[
         {
-        // booking details 
-        bookingId:{type: String, required: true},
-        email:{ type: String, required: true},
-        price:{type: Number, required: true},
-        commission:{type: Number, required: true, default: 0},
-        
-        isReview: [{ 
-            status: {type:Boolean, default: false},
-            date:{type: Date, default:Date.now } 
-        }],
-        isPaid: [{ 
-            status: {type:Boolean, default: false},
-            date:{type: Date,  default:Date.now } 
-        }],
-        paymentType:{
-            type:String, enum: ['online','onsite'],
-            default: "onsite"
-        },
-
+            // booking details 
+            bookingId:{type: String, required: true},
+            email:{ type: String, required: true},
+            price:{type: Number, required: true},
+            commission:{type: Number, required: true, default: 0},
+            paymentStatus: {type:Boolean, default: false},
+            paymentType:{
+                type:String, enum: ['online','onsite'],
+                default: "onsite"
+            },
                 // hotel details 
                 hotelDetails: { 
                     hotelId: {type: mongoose.Schema.Types.ObjectId, ref: 'Hotel', required:true}, 
@@ -50,14 +41,18 @@ const BookingSchema = new mongoose.Schema({
                     address:{type: String, required: true},
                 },
             
-                // Booking Status details
-                BookingStatus:{
-                    hotelStatus:{type: String,
-                        enum: ['Pending','Check-In','Check-Out','Cancelled','Expired'],
+                // Booking information details
+                bookingInfo:{
+                    bookingStatus:{type: String,
+                        enum: ['Pending','Active','Inactive','Cancelled','Expired'],
                         default: "Pending"
                     },
                     // Each part need to be updated
                     cancelReservation:[{ 
+                        status: {type:Boolean, default: false},
+                        date:{type: Date, default:Date.now } 
+                    }],
+                    isExpired:[{ 
                         status: {type:Boolean, default: false},
                         date:{type: Date, default:Date.now } 
                     }],
@@ -69,8 +64,11 @@ const BookingSchema = new mongoose.Schema({
                         status: {type:Boolean, default: false},
                         date:{type: Date, default:Date.now } 
                     }],
-                },
-            
+                    isReview: [{ 
+                        status: {type:Boolean, default: false},
+                        date:{type: Date, default:Date.now } 
+                    }],                
+                },  
         }
 
     ],
