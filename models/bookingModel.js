@@ -65,26 +65,26 @@ const BookingSchema = new mongoose.Schema({
                         default: "Pending"
                     },
                     // Each part need to be updated
-                    cancelReservation:[{ 
+                    cancelReservation:{ 
                         status: {type:Boolean, default: false},
                         date:{type: Date,  } 
-                    }],
-                    isExpired:[{ 
+                    },
+                    isExpired:{ 
                         status: {type:Boolean, default: false},
                         date:{type: Date,  } 
-                    }],
-                    isCheckIn:[{ 
+                    },
+                    isCheckIn:{ 
                         status: {type:Boolean, default: false},
                         date:{type: Date, } 
-                    }],
-                    isCheckOut:[{ 
+                    },
+                    isCheckOut:{ 
                         status: {type:Boolean, default: false},
                         date:{type: Date, } 
-                    }],
-                    isReview: [{ 
+                    },
+                    isReview: { 
                         status: {type:Boolean, default: false},
                         date:{type: Date, } 
-                    }],                
+                    },                
                 },  
         }
 

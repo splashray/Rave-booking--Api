@@ -338,77 +338,119 @@ const getUserSingleBookings = async (req, res, next)=>{
 }
 
 const checkinBooking = async (req, res, next)=>{
-
     try {
-        const checkin = await Booking.findByIdAndUpdate(
-            req.params.id, 
-            {$set: {
-                hasCheckedin: true,
+        const { bookingRecordId } = req.params;
 
-            }},
-            {new: true}
-            )
-        // Perform a commission transaction taged as unpaid
-        // Perform a debit transactions to the hotel owners wallet
-            res.status(200).json(checkin)
+        // Get the booking record by ID
+        const booking = await Booking.findOne({ "bookingRecords._id": bookingRecordId });
+
+        // Check if the booking record exists
+        if (!booking) {
+            return res.status(404).json({ message: "Booking not found" });
+        }
+    
+        const bookingRecord = booking.bookingRecords.find(record => record._id.toString() === bookingRecordId);
+        if (!bookingRecord) {
+          return res.status(404).json({ message: 'Booking record not found' });
+        }
+    
+        if (bookingRecord.bookingInfo.isCheckIn.status) {
+          return res.status(400).json({ message: "Booking is already checked in" });
+        }
+        
+        // Update isCheckIn status
+        bookingRecord.bookingInfo.isCheckIn.status = true;
+        bookingRecord.bookingInfo.isCheckIn.date = new Date();
+  
+        // Update booking status to Active
+        bookingRecord.bookingInfo.bookingStatus = 'Active';
+
+    
+        // Save the updated booking record
+        const updatedBooking = await bookingRecord.save();
+
+        return res.status(200).json({ updatedBooking, message: 'Checkin successful' });
+
+            //Todo: Perform a commission transaction taged as unpaid
+            //Todo: Perform a debit transactions to the hotel owners wallet
     } catch (err) {
         next(err)
     }
 }
 
 const checkoutBooking = async (req, res, next)=>{
-
+    const { bookingRecordId } = req.params;
     try {
-        const checkin = await Booking.findByIdAndUpdate(
-            req.params.id, 
-            {$set: {
-                hasCheckedin: true,
+      const booking = await Booking.findOne({ 'bookingRecords._id': bookingRecordId });
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+  
+      const bookingRecord = booking.bookingRecords.find(record => record._id.toString() === bookingRecordId);
+      if (!bookingRecord) {
+        return res.status(404).json({ message: 'Booking record not found' });
+      }
+  
+      if (bookingRecord.bookingInfo.isCheckOut.status) {
+        return res.status(400).json({ message: "Booking is already checked out" });
+      }
 
-            }},
-            {new: true}
-            )
+      // Update isCheckOut status
+      bookingRecord.bookingInfo.isCheckOut.status = true;
+      bookingRecord.bookingInfo.isCheckOut.date = new Date();
+
+      // Update booking status to Inactive
+      bookingRecord.bookingInfo.bookingStatus = 'Inactive';
+  
+      const updatedBooking = await booking.save();
+  
+      return res.status(200).json({ updatedBooking, message: 'Checkout successful' });
+      
         // Perform a commission transaction 
         // Perform a debit transactions to the hotel owners wallet
-            res.status(200).json(checkin)
+
+    } catch (err) {
+        next(err)
+    }
+}
+
+const cancelReservation  = async (req, res, next)=>{
+    const { bookingRecordId } = req.params;
+    try {
+      const booking = await Booking.findOne({ 'bookingRecords._id': bookingRecordId });
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+  
+      const bookingRecord = booking.bookingRecords.find(record => record._id.toString() === bookingRecordId);
+      if (!bookingRecord) {
+        return res.status(404).json({ message: 'Booking record not found' });
+      }
+  
+      if (bookingRecord.bookingInfo.cancelReservation.status) {
+        return res.status(400).json({ message: "Booking Reservation is already cancelled" });
+      }
+
+      // Update cancelReservation status
+      bookingRecord.bookingInfo.cancelReservation.status = true;
+      bookingRecord.bookingInfo.cancelReservation.date = new Date();
+
+      // Update booking status to Inactive
+      bookingRecord.bookingInfo.bookingStatus = 'Cancelled';
+  
+      const updatedBooking = await booking.save();
+  
+      return res.status(200).json({ updatedBooking, message: 'Reservation Cancelled successfully' });
+      
+        // Perform a commission transaction 
+        // Perform a debit transactions to the hotel owners wallet
+
     } catch (err) {
         next(err)
     }
 }
 
 
-
 module.exports ={
-    validatePaymentType, createBooking, paymentVerification, paymentRegeneration, getBooking, getBookings, getOwnerBoookings, getOwnerSingleBookings, getUserBoookings,  getUserSingleBookings, checkinBooking, checkoutBooking
+    validatePaymentType, createBooking, paymentVerification, paymentRegeneration, getBooking, getBookings, getOwnerBoookings, getOwnerSingleBookings, getUserBoookings,  getUserSingleBookings, checkinBooking, checkoutBooking, cancelReservation
 }
-
-
-
-
-  // if (paymentDetails.status === 'success') {
-        //     const paymentData = {
-        //     bookingId: paymentDetails.data.metadata.bookingId,
-        //     amount: paymentDetails.data.amount / 100,
-        //     status: paymentDetails.data.status,
-        //     transactionId: paymentDetails.data.reference,
-        //     };
-        //     const paymentRecord = new Payment(paymentData);
-        //     const savedPayment = await paymentRecord.save();
-
-        //     //Updating Booking Record
-        //     const bookingRecord = await Booking.findOne({ 'bookingRecords.bookingId': paymentData.bookingId });
-        //     if (!bookingRecord) {
-        //     return res.status(404).json({ error: 'Booking not found.' });
-        //     }
-
-        //     bookingRecord.bookingRecords.forEach(async (booking, index) => {
-        //     if (booking.bookingId === paymentData.bookingId) {
-        //         booking.paymentStatus = paymentData.status;
-        //         booking.paymentTransactionId = paymentData.transactionId;
-        //         bookingRecord.bookingRecords[index] = booking;
-        //         await bookingRecord.save();
-        //     }
-        //     });
-        //     return res.status(200).json({ message: 'Payment verified and booking record updated.' });
-        // } else {
-        //     return res.status(400).json({ error: 'Payment verification failed.' });
-        // }
