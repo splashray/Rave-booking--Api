@@ -10,7 +10,7 @@ const BookingSchema = new mongoose.Schema({
             price:{type: Number, required: true},
             commission:{type: Number, required: true, default: 0},
             paymentStatus: {type:Boolean, default: false},
-            paymentType:{ type:String, enum: ['online','onsite'], default: "onsite" },
+            paymentType:{ type:String, enum: ['online','onsite'], required: true },
 
                 // hotel details 
                 hotelDetails: { 
@@ -84,7 +84,11 @@ const BookingSchema = new mongoose.Schema({
                     isReview: { 
                         status: {type:Boolean, default: false},
                         date:{type: Date, } 
-                    },                
+                    },  
+                    isPaymentRefund: { 
+                        status: {type:Boolean, default: false},
+                        date:{type: Date, } 
+                    },               
                 },  
         }
 

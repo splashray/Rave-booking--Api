@@ -7,7 +7,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "swagger-autogen": "node swagger.js",
-    "test": "test"
+    "test": "jest --watch"
   },
   "keywords": [],
   "author": "",
@@ -41,5 +41,9 @@
   "engine": {
     "node": "14.x",
     "npm": "6.9.0"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0",
+    "supertest": "^6.3.3"
   }
 }

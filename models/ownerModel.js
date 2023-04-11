@@ -27,10 +27,6 @@ const ownerSchema = new mongoose.Schema({
     isVerified: {
         type: Boolean,
         default: false,
-    },
-    isKyc: {
-        type: Boolean,
-        default: false,
     }
 },{timestamps:true})
 

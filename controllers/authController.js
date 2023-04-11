@@ -129,7 +129,7 @@ const config = require('./../utils/config')
                 phoneNumber: signinOwner.phoneNumber,
                 email: signinOwner.email,
                 isVerified: signinOwner.isVerified,
-                isKyc: signinOwner.isKyc,
+           
                 token: generateToken(signinOwner),
             })
         }

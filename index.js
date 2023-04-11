@@ -91,7 +91,7 @@ mongoose.connection.once("open", () => {
 });
 //with this setup, app won't listen until mongoDB is cconnected. Helps avoid future error
 
-bookingCronJobs.task.start(); // call the function to start the task for booking cron Jobs functions
+bookingCronJobs.taskExpiredBooking.start(); // call the task for booking cron Job functions for Expired Booking
 
 
 
@@ -102,11 +102,7 @@ bookingCronJobs.task.start(); // call the function to start the task for booking
 // const express = require('express')
 // const mongoose = require('mongoose')
 // const cors = require('cors')
-// //import coustom middlware
-// const connectDB = require("./utils/dbConn");
-// const config = require('./utils/config')
-// const notFound = require('./middlewares/not-found')
-// //import Swagger ui
+// /import Swagger ui
 // const swaggerUi = require('swagger-ui-express')
 // const swaggerFile = require('./swagger_output.json')
 // //import custom router
@@ -165,4 +161,8 @@ bookingCronJobs.task.start(); // call the function to start the task for booking
 //     console.log(`connected to backend @ ${config.PORT}`);
 //   });
 // });
-// //with this setup, app won't listen until mongoDB is cconnected. Helps avoid future error
+// //with this setup, app won't listen until mongoDB is cconnected. Helps avoid future error//import coustom middlware
+// const connectDB = require("./utils/dbConn");
+// const config = require('./utils/config')
+// const notFound = require('./middlewares/not-found')
+// /

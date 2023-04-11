@@ -1,14 +1,11 @@
 const cron = require('node-cron');
 const Booking = require('../models/bookingModel')
 
-// In this script, we use node-cron to schedule the task to run every 24 hours (at midnight). 
-// The task first finds all bookings where the check-in date has passed and the status is not already expired, then updates their status to "Expired". 
 
-// const task = cron.schedule('*/2 * * * *', async () => {
+// Define the taskExpiredBooking to run every 24 hours (at midnight) and This is set to 2 days later
+const taskExpiredBooking = cron.schedule('0 0 */24 * * *', async () => {
+  // The task first finds all bookings where the check-in date has passed the current day (two Days Later) and the status is not already expired, then updates their status to "Expired". 
 
-// This is set to 2 days later
-// Define the task to run every 24 hours
-const task = cron.schedule('0 0 */24 * * *', async () => {
   console.log('Running booking check...');
   const currentDate = new Date();
   const twoDaysLater = new Date(currentDate.getTime() + 2 * 24 * 60 * 60 * 1000);
@@ -36,8 +33,9 @@ const task = cron.schedule('0 0 */24 * * *', async () => {
   console.log(`Booking check completed. ${expiredBookings.length} bookings updated.`);
 }, { scheduled: true });
 
+// Define the taskCheckOutBooking to run Automatic checkout date function, if the checkout wasn't done after 2 days by the user provided that the user checked in before  
 
 // Start the task
-task.start();
+taskExpiredBooking.start();
 
-module.exports = { task };
+module.exports = { taskExpiredBooking };

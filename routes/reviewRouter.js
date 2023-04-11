@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { createReview, getReviewByAdmin, getAllReviewsByAdmin, getOwnerSingleReview, getOwnerReviews, getUserSingleReview, getUserReviews, deleteReview } = require('../controllers/reviewController');
+const { createReview, getReviewByAdmin, getAllReviewsByAdmin, getOwnerSingleReview, getOwnerReviews, getUserSingleReview, getUserReviews, deleteReview, generalHotelReviews } = require('../controllers/reviewController');
 const router = express.Router()
 
 const {isVerifiedOwner, verifyAdmin, verifyToken } = require("../utils/verifyToken");
@@ -8,11 +8,14 @@ const {isVerifiedOwner, verifyAdmin, verifyToken } = require("../utils/verifyTok
 // post a new review
 router.post('/:bookingid', verifyToken, createReview)
 
+//get general endpoint to be viewed by user to view all reviews by certain hotel.
+router.get("/general/:hotelId", generalHotelReviews)
+
 // get users personal all review
-router.get("/usersreview/:email/all", verifyToken, getUserReviews)
+router.get("/usersreview/:userId/all", verifyToken, getUserReviews)
 
 // Get users personal  id of a review
-router.get("/usersreview/:email/:reviewid", verifyToken, getUserSingleReview)
+router.get("/usersreview/:userId/:reviewid", verifyToken, getUserSingleReview)
 
 // get owners all review  --check hotel kyc
 router.get("/ownersreview/:hotelid", verifyToken, isVerifiedOwner, getOwnerReviews)

@@ -12,7 +12,6 @@ const generateToken = (user) => {
         email: user.email,
         isAdmin: user.isAdmin,
         isVerified: user.isVerified ? user.isVerified :``,
-        isKyc: user.isKyc ? user.isKyc :``
     },
       config.JWT_SECRET,
        { expiresIn: "24h" }
@@ -53,14 +52,6 @@ const  isVerifiedOwner  = (req, res, next) =>{
     }
   }
 
-const  isKycOwner  = (req, res, next) =>{
-    if(req.user && req.user.isKyc){
-      next()
-    }else{
-      res.status(401).send({message: 'You have not been Authorized as owner, Do your KYC!'})
-    }
-  }
-
   module.exports ={
-    generateToken, verifyToken, verifyAdmin, isVerifiedOwner, isKycOwner
+    generateToken, verifyToken, verifyAdmin, isVerifiedOwner
 }

@@ -7,20 +7,27 @@ const CommissionWalletModelSchema = new mongoose.Schema({
     commissionPaidToCompany: {type: Number, required: true, default: 0},
     
     commissionRecords:[{     
-        bookingId:{type: String, required: true},
+        customBookingId:{type: String, required: true},
         userId: {type: String, required: true},
         price:{type: Number, required: true},
         commission:{type: Number, required: true},
-        hasPaid:{type: Boolean, default: false, required: true}
+        paymentStatus:{type: Boolean, default: false, required: true},
+        date:{type: Date, default:Date.now },
+
+        paymentSettlement:{
+          status: {type: String, enum:['unsettled', 'settledToOwner','settledToCompany']},
+          date: {type: Date}
+        }
+        
     }],
-    TransactionRecords:[{      
-      amount: {type:Number, required:true},
-      type:{type: String, required:true, enum:['credit','debit','withdrawal']},
-      date:{type: Date, default:Date.now },
-      desc:{type: String, required:true, default:`Payment Unspecified`},
-      currency: {type: String, required:true, default:`NGN`},
-    }]
+
 },{timestamps:true});
 
 module.exports = mongoose.model("Commission-Wallet", CommissionWalletModelSchema)
 
+
+//2. Commission of 10% per the total amount of the booking will start calculating when checked-in AND update commission amount when checkout date is extended.
+
+// If onsite user checkin , we will call the users and hotel to confirm to ensure they checkin and the hotel will recieve a new payment in your commission wallet as yet to pay.
+
+// 

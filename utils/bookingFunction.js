@@ -292,5 +292,5 @@ const handleGeneralPaymentStatus = async (paymentStatus, response, res) => {
     res.status(200).json({ paymentStatus, responseFromVerification : response });
 };
 module.exports = {
-    generateBookingCustomId, createBookingRecord, processPaymentType, handleSuccessfulPayment, handleFailedOrPendingPayment, handleGeneralPaymentStatus
+    generateBookingCustomId, createBookingRecord, processPaymentType, deleteLastBookingRecord,  handleSuccessfulPayment, handleFailedOrPendingPayment, handleGeneralPaymentStatus
 } 
