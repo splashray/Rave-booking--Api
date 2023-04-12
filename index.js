@@ -8,7 +8,7 @@ const helmet = require('helmet');
 const connectDB = require("./utils/dbConn");
 const config = require('./utils/config')
 const notFound = require('./middlewares/not-found')
-const bookingCronJobs = require('./utils/cronJobs'); 
+const cronJobs = require('./utils/cronJobs'); 
 
 //import Swagger ui
 const swaggerUi = require('swagger-ui-express')
@@ -91,4 +91,5 @@ mongoose.connection.once("open", () => {
 });
 //with this setup, app won't listen until mongoDB is cconnected. Helps avoid future error
 
-bookingCronJobs.taskExpiredBooking.start(); // call the task for booking cron Job functions for Expired Booking
+cronJobs.taskExpiredBooking.start(); // call the task for booking cron Job functions for Expired Booking
+cronJobs.commissionReconciliationJob.start(); // cal the task for commission Reconciliation cron Job for unpaid

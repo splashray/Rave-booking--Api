@@ -35,11 +35,8 @@ const taskExpiredBooking = cron.schedule('0 0 */24 * * *', async () => {
 
 // Define the taskCheckOutBooking to run Automatic checkout date function, if the checkout wasn't done after 2 days by the user provided that the user checked in before  
 
-// Start the task
-taskExpiredBooking.start();
 
-
-const commissionReconciliationJob = new CronJob('0 0 1 * * *', async () => {
+const commissionReconciliationJob = cron.schedule('0 0 1 * * *', async () => {
   try {
     // Get all bookings that have been checked out in the last month
     const monthAgo = new Date();
@@ -76,17 +73,20 @@ const commissionReconciliationJob = new CronJob('0 0 1 * * *', async () => {
     owners.forEach(owner => {
       const hotelId = owner.hotelId.toString();
       const hotelInfo = bookingsByHotel[hotelId];
-  // If hotel has any outstanding commission due, send a reminder
-  if (hotelInfo && hotelInfo.totalCommissionDue > 0) {
-    const emailContent = `Dear ${owner.name},\n\nThis is a reminder that your hotel ${hotelInfo.hotelName} has an outstanding commission payment of $${hotelInfo.totalCommissionDue} due to us. Please make the payment as soon as possible.\n\nBest regards,\nThe Commission Reconciliation Team`;
-    sendEmail(owner.email, 'Commission Payment Reminder', emailContent);
-  }
-});
+    // If hotel has any outstanding commission due, send a reminder
+    if (hotelInfo && hotelInfo.totalCommissionDue > 0) {
+      const emailContent = `Dear ${owner.name},\n\nThis is a reminder that your hotel ${hotelInfo.hotelName} has an outstanding commission payment of $${hotelInfo.totalCommissionDue} due to us. Please make the payment as soon as possible.\n\nBest regards,\nThe Commission Reconciliation Team`;
+      sendEmail(owner.email, 'Commission Payment Reminder', emailContent);
+      }
+    });
 
-console.log('Commission reconciliation job ran successfully');
+  console.log('Commission reconciliation job ran successfully');
 } catch (error) {
   console.log('Error running commission reconciliation job:', error.message);
-  }
-});
+}
+}, { scheduled: true });
 
+// Start the tasks
+taskExpiredBooking.start();
+commissionReconciliationJob.start();
 module.exports = { taskExpiredBooking , commissionReconciliationJob };
