@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = require('mongoose')
 
-const OwnerTransactionSchema = new mongoose.Schema({
+const CentralTransactionSchema = new mongoose.Schema({
     commissionWalletId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
@@ -19,4 +19,4 @@ const OwnerTransactionSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-module.exports = mongoose.model("Owner-Transaction", OwnerTransactionSchema);
+module.exports = mongoose.model("Central-Transaction", CentralTransactionSchema);

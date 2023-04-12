@@ -61,7 +61,7 @@ const BookingSchema = new mongoose.Schema({
                 // Booking information details
                 bookingInfo:{
                     bookingStatus:{type: String,
-                        enum: ['Pending','Active','Inactive','Cancelled','Expired'],
+                        enum: ['Pending','Active','Inactive','Cancelled','Expired', 'Refund','Closed'],
                         default: "Pending"
                     },
                     // Each part need to be updated

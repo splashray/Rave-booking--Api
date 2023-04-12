@@ -39,6 +39,7 @@ const createHotel = async (req, res, next) => {
         commissionYetToPay : 0,
         commissionPaidToCompany : 0,
         commissionRecords: [],
+        TransactionRecords: []
     });
     await newCommission.save();
     console.log("and the hotel's Wallet is Created");

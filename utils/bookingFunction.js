@@ -99,9 +99,9 @@ const processPaymentType = async(paymentType, lastBookingRecord, user, res) => {
             email: lastBookingRecord.email,
             currency: "NGN",
             // callback_url: 'http://localhost:5000', //user will be directed to this route when payment is successful
-             callback_url: 'https://ravebooking.netlify.app/booking/payment-verification.html', //user will be directed to this route when payment is successful
+             callback_url: `${config.PAYSTACK_CALLBACK_URL}`, //user will be directed to this route when payment is successful
             metadata: {
-                cancel_action: "http://localhost:5000", //user will be directed to this route once payment fails
+                cancel_action: `${config.PAYSTACK_CANCEL_ACTION}`, //user will be directed to this route once payment fails
                 userId: user,
                 bookingId: lastBookingRecord._id,
                 bookingInfo: lastBookingRecord

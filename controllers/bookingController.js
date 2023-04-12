@@ -1,6 +1,7 @@
 const Booking = require('../models/bookingModel')
 const Hotel = require('../models/hotelModel')
 const Payment = require('../models/paymentModel')
+
 const config = require('../utils/config')
 
 const axios = require('axios')
@@ -165,9 +166,9 @@ const paymentRegeneration = async (req, res, next) => {
                 amount: booking.price * 100, 
                 email: booking.email,
                 currency: "NGN",
-                callback_url: 'https://ravebooking.netlify.app/booking/payment-verification.html', //user will be directed to this route when payment is successful
+                callback_url: `${config.PAYSTACK_CALLBACK_URL}`, //user will be directed to this route when payment is successful
                 metadata: {
-                    cancel_action: "http://localhost:5000", //user will be directed to this route once payment fails
+                    cancel_action: `${config.PAYSTACK_CANCEL_ACTION}`, //user will be directed to this route once payment fails
                     userId: userId,
                     bookingId: booking._id,
                     bookingInfo: booking
@@ -356,29 +357,42 @@ const checkinBooking = async (req, res, next)=>{
     
         if (bookingRecord.paymentType === "online" && bookingRecord.paymentStatus === false){ return res.status(400).json({ message: "Booking type is online and you havent make the payment" });
         }else{
-            // If onsite and regardless if it paid or not 
-            //Todo A: If onsite and paid create a commission transaction (as Paid commision)
-            //Todo B: If onsite and unpaid immediatly create a commission transaction. (as Unpaid commision) -Trigger a call to the user and owners
-            //Todo C: If online will definitely be paid already , create a commission transaction (as Paid commision)
-
+           // Those that can checkin are (online paid), (onsite unpaid), (oniste unpaid)
             if (bookingRecord.bookingInfo.isCheckIn.status) {
                 return res.status(400).json({ message: "Booking is already checked in" });
             }
-        
-            // Update isCheckIn status
+            // Update isCheckIn status and booking status to Active
             bookingRecord.bookingInfo.isCheckIn.status = true;
             bookingRecord.bookingInfo.isCheckIn.date = new Date();
+           const checkInBooking = await booking.save();
+           if (!checkInBooking) {
+            return res.status(500).json({ message: "Checkin process aborted" }).end()
+            }
 
-            // Update booking status to Active
-            bookingRecord.bookingInfo.bookingStatus = 'Active';
 
-        
-            // Save the updated booking record
-            await booking.save();
+            //  The commision sent to the hotel wallet start here
+            //Todo A: If onsite and paid create a commission transaction (as Paid commision)
+            //Todo B: If onsite and unpaid immediatly create a commission transaction. (as Unpaid commision) -Trigger a call to the user and owners
+            //Todo C: If online will definitely be paid already , create a commission transaction (as Paid commision)
+            
+            // money will be paid on checkout
+            const commissionRecord = [{     
+                customBookingId: bookingRecord.bookingId,
+                userId: booking.userId,
+                price: bookingRecord.price,
+                commission: bookingRecord.commission,
+                paymentStatus: bookingRecord.paymentStatus,
+                date: Date.now ,
+
+                paymentSettlement:{
+                  status: {type: String, enum:['unsettledToOwner', 'settledToOwner','settledToCompany']},
+                  date: Date.now
+                } 
+            }]
+
+
             return res.status(200).json({ updatedBooking: bookingRecord, message: 'Checkin successful' });
 
-            //Todo: Perform a commission transaction taged as unpaid
-            //Todo: Perform a debit transactions to the hotel owners wallet
       }
     } catch (err) {
         next(err)
@@ -463,6 +477,53 @@ const cancelReservation  = async (req, res, next)=>{
     }
 }
 
+const  refundBooking   = async (req, res, next)=>{
+    const { bookingRecordId } = req.params;
+    try {
+      const booking = await Booking.findOne({ 'bookingRecords._id': bookingRecordId });
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+  
+      const bookingRecord = booking.bookingRecords.find(record => record._id.toString() === bookingRecordId);
+      if (!bookingRecord) {
+        return res.status(404).json({ message: 'Booking record not found' });
+      }
+
+       //check paymentstatus and type and refund status
+       if (bookingRecord.paymentStatus === false) {
+            return res.status(400).json({ message: "Booking hasn't been paid" });
+       }
+       if (bookingRecord.bookingInfo.isPaymentRefund.status===true) {
+            return res.status(400).json({ message: "Booking Refund has been requested already" });
+       }
+
+       // Check if the booking is refundable, only pending status is allowed
+        if (bookingRecord.bookingInfo.bookingStatus !== "Pending") {
+            return res.status(400).json({ message: "Booking cannot be refunded at this time." });
+        }
+
+        // Process the refund, 
+        // Breakdown  price = 1000 , commision = 100, refund = 1000-100 = 900 , 900 will be returned
+        const refundAmount = bookingRecord.price - bookingRecord.commission;
+        //TODO: process the refund using a payment gateway and refundBooking model will be submitted and marked as the payment type
+
+        // Update the booking record
+        bookingRecord.bookingInfo.bookingStatus = 'Refund'
+        bookingRecord.bookingInfo.isPaymentRefund = {
+            status: true,
+            date: new Date()
+        };
+        await booking.save();
+
+        // Return success response
+        return res.status(200).json({ message: `Refund of ${refundAmount} has been processed.` });
+    
+    } catch (err) {
+        next(err)
+    }
+}
+
 const deleteBookingOnCanceledPayment  = async (req, res, next)=>{
     const  bookingId  = req.params.bookingId;
     try {
@@ -491,5 +552,5 @@ const deleteBookingOnCanceledPayment  = async (req, res, next)=>{
 
 
 module.exports ={
-    validatePaymentType, createBooking, paymentVerification, paymentRegeneration, getBooking, getBookings, getOwnerBoookings, getOwnerSingleBookings, getUserBoookings,  getUserSingleBookings, checkinBooking, checkoutBooking, cancelReservation, deleteBookingOnCanceledPayment
+    validatePaymentType, createBooking, paymentVerification, paymentRegeneration, getBooking, getBookings, getOwnerBoookings, getOwnerSingleBookings, getUserBoookings,  getUserSingleBookings, checkinBooking, checkoutBooking, cancelReservation, refundBooking , deleteBookingOnCanceledPayment
 }
