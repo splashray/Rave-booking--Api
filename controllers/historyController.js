@@ -9,7 +9,8 @@ const streamToBlob = require('stream-to-blob');
 
 
 const createUserPaymentHistoryCsv = async (req, res) => {
-
+   // #swagger.tags = ['Historys']
+    // #swagger.description = 'Endpoint to get History os user payment History by CSV.'
   try {
     const payments = await Payment.findOne({ userId: req.params.userId }).populate('paymentRecords.bookingId');
     if (!payments) {
@@ -144,6 +145,9 @@ const createUserPaymentHistoryCsv = async (req, res) => {
 // }
 
  const createUserPaymentHistoryPdf = async (req, res) => {
+  // #swagger.tags = ['Historys']
+    // #swagger.description = 'Endpoint to get History os user payment History by CSV.'
+    
 //   try {
 //     const payments = await Payment.findOne({ userId: req.params.userId }).populate('paymentRecords.bookingId');
 //     if (!payments) {

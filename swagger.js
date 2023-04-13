@@ -9,17 +9,26 @@ const doc = {
         title: "Rave-Booking API",
         description: "Documentation for Rave-Boking automatically generated </b> module."
     },
-    // host: "localhost:3000",
-    host: "https://rave-booking.onrender.com",
+    servers: [
+        // {
+        //   url: "http://localhost:3000",
+        //   description: "Testing on Local Machine"
+        // },
+        {
+          url: "https://rave-booking.onrender.com",
+          description: "Confirmed working well"
+        }
+      ],
+    // host: "",
     basePath: "/",
     schemes: ['https'],
     consumes: ['application/json'],
     produces: ['application/json'],
     securityDefinitions: {
-        bearerAuth: {
-            type: 'apiKey',
-            name: 'Authorization',
+        JWT: {
+            type: 'http',
             scheme: 'bearer',
+            bearerFormat: 'JWT',
             in: 'header',
         },
     },
@@ -64,6 +73,11 @@ const doc = {
             "name": "Review",
             "description": "Reviews Endpoints"
         },
+        {
+            "name": "Historys",
+            "description": "Historys Endpoints"
+        },
+        
         
         
     ],
@@ -145,30 +159,60 @@ const doc = {
 
         },
         Booking:{
-            hotelDetails:{
-                hotelId:"63856ebfc92910673c8a412f",
-                hotelCustomId:"AOW17519787",
-                hotelName:"Grid Hotel",
-                hotelAddress:"Amazona street, ikorodu lagos"
-            },
-        
-            roomDetails:{
-                roomType:"Double Arena Room",
-                noOfRooms:2,
-                nightsNumber:5,
-                checkIn:"25/11/2022",
-                checkOut:"30/11/2022",
-                guestCount:  [{picked: "Adults", amount:2 },{ picked: "Children", amount:5 }]
-            },
-        
-            userDetails:{
-                firstName:"John",
-                lastName:"Tayo",
-                phoneNumber:"09031874139",
-                gender:"Male",
-                address:"32, Toke street, ikorodu"
-            },
-            price: 39000
+            userId : "6412781be57fddc8204891b1",
+            bookingId: 4353466,
+            email: "booker@gmail.com",
+            price: 39000,
+            commission:3900,
+            paymentStatus: true,
+            paymentType:'online',
+            bookingRecords:[{
+                hotelDetails:{
+                    hotelId:"63856ebfc92910673c8a412f",
+                    hotelEmail: "Besthotel@gmail.com",
+                    hotelName:"Grid Hotel",
+                    hotelAddress:"Amazona street, ikorodu lagos"
+                },
+                roomDetails:{
+                    roomType:"Double Arena Room",
+                    noOfRooms:2,
+                    nightsNumber:5,
+                    checkIn:"25/11/2022",
+                    checkOut:"30/11/2022",
+                    guestCount:  [{picked: "Adults", amount:2 },{ picked: "Children", amount:5 }]
+                },
+                userDetails:{
+                    firstName:"John",
+                    lastName:"Tayo",
+                    phoneNumber:"09031874139",
+                    title:"Mr",
+                    address:"32, Toke street, ikorodu"
+                },
+                bookingInfo:{
+                    bookingStatus: "Pending",
+                    // Each part need to be updated
+                    cancelReservation:{ 
+                        status:  false, date: Date  
+                    },
+                    isExpired:{ 
+                        status: false,  date: Date  
+                    },
+                    isCheckIn:{ 
+                        status: false, date: Date 
+                    },
+                    isCheckOut:{ 
+                        status:  false, date: Date 
+                    },
+                    isReview: { 
+                        status: false, date: Date 
+                    },  
+                    isPaymentRefund: { 
+                        status: false, date: Date
+                    },               
+                },  
+            createdAt: Date
+            }]
+
         },
         Kyc:{
                 "PropertyDetails": {
@@ -211,25 +255,18 @@ const doc = {
                     }
                 }
       
-             },
-             Review: {
-                "bookingid": "623fh2fhfwej33",
-                "user": "672dqqh3h24du12",
-                "email": "test@gmail.com",
-                "hotelId" : "6920fh23hsj323",
-                "hotelName" :  "HMAS Hotel",
-                "hotelAddress": "ilorin, kwara state",
-                "image" :  "img.jpg",
-                "firstName" :  "John-doe",
-                "content" :  "Food are expensive",
-                "starRating" :  4,             
-             }
-        
+        },
+        Review: {
+        "bookingid": "6435565ff74ff207e8f84875",
+        "userId": "641276a4e57fddc820489188",
+        "hotelId" : "6412781be57fddc8204891b13",
+        "fullName" :  "John-doe",
+        "location": "New York",
+        "reviewTitle": "Great hotel!",
+        "reviewContent":"I had a fantastic stay at this hotel.",
+        "starRating" :  4,       
+        } 
     }
-
-
-
-
 
   };
 

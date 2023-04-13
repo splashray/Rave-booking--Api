@@ -6,6 +6,12 @@
     "description": "Documentation for Rave-Boking automatically generated </b> module."
   },
   "host": "localhost:3000",
+  "servers": [
+    {
+      "url": "https://rave-booking.onrender.com",
+      "description": "Confirmed working well"
+    }
+  ],
   "basePath": "/",
   "tags": [
     {
@@ -47,16 +53,20 @@
     {
       "name": "Review",
       "description": "Reviews Endpoints"
+    },
+    {
+      "name": "Historys",
+      "description": "Historys Endpoints"
     }
   ],
   "schemes": [
     "https"
   ],
   "securityDefinitions": {
-    "bearerAuth": {
-      "type": "apiKey",
-      "name": "Authorization",
+    "JWT": {
+      "type": "http",
       "scheme": "bearer",
+      "bearerFormat": "JWT",
       "in": "header"
     }
   },
@@ -2384,7 +2394,10 @@
     },
     "/api/historys/users/{userId}/payments/csv": {
       "get": {
-        "description": "",
+        "tags": [
+          "Historys"
+        ],
+        "description": "Endpoint to get History os user payment History by CSV.",
         "parameters": [
           {
             "name": "userId",
@@ -2416,7 +2429,10 @@
     },
     "/api/historys/users/{userId}/payments/pdf": {
       "get": {
-        "description": "",
+        "tags": [
+          "Historys"
+        ],
+        "description": "Endpoint to get History os user payment History by CSV.",
         "parameters": [
           {
             "name": "userId",
@@ -2707,96 +2723,212 @@
     "Booking": {
       "type": "object",
       "properties": {
-        "hotelDetails": {
-          "type": "object",
-          "properties": {
-            "hotelId": {
-              "type": "string",
-              "example": "63856ebfc92910673c8a412f"
-            },
-            "hotelCustomId": {
-              "type": "string",
-              "example": "AOW17519787"
-            },
-            "hotelName": {
-              "type": "string",
-              "example": "Grid Hotel"
-            },
-            "hotelAddress": {
-              "type": "string",
-              "example": "Amazona street, ikorodu lagos"
-            }
-          }
+        "userId": {
+          "type": "string",
+          "example": "6412781be57fddc8204891b1"
         },
-        "roomDetails": {
-          "type": "object",
-          "properties": {
-            "roomType": {
-              "type": "string",
-              "example": "Double Arena Room"
-            },
-            "noOfRooms": {
-              "type": "number",
-              "example": 2
-            },
-            "nightsNumber": {
-              "type": "number",
-              "example": 5
-            },
-            "checkIn": {
-              "type": "string",
-              "example": "25/11/2022"
-            },
-            "checkOut": {
-              "type": "string",
-              "example": "30/11/2022"
-            },
-            "guestCount": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "picked": {
-                    "type": "string",
-                    "example": "Children"
-                  },
-                  "amount": {
-                    "type": "number",
-                    "example": 5
-                  }
-                }
-              }
-            }
-          }
+        "bookingId": {
+          "type": "number",
+          "example": 4353466
         },
-        "userDetails": {
-          "type": "object",
-          "properties": {
-            "firstName": {
-              "type": "string",
-              "example": "John"
-            },
-            "lastName": {
-              "type": "string",
-              "example": "Tayo"
-            },
-            "phoneNumber": {
-              "type": "string",
-              "example": "09031874139"
-            },
-            "gender": {
-              "type": "string",
-              "example": "Male"
-            },
-            "address": {
-              "type": "string",
-              "example": "32, Toke street, ikorodu"
-            }
-          }
+        "email": {
+          "type": "string",
+          "example": "booker@gmail.com"
         },
         "price": {
           "type": "number",
           "example": 39000
+        },
+        "commission": {
+          "type": "number",
+          "example": 3900
+        },
+        "paymentStatus": {
+          "type": "boolean",
+          "example": true
+        },
+        "paymentType": {
+          "type": "string",
+          "example": "online"
+        },
+        "bookingRecords": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "hotelDetails": {
+                "type": "object",
+                "properties": {
+                  "hotelId": {
+                    "type": "string",
+                    "example": "63856ebfc92910673c8a412f"
+                  },
+                  "hotelEmail": {
+                    "type": "string",
+                    "example": "Besthotel@gmail.com"
+                  },
+                  "hotelName": {
+                    "type": "string",
+                    "example": "Grid Hotel"
+                  },
+                  "hotelAddress": {
+                    "type": "string",
+                    "example": "Amazona street, ikorodu lagos"
+                  }
+                }
+              },
+              "roomDetails": {
+                "type": "object",
+                "properties": {
+                  "roomType": {
+                    "type": "string",
+                    "example": "Double Arena Room"
+                  },
+                  "noOfRooms": {
+                    "type": "number",
+                    "example": 2
+                  },
+                  "nightsNumber": {
+                    "type": "number",
+                    "example": 5
+                  },
+                  "checkIn": {
+                    "type": "string",
+                    "example": "25/11/2022"
+                  },
+                  "checkOut": {
+                    "type": "string",
+                    "example": "30/11/2022"
+                  },
+                  "guestCount": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "picked": {
+                          "type": "string",
+                          "example": "Children"
+                        },
+                        "amount": {
+                          "type": "number",
+                          "example": 5
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "userDetails": {
+                "type": "object",
+                "properties": {
+                  "firstName": {
+                    "type": "string",
+                    "example": "John"
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "example": "Tayo"
+                  },
+                  "phoneNumber": {
+                    "type": "string",
+                    "example": "09031874139"
+                  },
+                  "title": {
+                    "type": "string",
+                    "example": "Mr"
+                  },
+                  "address": {
+                    "type": "string",
+                    "example": "32, Toke street, ikorodu"
+                  }
+                }
+              },
+              "bookingInfo": {
+                "type": "object",
+                "properties": {
+                  "bookingStatus": {
+                    "type": "string",
+                    "example": "Pending"
+                  },
+                  "cancelReservation": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "boolean",
+                        "example": false
+                      },
+                      "date": {
+                        "type": "function"
+                      }
+                    }
+                  },
+                  "isExpired": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "boolean",
+                        "example": false
+                      },
+                      "date": {
+                        "type": "function"
+                      }
+                    }
+                  },
+                  "isCheckIn": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "boolean",
+                        "example": false
+                      },
+                      "date": {
+                        "type": "function"
+                      }
+                    }
+                  },
+                  "isCheckOut": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "boolean",
+                        "example": false
+                      },
+                      "date": {
+                        "type": "function"
+                      }
+                    }
+                  },
+                  "isReview": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "boolean",
+                        "example": false
+                      },
+                      "date": {
+                        "type": "function"
+                      }
+                    }
+                  },
+                  "isPaymentRefund": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "boolean",
+                        "example": false
+                      },
+                      "date": {
+                        "type": "function"
+                      }
+                    }
+                  }
+                }
+              },
+              "createdAt": {
+                "type": "function"
+              }
+            }
+          }
         }
       }
     },
@@ -2943,39 +3075,31 @@
       "properties": {
         "bookingid": {
           "type": "string",
-          "example": "623fh2fhfwej33"
+          "example": "6435565ff74ff207e8f84875"
         },
-        "user": {
+        "userId": {
           "type": "string",
-          "example": "672dqqh3h24du12"
-        },
-        "email": {
-          "type": "string",
-          "example": "test@gmail.com"
+          "example": "641276a4e57fddc820489188"
         },
         "hotelId": {
           "type": "string",
-          "example": "6920fh23hsj323"
+          "example": "6412781be57fddc8204891b13"
         },
-        "hotelName": {
-          "type": "string",
-          "example": "HMAS Hotel"
-        },
-        "hotelAddress": {
-          "type": "string",
-          "example": "ilorin, kwara state"
-        },
-        "image": {
-          "type": "string",
-          "example": "img.jpg"
-        },
-        "firstName": {
+        "fullName": {
           "type": "string",
           "example": "John-doe"
         },
-        "content": {
+        "location": {
           "type": "string",
-          "example": "Food are expensive"
+          "example": "New York"
+        },
+        "reviewTitle": {
+          "type": "string",
+          "example": "Great hotel!"
+        },
+        "reviewContent": {
+          "type": "string",
+          "example": "I had a fantastic stay at this hotel."
         },
         "starRating": {
           "type": "number",
