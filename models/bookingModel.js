@@ -90,6 +90,7 @@ const BookingSchema = new mongoose.Schema({
                         date:{type: Date, } 
                     },               
                 },  
+            createdAt: { type: Date, default:Date.now}
         }
 
     ],

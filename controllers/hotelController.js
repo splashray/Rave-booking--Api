@@ -1,6 +1,6 @@
 const Hotel = require('../models/hotelModel')
 const Room = require('../models/roomModel')
-const Commission =  require('../models/commissionWalletModel')
+const OwnerHotelWallet =  require('../models/ownerHotelWalletModel')
 const {sendNewHotelRegistrationEmail, sendNewHotelVerifiedEmail, sendNewHotelFailedEmail} = require('../utils/email')
 
 // generate a random hotelCustomId
@@ -32,8 +32,8 @@ const createHotel = async (req, res, next) => {
     });
     const result = await newHotel.save();
     console.log("New Hotel Created");
-    // create commission wallet for new hotel
-    const newCommission = new Commission({
+    // create owner hotel wallet for new hotel
+    const newWallet = new OwnerHotelWallet({
         hotelId: result._id,
         balance: 0,
         commissionYetToPay : 0,
@@ -41,12 +41,12 @@ const createHotel = async (req, res, next) => {
         commissionRecords: [],
         TransactionRecords: []
     });
-    await newCommission.save();
+    await newWallet.save();
     console.log("and the hotel's Wallet is Created");
 
     // send hotel new listing email and check 
-    if (newCommission) {
-        sendNewHotelRegistrationEmail(result, res);
+    if (newWallet) {
+        await sendNewHotelRegistrationEmail(result, res);
     } else {
         // delete the newly created hotel if commission wallet fails to create
         console.log("but the hotel's Wallet not Created");

@@ -1,5 +1,5 @@
 const express = require('express');
-const { createBooking, getBooking, getBookings, getOwnerSingleBookings, getOwnerBoookings, getUserSingleBookings, getUserBoookings, validatePaymentType, paymentVerification, paymentRegeneration, checkinBooking, checkoutBooking, cancelReservation, deleteBookingOnCanceledPayment } = require('../controllers/bookingController');
+const { createBooking, getBooking, getBookings, getOwnerSingleBookings, getOwnerBookings, getUserSingleBookings, getUserBookings, validatePaymentType, paymentVerification, paymentRegeneration, checkinBooking, checkoutBooking, cancelReservation, deleteBookingOnCanceledPayment } = require('../controllers/bookingController');
 const router = express.Router()
 
 const {isVerifiedOwner, verifyAdmin, verifyToken } = require("../utils/verifyToken");
@@ -17,13 +17,13 @@ router.post('/paystack/regenerate/:id', verifyToken, paymentRegeneration)
 router.get("/",verifyToken, verifyAdmin, getBookings)
 
 // get users personal all boooking
-router.get("/usersbooking/:userId", verifyToken, getUserBoookings)
+router.get("/usersbooking/:userId", verifyToken, getUserBookings)
 
 // Get users personal  id of a booking
 router.get("/usersbooking/:userId/:bookingId", verifyToken, getUserSingleBookings)
 
 // get all owner's boooking    --check hotel kyc
-router.get("/ownersbooking/:hotelId", verifyToken, isVerifiedOwner, getOwnerBoookings)
+router.get("/ownersbooking/:hotelId", verifyToken, isVerifiedOwner, getOwnerBookings)
 
 // Get booking by owner     --check hotel kyc
 router.get("/ownersbooking/:hotelId/:bookingId", verifyToken, isVerifiedOwner, getOwnerSingleBookings)

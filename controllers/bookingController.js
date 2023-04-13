@@ -1,9 +1,11 @@
 const Booking = require('../models/bookingModel')
 const Hotel = require('../models/hotelModel')
 const Payment = require('../models/paymentModel')
+const OwnerHotelWallet = require('../models/ownerHotelWalletModel')
 
 const config = require('../utils/config')
 
+const mongoose = require('mongoose')
 const axios = require('axios')
 const token = config.PAYSTACK_CLIENT_ID
 
@@ -225,50 +227,76 @@ const getBookings = async (req, res, next)=>{
     // #swagger.tags = ['Bookings']
     // #swagger.description = 'Endpoint to get all booking.'
 
-      try {
-          const bookingRecord = await Booking.find({})
-          if (!bookingRecord) return res.status(404).json({ error: "Booking not found" });
-          res.status(200).json({bookingRecord})
-      } catch (err) {
-          next(err)
-      }
+      try {  
+            const limit = parseInt(req.query.limit) || 10;
+            const bookingRecord = await Booking.findOne({})
+                .sort({createdAt: -1})
+                .limit(limit)
+                .select({bookingRecords: {$slice: -limit}});
+                
+            if (!bookingRecord) {
+                return res.status(404).json({message: "Booking record not found for the user"});
+            }
+            
+            const bookings = bookingRecord.bookingRecords.reverse();
+            if (!bookings) {
+                return res.status(404).json({error: "Bookings not found"});
+            }
+            res.status(200).json(bookings);
+        } catch (err) {
+            next(err);
+        }
 }
 
-const getOwnerBoookings = async (req, res, next)=>{
+const getOwnerBookings = async (req, res, next) => {
     // #swagger.tags = ['Bookings']
-    // #swagger.description = 'Endpoint to get all owners booking.'
-
+    // #swagger.description = 'Endpoint to get all owner bookings.'
+  
     try {
-        const hotelId = req.params.hotelId;
-        if(!hotelId) return res.status(404).json({error: "Hotel id not found"})
-
-        //check if the hotel with the id has a verified kyc 
-        const checkKyc = await Hotel.findOne({_id:hotelId, isKyc: true})
-        if (!checkKyc) {
-            return res.status(404).json({ msg: 'KYC not verified || Hotel Verification not returned' });
-        }
-
-        // Check equivalent bookings
-        const bookings = await Booking.find({ 'bookingRecords.hotelDetails.hotelId': hotelId });
-        if (!bookings) {
-          return res.status(404).json({ msg: 'No bookings found for the given hotelId' });
-        }
-    
-        const relatedBookings = bookings.reduce((acc, booking) => {
-          const relatedBookingRecords = booking.bookingRecords.filter(record => {
-            return record.hotelDetails.hotelId.toString() === hotelId;
-          });
-    
-          return [...acc, ...relatedBookingRecords];
-        }, []);
-    
-        res.status(200).json({ bookings: relatedBookings });
-      } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+      const limit = parseInt(req.query.limit) || 10;
+      const hotelId = req.params.hotelId;
+      if (!hotelId) return res.status(404).json({ error: "Hotel id not found" });
+  
+      const startDate = req.query.startDate ? new Date(req.query.startDate) : new Date(new Date().setDate(new Date().getDate() - 30));
+      const endDate = req.query.endDate ? new Date(req.query.endDate) : new Date();
+  
+      const checkKyc = await Hotel.findOne({ _id: hotelId, isKyc: true });
+      if (!checkKyc) {
+        return res.status(404).json({ msg: 'KYC not verified || Hotel Verification not returned' });
       }
-}
-
+  
+      const bookings = await Booking.aggregate([
+        { $match: {
+          'bookingRecords.hotelDetails.hotelId': mongoose.Types.ObjectId(hotelId),
+          'bookingRecords.createdAt': { $gte: startDate, $lte: endDate }
+        } },
+        { $unwind: "$bookingRecords" },
+        { $match: {
+          'bookingRecords.hotelDetails.hotelId': mongoose.Types.ObjectId(hotelId),
+          'bookingRecords.createdAt': { $gte: startDate, $lte: endDate }
+        } },
+        { $sort: { "bookingRecords.createdAt": -1 } },
+        { $group: { _id: "$_id", bookingRecords: { $push: "$bookingRecords" } } },
+        { $unwind: "$bookingRecords" },
+        { $sort: { "bookingRecords.createdAt": -1 } },
+        { $limit: limit },
+        { $group: { _id: "$_id", bookingRecords: { $push: "$bookingRecords" } } },
+        { $project: { bookingRecords: { $slice: ["$bookingRecords", limit] } } }
+      ]);
+  
+      if (!bookings || bookings.length === 0) {
+        return res.status(404).json({ msg: 'No bookings found for the given hotelId' });
+      }
+  
+      const relatedBookings = bookings[0].bookingRecords;
+  
+      res.status(200).json({ bookings: relatedBookings });
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server Error');
+    }
+  };
+  
 const getOwnerSingleBookings = async (req, res, next)=>{
     // #swagger.tags = ['Bookings']
     // #swagger.description = 'Endpoint to get single owner's booking.'
@@ -300,22 +328,33 @@ const getOwnerSingleBookings = async (req, res, next)=>{
         }
 }
 
-const getUserBoookings = async (req, res, next)=>{
+const getUserBookings = async (req, res, next) => {
     // #swagger.tags = ['Bookings']
-    // #swagger.description = 'Endpoint to get all users booking.'
-
+    // #swagger.description = 'Endpoint to get all users bookings.'
     try {
-        const userId = req.params.userId
-        if(!userId ) return res.status(404).json({error: "id not found"})
-
-       const bookingRecord = await Booking.findOne({ userId: userId }, { bookingRecords: 1 })
-          if (!bookingRecord) return res.status(404).json({ message: "Booking record not found for the user" });
-          const booking = bookingRecord.bookingRecords
-          if (!booking) return res.status(404).json({ error: "Bookings not found" });
-          res.status(200).json(booking);
-
+        const userId = req.params.userId;
+        if (!userId) {
+            return res.status(404).json({error: "User ID not found"});
+        }
+        
+        const limit = parseInt(req.query.limit) || 5;
+        const bookingRecord = await Booking.findOne({userId: userId})
+            .sort({createdAt: -1})
+            .limit(limit)
+            .select({bookingRecords: {$slice: -limit}});
+            
+        if (!bookingRecord) {
+            return res.status(404).json({message: "Booking record not found for the user"});
+        }
+        
+        const bookings = bookingRecord.bookingRecords.reverse();
+        if (!bookings) {
+            return res.status(404).json({error: "Bookings not found"});
+        }
+        
+        res.status(200).json(bookings);
     } catch (err) {
-        next(err)
+        next(err);
     }
 }
 
@@ -355,44 +394,129 @@ const checkinBooking = async (req, res, next)=>{
           return res.status(404).json({ message: 'Booking record not found' });
         }
     
-        if (bookingRecord.paymentType === "online" && bookingRecord.paymentStatus === false){ return res.status(400).json({ message: "Booking type is online and you havent make the payment" });
+        if (bookingRecord.paymentType === "online" && bookingRecord.paymentStatus === false){ 
+            return res.status(400).json({ message: "Booking type is online and you haven't make the payment" });
         }else{
            // Those that can checkin are (online paid), (onsite unpaid), (oniste unpaid)
             if (bookingRecord.bookingInfo.isCheckIn.status) {
                 return res.status(400).json({ message: "Booking is already checked in" });
+            }else{
+                // Update isCheckIn status and booking status to Active
+                bookingRecord.bookingInfo.isCheckIn.status = true;
+                bookingRecord.bookingInfo.isCheckIn.date = new Date();
+                bookingRecord.bookingInfo.bookingStatus = 'Active';
+
+                const checkInBooking = await booking.save();
+                if (!checkInBooking) {
+                    return res.status(500).json({ message: "Checkin process aborted" }).end()
+                }else{
+                    //  The commision sent to the hotel wallet start here
+                    //Todo A: If online and paid create a commission model (as Paid commision- settledToCompany)
+                    //Todo B: If onsite and paid already , create a commission model (as Paid commision -settledToOwner )
+                    //Todo C: If onsite and unpaid immediatly create a commission model. (as Unpaid commision - unsettledToOwner) -Trigger a call to the user and owners
+                    const ownerCommissionWallet = await OwnerHotelWallet.findOne({ hotelId: bookingRecord.hotelDetails.hotelId });
+                    if (!ownerCommissionWallet) {
+                    throw new Error('Owner commission wallet not found');
+                    }
+                    let checkResponse = ownerCommissionWallet.commissionRecords.some(record => record.bookingId === bookingRecord._id);
+                    switch (checkResponse) {
+                        case true:
+                            // The booking has already been saved before
+                            return res.status(400).json({ message: "Booking has already been saved" });
+                        case false:
+                                // The booking has not been saved before
+                                switch (bookingRecord.paymentType) {
+                                    case "online":
+                                        if (bookingRecord.paymentStatus) {
+                                        // Online and paid, settled to company
+                                        const commissionRecord1 = {
+                                            bookingId: bookingRecord._id,
+                                            customBookingId: bookingRecord.bookingId,
+                                            userId: booking.userId,
+                                            price: bookingRecord.price,
+                                            commission: bookingRecord.commission,
+                                            paymentStatus: true,
+                                            paymentType: bookingRecord.paymentType,
+                                            date: Date.now(),
+                                            paymentSettlement: {
+                                            status: 'settled To Company',
+                                            date: Date.now()
+                                            }
+                                        };
+                                        ownerCommissionWallet.commissionRecords.push(commissionRecord1);
+                                        ownerCommissionWallet.commissionPaidToCompany += commissionRecord1.commission;
+
+                                        // Save commission wallet changes
+                                        await ownerCommissionWallet.save();      
+
+                                        // futher transaction operation will be on checkout, as the commission  operation is saved already
+                                        return res.status(200).json({ updatedBooking: bookingRecord, message: 'Checkin successful' });
+
+                                        } else {
+                                        // Online and unpaid
+                                        return res.status(400).json({ message: "Booking is unpaid" }).end()
+                                        }
+                                    
+                                    case "onsite":
+                                        if (bookingRecord.paymentStatus) {
+                                        // Onsite and paid, settled to owner
+                                        const commissionRecord2 = {
+                                            bookingId: bookingRecord._id,
+                                            customBookingId: bookingRecord.bookingId,
+                                            userId: booking.userId,
+                                            price: bookingRecord.price,
+                                            commission: bookingRecord.commission,
+                                            paymentStatus: true,
+                                            paymentType: bookingRecord.paymentType,
+                                            date: Date.now(),
+                                            paymentSettlement: {
+                                            status: 'settled To Owner',
+                                            date: Date.now()
+                                            }
+                                        };
+                                        ownerCommissionWallet.commissionRecords.push(commissionRecord2);
+                                        ownerCommissionWallet.commissionYetToPay += commissionRecord2.commission;
+
+                                        // Save commission wallet changes
+                                        await ownerCommissionWallet.save();      
+
+                                        // futher transaction operation will be on checkout, as the commission  operation is saved already
+                                        return res.status(200).json({ updatedBooking: bookingRecord, message: 'Checkin successful' });
+                                        } else {
+                                        // Onsite and unpaid, unsettled to owner
+                                        const commissionRecord3 = {
+                                            bookingId: bookingRecord._id,
+                                            customBookingId: bookingRecord.bookingId,
+                                            userId: booking.userId,
+                                            price: bookingRecord.price,
+                                            commission: bookingRecord.commission,
+                                            paymentStatus: false,
+                                            paymentType: bookingRecord.paymentType,
+                                            date: Date.now(),
+                                            paymentSettlement: {
+                                            status: 'unsettled To Owner'
+                                            }
+                                        };
+                                        ownerCommissionWallet.commissionRecords.push(commissionRecord3);
+                                        ownerCommissionWallet.commissionYetToPay += commissionRecord3.commission;
+
+                                        // Save commission wallet changes
+                                        await ownerCommissionWallet.save();      
+
+                                        // futher transaction operation will be on checkout, as the commission  operation is saved already
+                                        return res.status(200).json({ updatedBooking: bookingRecord, message: 'Checkin successful' });
+                                        // TODO: Trigger the action to call the user and owner and remind them to settle the payment onsite.
+                                        } 
+                                    default:
+                                    // Invalid payment type or status
+                                    return res.status(400).json({ message: "Invalid payment type or status" }).end();          
+                                }
+                        default:
+                        // Unable to check the response of booking saved in commission already.
+                        return res.status(400).json({ message: "Unable to check the response if booking saved in commission already" }).end();
+                    }
+                }
             }
-            // Update isCheckIn status and booking status to Active
-            bookingRecord.bookingInfo.isCheckIn.status = true;
-            bookingRecord.bookingInfo.isCheckIn.date = new Date();
-           const checkInBooking = await booking.save();
-           if (!checkInBooking) {
-            return res.status(500).json({ message: "Checkin process aborted" }).end()
-            }
-
-
-            //  The commision sent to the hotel wallet start here
-            //Todo A: If onsite and paid create a commission transaction (as Paid commision)
-            //Todo B: If onsite and unpaid immediatly create a commission transaction. (as Unpaid commision) -Trigger a call to the user and owners
-            //Todo C: If online will definitely be paid already , create a commission transaction (as Paid commision)
-            
-            // money will be paid on checkout
-            const commissionRecord = [{     
-                customBookingId: bookingRecord.bookingId,
-                userId: booking.userId,
-                price: bookingRecord.price,
-                commission: bookingRecord.commission,
-                paymentStatus: bookingRecord.paymentStatus,
-                date: Date.now ,
-
-                paymentSettlement:{
-                  status: {type: String, enum:['unsettledToOwner', 'settledToOwner','settledToCompany']},
-                  date: Date.now
-                } 
-            }]
-
-
-            return res.status(200).json({ updatedBooking: bookingRecord, message: 'Checkin successful' });
-
       }
     } catch (err) {
         next(err)
@@ -552,5 +676,5 @@ const deleteBookingOnCanceledPayment  = async (req, res, next)=>{
 
 
 module.exports ={
-    validatePaymentType, createBooking, paymentVerification, paymentRegeneration, getBooking, getBookings, getOwnerBoookings, getOwnerSingleBookings, getUserBoookings,  getUserSingleBookings, checkinBooking, checkoutBooking, cancelReservation, refundBooking , deleteBookingOnCanceledPayment
+    validatePaymentType, createBooking, paymentVerification, paymentRegeneration, getBooking, getBookings, getOwnerBookings, getOwnerSingleBookings, getUserBookings,  getUserSingleBookings, checkinBooking, checkoutBooking, cancelReservation, refundBooking , deleteBookingOnCanceledPayment
 }

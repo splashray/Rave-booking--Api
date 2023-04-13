@@ -2,7 +2,7 @@ const cron = require('node-cron');
 const Booking = require('../models/bookingModel')
 
 
-// Define the taskExpiredBooking to run every 24 hours (at midnight) and This is set to 2 days later
+// Task 1: Define the taskExpiredBooking to run every 24 hours (at midnight) and This is set to 2 days later
 const taskExpiredBooking = cron.schedule('0 0 */24 * * *', async () => {
   // The task first finds all bookings where the check-in date has passed the current day (two Days Later) and the status is not already expired, then updates their status to "Expired". 
 
@@ -33,9 +33,8 @@ const taskExpiredBooking = cron.schedule('0 0 */24 * * *', async () => {
   console.log(`Booking check completed. ${expiredBookings.length} bookings updated.`);
 }, { scheduled: true });
 
-// Define the taskCheckOutBooking to run Automatic checkout date function, if the checkout wasn't done after 2 days by the user provided that the user checked in before  
-
-
+//Reminder: untested
+// Task 2: Define the commissionReconciliationJob to run every 30 days
 const commissionReconciliationJob = cron.schedule('0 0 1 * * *', async () => {
   try {
     // Get all bookings that have been checked out in the last month
@@ -85,6 +84,11 @@ const commissionReconciliationJob = cron.schedule('0 0 1 * * *', async () => {
   console.log('Error running commission reconciliation job:', error.message);
 }
 }, { scheduled: true });
+
+// Task 3: Define the taskCheckOutBooking to run Automatic checkout date function, if the checkout wasn't done after 2 days by the user provided that the user checked in before  
+
+
+
 
 // Start the tasks
 taskExpiredBooking.start();
