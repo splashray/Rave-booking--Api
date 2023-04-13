@@ -6,11 +6,11 @@ const doc = {
 
     info: {
         version: "1.0.0",
-        title: "Awuf-Booking API",
-        description: "Documentation for Awuf-Boking automatically generated </b> module."
+        title: "Rave-Booking API",
+        description: "Documentation for Rave-Boking automatically generated </b> module."
     },
     // host: "localhost:3000",
-    host: "awuf-booking.cyclic.app",
+    host: "https://rave-booking.onrender.com",
     basePath: "/",
     schemes: ['https'],
     consumes: ['application/json'],

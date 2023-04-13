@@ -1,5 +1,5 @@
 const express = require('express');
-const { createBooking, getBooking, getBookings, getOwnerSingleBookings, getOwnerBookings, getUserSingleBookings, getUserBookings, validatePaymentType, paymentVerification, paymentRegeneration, checkinBooking, checkoutBooking, cancelReservation, deleteBookingOnCanceledPayment } = require('../controllers/bookingController');
+const { createBooking, getBooking, getBookings, getOwnerSingleBookings, getOwnerBookings, getUserSingleBookings, getUserBookings, validatePaymentType, paymentVerification, paymentRegeneration, checkinBooking, checkoutBooking, cancelReservation, deleteBookingOnCanceledPayment, refundBooking } = require('../controllers/bookingController');
 const router = express.Router()
 
 const {isVerifiedOwner, verifyAdmin, verifyToken } = require("../utils/verifyToken");
@@ -35,6 +35,7 @@ router.get("/getBookingAdmin/:userId/:bookingId", verifyToken, verifyAdmin, getB
 router.put('/actions/:bookingRecordId/cancel', verifyToken, cancelReservation);
 router.put('/actions/:bookingRecordId/checkin', verifyToken, checkinBooking);
 router.put('/actions/:bookingRecordId/checkout', verifyToken, checkoutBooking);
+router.put('/actions/:bookingRecordId/refund', verifyToken, refundBooking);
 
 
 // Delete 

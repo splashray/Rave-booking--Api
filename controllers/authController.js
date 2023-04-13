@@ -158,6 +158,8 @@ const config = require('./../utils/config')
 
 //other owners sections
 const sendOwnerOtp = async (req, res, next) => {
+        // #swagger.tags = ['Auth']
+    // #swagger.description = 'Endpoint to send Owner's OTP to their email.'
     try {
     const ownerId = req.params.ownerId;
     console.log(ownerId);
@@ -207,6 +209,8 @@ const sendOwnerOtp = async (req, res, next) => {
 
 
 const ownerVerification = async (req, res, next) => {
+        // #swagger.tags = ['Auth']
+    // #swagger.description = 'Endpoint to Verify Owner's Account via OTP.'
     try {
         const { email, otp } = req.body;
         const owner = await Owner.findOne({ email });

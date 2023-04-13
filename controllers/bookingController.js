@@ -82,6 +82,9 @@ const createBooking = async (req, res, next) => {
 }
 
 const paymentVerification = async (req, res, next) => {
+        // #swagger.tags = ['Bookings']
+    // #swagger.description = 'Endpoint to Verify payment from paystack with reference.'
+
     const { reference } = req.query;
     try {
         if (!reference) return res.status(404).json({ error: 'reference not found.' });
@@ -148,6 +151,9 @@ const paymentVerification = async (req, res, next) => {
 }
 
 const paymentRegeneration = async (req, res, next) => {
+     // #swagger.tags = ['Bookings']
+    // #swagger.description = 'Endpoint to Regeneration payment URL.'
+
   // Todo: paymentType must be "online" before regeneration of url for payment 
   const bookingId = req.params.id
   const userId = req.user.id
@@ -378,6 +384,8 @@ const getUserSingleBookings = async (req, res, next)=>{
 }
 
 const checkinBooking = async (req, res, next)=>{
+        // #swagger.tags = ['Bookings']
+    // #swagger.description = 'Endpoint to checkin booking(Commission are calculated).'
     try {
         const { bookingRecordId } = req.params;
 
@@ -524,8 +532,11 @@ const checkinBooking = async (req, res, next)=>{
 }
 
 const checkoutBooking = async (req, res, next)=>{
-    const { bookingRecordId } = req.params;
-    try {
+       // #swagger.tags = ['Bookings']
+    // #swagger.description = 'Endpoint to checkout booking(Transaction are paid out).'
+  
+    try {  
+        const { bookingRecordId } = req.params;
       const booking = await Booking.findOne({ 'bookingRecords._id': bookingRecordId });
       if (!booking) {
         return res.status(404).json({ message: 'Booking not found' });
@@ -566,8 +577,11 @@ const checkoutBooking = async (req, res, next)=>{
 }
 
 const cancelReservation  = async (req, res, next)=>{
-    const { bookingRecordId } = req.params;
-    try {
+    // #swagger.tags = ['Bookings']
+    // #swagger.description = 'Endpoint to Cancel booking Reservation.'
+  
+    try { 
+     const { bookingRecordId } = req.params;
       const booking = await Booking.findOne({ 'bookingRecords._id': bookingRecordId });
       if (!booking) {
         return res.status(404).json({ message: 'Booking not found' });
@@ -602,8 +616,10 @@ const cancelReservation  = async (req, res, next)=>{
 }
 
 const  refundBooking   = async (req, res, next)=>{
-    const { bookingRecordId } = req.params;
+     // #swagger.tags = ['Bookings']
+    // #swagger.description = 'Endpoint to Refund booking Reservation to users.'
     try {
+      const { bookingRecordId } = req.params;
       const booking = await Booking.findOne({ 'bookingRecords._id': bookingRecordId });
       if (!booking) {
         return res.status(404).json({ message: 'Booking not found' });
@@ -649,8 +665,10 @@ const  refundBooking   = async (req, res, next)=>{
 }
 
 const deleteBookingOnCanceledPayment  = async (req, res, next)=>{
-    const  bookingId  = req.params.bookingId;
-    try {
+     // #swagger.tags = ['Bookings']
+    // #swagger.description = 'Endpoint to Delete booking Reservation especially when error occur during payment.'
+    try {    
+        const  bookingId  = req.params.bookingId;
         const booking = await Booking.findOne({ "bookingRecords._id": bookingId });
         if (!booking) {
           console.log("Booking not found");
