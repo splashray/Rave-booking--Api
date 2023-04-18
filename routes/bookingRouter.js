@@ -1,8 +1,10 @@
 const express = require('express');
-const { createBooking, getBooking, getBookings, getOwnerSingleBookings, getOwnerBookings, getUserSingleBookings, getUserBookings, validatePaymentType, paymentVerification, paymentRegeneration, checkinBooking, checkoutBooking, cancelReservation, deleteBookingOnCanceledPayment, refundBooking } = require('../controllers/bookingController');
+const { createBooking, getBooking, getBookings, getOwnerSingleBookings, getOwnerBookings, getUserSingleBookings, getUserBookings, validatePaymentType, paymentVerification, paymentRegeneration,  deleteBookingOnCanceledPayment } = require('../controllers/bookingController');
 const router = express.Router()
 
 const {isVerifiedOwner, verifyAdmin, verifyToken } = require("../utils/verifyToken");
+
+const { cancelReservation, checkinBooking, checkoutBooking, refundBooking } = require('../controllers/ownerHotelWalletController');
 
 // create booking by everyone --
 router.post("/:hotelId", verifyToken, validatePaymentType, createBooking)
@@ -31,7 +33,7 @@ router.get("/ownersbooking/:hotelId/:bookingId", verifyToken, isVerifiedOwner, g
 //get a single booking by an admin
 router.get("/getBookingAdmin/:userId/:bookingId", verifyToken, verifyAdmin, getBooking)
 
-//Updating the Booking status 
+//Updating the Booking status and commission
 router.put('/actions/:bookingRecordId/cancel', verifyToken, cancelReservation);
 router.put('/actions/:bookingRecordId/checkin', verifyToken, checkinBooking);
 router.put('/actions/:bookingRecordId/checkout', verifyToken, checkoutBooking);

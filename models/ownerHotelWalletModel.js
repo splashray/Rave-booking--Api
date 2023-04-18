@@ -13,6 +13,7 @@ const OwnerHotelWalletModelSchema = new mongoose.Schema({
         monthCommission: [{
             bookingId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Bookings', unique: true },
             customBookingId: { type: String, required: true },
+            userId: { type: String },
             price: { type: Number, required: true },
             commission: { type: Number, required: true },
             paymentStatus: { type: Boolean, default: false, required: true },

@@ -6,21 +6,18 @@ const { addCommissionDataManual } = require('../controllers/ownerHotelWalletCont
 
 
 //create manual commission
-router.post("/:hotelId/create/:bookingId/:userId",verifyToken, verifyAdmin, addCommissionDataManual)
+router.post("/:bookingId/create/:userId",verifyToken, verifyAdmin, addCommissionDataManual)
 
-// //update commission
-// router.put("/pass/:id",verifyToken, updateUserPassword)
+// update manual commission
+// router.put("/:commissionId/edit",verifyToken, verifyAdmin,  )
 
-// //update user image
-// router.put("/image/:id",verifyToken, updateUserProfileDp)
+// delete manual commission
+// router.delete("/:commissionId",verifyToken, verifyAdmin, )
 
-// //delete
-// router.delete("/:id",verifyToken, verifyAdmin, deleteUser)
+// get a commission by Admin
+// router.get("/:commissionId",verifyToken, )
 
-// //get
-// router.get("/:id",verifyToken, getUser)
-
-// //get all
-// router.get("/", verifyToken, verifyAdmin, getUsers)
+// get all commission by Admin
+// router.get("/", verifyToken, verifyAdmin, )
 
 module.exports = router

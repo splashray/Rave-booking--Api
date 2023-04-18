@@ -51,6 +51,7 @@ const BookingSchema = new mongoose.Schema({
             
                 // user details 
                 userDetails:{
+                    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User'},
                     firstName:{type: String, required: true},
                     lastName:{type: String, required: true},
                     phoneNumber:{type: String,required: true},

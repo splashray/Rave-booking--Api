@@ -19,22 +19,22 @@ const Booking = require('../models/bookingModel')
           for (const monthCommission of commissionRecord.monthCommission) {
             // Check if the bookingId already exists in the monthCommission array
             if (monthCommission.bookingId.equals(bookingId)) {
+                //TODO: if the booking id already exist check and help the user to check in if not checkin
               return true; // bookingId already exists, return true
             }
           }
         }
         return false; // bookingId does not exist in any of the commissionRecords
-      };
+    };
 
 const addCommissionDataManual = async (req, res, next) => {
     // #swagger.tags = ['Commissions']
     // #swagger.description = 'Manual commission creation depends on type of payment and payment status.'
     try {    
-        const hotelId = req.params.hotelId
         const bookingId = req.params.bookingId
         const userId = req.params.userId
-        if (!hotelId && !bookingId && !userId) {
-            return res.status(400).json({ success: false, message: 'Error: bookingId or hotel id or userId missing' });
+        if (!bookingId && !userId) {
+            return res.status(400).json({ success: false, message: 'Error: bookingId or userId missing' });
         }
 
         const bookingRecord = await Booking.findOne({ userId: userId }, { bookingRecords: 1 })
@@ -45,6 +45,7 @@ const addCommissionDataManual = async (req, res, next) => {
 
         console.log(getBooking);
 
+        const hotelId = getBooking.hotelDetails.hotelId
         const customBookingId  = getBooking.bookingId
         const price = getBooking.price
         const commission = getBooking.commission
@@ -108,6 +109,7 @@ const addCommissionDataManual = async (req, res, next) => {
             const newCommission = {
                 bookingId: bookingId,
                 customBookingId: customBookingId,
+                userId: userId,
                 price: price,
                 commission: commission,
                 paymentStatus: paymentStatus,
@@ -150,6 +152,7 @@ const addCommissionDataManual = async (req, res, next) => {
             const newCommission = {
                 bookingId: bookingId,
                 customBookingId: customBookingId,
+                userId: userId,
                 price: price,
                 commission: commission,
                 paymentStatus: paymentStatus,
@@ -182,9 +185,324 @@ const addCommissionDataManual = async (req, res, next) => {
       
 }
 
-module.exports ={
-    addCommissionDataManual
+const checkinBooking = async (req, res, next)=>{
+    // #swagger.tags = ['Bookings']
+// #swagger.description = 'Endpoint to checkin booking(Commission are calculated).'
+try {
+    const { bookingRecordId } = req.params;
+    // Get the booking record by ID
+    const booking = await Booking.findOne({ "bookingRecords._id": bookingRecordId });
+
+    // Check if the booking record exists
+    if (!booking) {
+        return res.status(404).json({ message: "Booking not found" });
+    }
+
+    const bookingRecord = booking.bookingRecords.find(record => record._id.toString() === bookingRecordId);
+    if (!bookingRecord) {
+      return res.status(404).json({ message: 'Booking record not found' });
+    }
+
+    if (bookingRecord.paymentType === "online" && bookingRecord.paymentStatus === false){ 
+        return res.status(400).json({ message: "Booking type is online and you haven't make the payment" });
+    }else{
+       // Those that can checkin are (online paid), (onsite unpaid), (oniste unpaid)
+        if (bookingRecord.bookingInfo.isCheckIn.status) {
+            return res.status(400).json({ message: "Booking is already checked in" });
+        }else{
+
+            //  The commision sent to the hotel wallet start here
+            //Todo A: If online and paid create a commission model (as Paid commision- settledToCompany)
+            //Todo B: If onsite and paid already , create a commission model (as Paid commision -settledToOwner )
+            //Todo C: If onsite and unpaid immediatly create a commission model. (as Unpaid commision - unsettledToOwner) -Trigger a call to the user and owners
+
+                const currentDate = new Date(); // Get the current date
+                const currentMonth = getMonthNameAndYear(currentDate); // Get the current month name and year
+            
+                const hotelId = bookingRecord.hotelDetails.hotelId  //details coming from the bookingRecord
+                const userId = bookingRecord.userDetails.userId
+                const bookingId  = bookingRecord._id
+                const customBookingId  = bookingRecord.bookingId
+                const price = bookingRecord.price
+                const commission = bookingRecord.commission
+                const paymentType = bookingRecord.paymentType
+                const paymentStatus = bookingRecord.paymentStatus  //details coming from the bookingRecord
+
+                let wallet = await OwnerHotelWallet.findOne({ hotelId:hotelId});
+                if (!wallet) {
+                    return res.status(400).json({ success: false, message: 'Error: Unable to add comission due to hotel wallet Missing' });
+                }
+
+                // Check whether the bookingId already exists in the commissionRecords array
+                const isBookingExists = checkBookingExists(wallet, bookingId);
+                if (isBookingExists) {
+                    return res.status(400).json({ success: false, message: 'Error: Booking ID has already been added to the commission.' });
+                }
+
+                // Find the commission record for the current month
+                const commissionRecord = wallet.commissionRecords.find(record => record.monthName === currentMonth);
+                if (!commissionRecord) {
+                    console.log("New month commission record");
+                    // Create a new commission record if it doesn't exist
+                    await wallet.addCommissionRecord();
+                    // await addCommissionRecord.call(wallet);
+
+                    // Get the newly created commission record
+                    const newCommissionRecord = wallet.commissionRecords.find(record => record.monthName === currentMonth);
+            
+                    // Set the payment settlement and date based on payment type and status
+                    let paymentSettlement;
+                    switch (paymentType) {
+                        case 'online':
+                            if (paymentStatus) {
+                            paymentSettlement = 'settled To Company';
+                            newCommissionRecord.monthBalance += commission;
+                            //   newCommissionRecord.balanceAfterCommission = newCommissionRecord.monthBalance;
+                            } else {
+                            return res.status(400).json({ success: false, message: 'Error: Payment is not yet paid and is online.' });
+                            }
+                            break;
+                        case 'onsite':
+                            if (paymentStatus) {
+                            paymentSettlement = 'settled To Owner';
+                            newCommissionRecord.monthBalance -= commission;
+                            //   newCommissionRecord.balanceAfterCommission = newCommissionRecord.monthBalance;
+                            } else {
+                            paymentSettlement = 'unsettled To Owner';
+                            newCommissionRecord.monthBalance -= commission;
+                            //   newCommissionRecord.balanceAfterCommission = newCommissionRecord.monthBalance;
+                            }
+                            break;
+                        default:
+                            return res.status(400).json({ success: false, message: 'Error: Invalid payment type.' });
+                    }
+            
+                    // Create a new commission record for this booking
+                    const newCommission = {
+                        bookingId: bookingId,
+                        userId: userId,
+                        customBookingId: customBookingId,
+                        price: price,
+                        commission: commission,
+                        paymentStatus: paymentStatus,
+                        paymentType: paymentType,
+                        paymentSettlement: paymentSettlement,
+                        balanceAfterCommission: newCommissionRecord.monthBalance,
+                        createdAt: currentDate
+                    };
+            
+                    // Add the new commission data
+                    newCommissionRecord.monthCommission.push(newCommission);
+                } else {
+                    console.log("old month commission record");
+                    // Update the payment settlement and balance
+                    switch (paymentType) {
+                    case 'online':
+                        if (paymentStatus) {
+                        paymentSettlement = 'settled To Company';
+                        commissionRecord.monthBalance += commission;
+                        //   commissionRecord.balanceAfterCommission = commissionRecord.monthBalance;
+                        } else {
+                        return res.status(400).json({ success: false, message: 'Error: Payment is not yet paid and is online.' });
+                        }
+                        break;
+                    case 'onsite':
+                        if (paymentStatus) {
+                        paymentSettlement = 'settled To Owner';
+                        commissionRecord.monthBalance -= commission;
+                        //   commissionRecord.balanceAfterCommission = commissionRecord.monthBalance;
+                        } else {
+                        paymentSettlement = 'unsettled To Owner';
+                        commissionRecord.monthBalance -= commission;
+                        //   commissionRecord.balanceAfterCommission = commissionRecord.monthBalance;
+                        }
+                        break;
+                    default:
+                        return res.status(400).json({ success: false, message: 'Error: Invalid payment type.' });
+                    }
+
+                    // Create a new commission record for this booking
+                    const newCommission = {
+                        bookingId: bookingId,
+                        userId: userId,
+                        customBookingId: customBookingId,
+                        price: price,
+                        commission: commission,
+                        paymentStatus: paymentStatus,
+                        paymentType: paymentType,
+                        paymentSettlement: paymentSettlement,
+                        balanceAfterCommission: commissionRecord.monthBalance,
+                        createdAt: currentDate
+                    };
+
+                    // Add the new commission data
+                    commissionRecord.monthCommission.push(newCommission);
+                }
+
+                // Save the commission record in wallet and update the booking to checkin
+                try {  
+                    // Save the commission record in wallet
+                    const savedWallet = await wallet.save();
+                    if (!savedWallet) {
+                        return res.status(500).json({ success: false, message: 'Error: Unable to save commission record.' });
+                    }else{
+                        // Update isCheckIn status and booking status to Active
+                        bookingRecord.bookingInfo.isCheckIn.status = true;
+                        bookingRecord.bookingInfo.isCheckIn.date = new Date();
+                        bookingRecord.bookingInfo.bookingStatus = 'Active';
+                        const checkInBooking = await booking.save();
+
+                        if (!checkInBooking) {
+                            return res.status(500).json({ message: "Checkin process aborted" }).end();
+                        } 
+                    return res.status(200).json({ success: true, messageToUser: 'Checkin Successful', messageToAdmin: 'Commission record updated successfully' });   
+                    }
+                
+                } catch (err) {
+                    console.log(err);
+                    return res.status(500).json({ success: false, message: 'Error: Unable to save commission record.' });
+                }
+        }
+    }
+} catch (err) {
+    next(err)
 }
+}
+
+const checkoutBooking = async (req, res, next)=>{
+// #swagger.tags = ['Bookings']
+// #swagger.description = 'Endpoint to checkout booking(Transaction are paid out).'
+
+    try {  
+        const { bookingRecordId } = req.params;
+        const booking = await Booking.findOne({ 'bookingRecords._id': bookingRecordId });
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+        const bookingRecord = booking.bookingRecords.find(record => record._id.toString() === bookingRecordId);
+        if (!bookingRecord) {
+            return res.status(404).json({ message: 'Booking record not found' });
+        }
+
+        if (bookingRecord.paymentType === "online" && bookingRecord.paymentStatus === false) {
+            return res.status(400).json({ message: "Booking type is online and you havent make the payment" });
+        }
+
+        if (bookingRecord.bookingInfo.isCheckOut.status) {
+            return res.status(400).json({ message: "Booking is already checked out" });
+        }
+
+        // Update isCheckOut status
+        bookingRecord.bookingInfo.isCheckOut.status = true;
+        bookingRecord.bookingInfo.isCheckOut.date = new Date();
+
+        // Update booking status to Inactive
+        bookingRecord.bookingInfo.bookingStatus = 'Inactive';
+
+                    
+        // Save the updated booking record
+        await booking.save();
+
+        return res.status(200).json({ updatedBooking: bookingRecord, message: 'Checkout successful' });
+        
+            // Perform a commission transaction with second verification to determine if the commision wil be charged by the company or owner in their wallet
+
+    } catch (err) {
+        next(err)
+    }
+}
+
+const cancelReservation  = async (req, res, next)=>{
+// #swagger.tags = ['Bookings']
+// #swagger.description = 'Endpoint to Cancel booking Reservation.'
+
+    try { 
+        const { bookingRecordId } = req.params;
+        const booking = await Booking.findOne({ 'bookingRecords._id': bookingRecordId });
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+        const bookingRecord = booking.bookingRecords.find(record => record._id.toString() === bookingRecordId);
+        if (!bookingRecord) {
+            return res.status(404).json({ message: 'Booking record not found' });
+        }
+
+        if (bookingRecord.bookingInfo.cancelReservation.status) {
+            return res.status(400).json({ message: "Booking Reservation is already cancelled" });
+        }
+
+        // Update cancelReservation status
+        bookingRecord.bookingInfo.cancelReservation.status = true;
+        bookingRecord.bookingInfo.cancelReservation.date = new Date();
+
+        // Update booking status to Inactive
+        bookingRecord.bookingInfo.bookingStatus = 'Cancelled';
+
+        await booking.save();
+
+        return res.status(200).json({ updatedBooking: bookingRecord, message: 'Reservation Cancelled successfully' });
+        
+            // Perform a commission transaction 
+            // Perform a debit transactions to the hotel owners wallet
+    } catch (err) {
+        next(err)
+    }
+}
+
+const  refundBooking   = async (req, res, next)=>{
+ // #swagger.tags = ['Bookings']
+// #swagger.description = 'Endpoint to Refund booking Reservation to users.'
+    try {
+        const { bookingRecordId } = req.params;
+        const booking = await Booking.findOne({ 'bookingRecords._id': bookingRecordId });
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+        const bookingRecord = booking.bookingRecords.find(record => record._id.toString() === bookingRecordId);
+        if (!bookingRecord) {
+            return res.status(404).json({ message: 'Booking record not found' });
+        }
+
+        //check paymentstatus and type and refund status
+        if (bookingRecord.paymentStatus === false) {
+                return res.status(400).json({ message: "Booking hasn't been paid" });
+        }
+        if (bookingRecord.bookingInfo.isPaymentRefund.status===true) {
+                return res.status(400).json({ message: "Booking Refund has been requested already" });
+        }
+
+        // Check if the booking is refundable, only pending status is allowed
+        if (bookingRecord.bookingInfo.bookingStatus !== "Pending") {
+            return res.status(400).json({ message: "Booking cannot be refunded at this time." });
+        }
+
+        // Process the refund, 
+        // Breakdown  price = 1000 , commision = 100, refund = 1000-100 = 900 , 900 will be returned
+        const refundAmount = bookingRecord.price - bookingRecord.commission;
+        //TODO: process the refund using a payment gateway and refundBooking model will be submitted and marked as the payment type
+
+        // Update the booking record
+        bookingRecord.bookingInfo.bookingStatus = 'Refund'
+        bookingRecord.bookingInfo.isPaymentRefund = {
+            status: true,
+            date: new Date()
+        };
+        await booking.save();
+
+        // Return success response
+        return res.status(200).json({ message: `Refund of ${refundAmount} has been processed.` });
+
+    } catch (err) {
+        next(err)
+    }
+}
+
+module.exports ={
+    addCommissionDataManual, checkinBooking, checkoutBooking,  cancelReservation,  refundBooking
+} 
 
 
 

@@ -42,6 +42,7 @@ const createBookingRecord = async (genbookingCustomId, price, commission, email,
             hotelAddress: hotel.hotelBasicInfo.streetAddress
         },
         userDetails: {
+            userId: user,
             firstName: firstName,
             lastName: lastName,
             phoneNumber: phoneNumber,
