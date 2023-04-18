@@ -35,9 +35,7 @@ const createHotel = async (req, res, next) => {
     // create owner hotel wallet for new hotel
     const newWallet = new OwnerHotelWallet({
         hotelId: result._id,
-        balance: 0,
-        commissionYetToPay : 0,
-        commissionPaidToCompany : 0,
+        generalBalance: 0,
         commissionRecords: [],
         TransactionRecords: []
     });

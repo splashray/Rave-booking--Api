@@ -70,6 +70,10 @@ const doc = {
             "description": "Bookings Endpoints"
         },
         {
+            "name": "Commissions",
+            "description": "Commissions Endpoints"
+        },
+        {
             "name": "Review",
             "description": "Reviews Endpoints"
         },

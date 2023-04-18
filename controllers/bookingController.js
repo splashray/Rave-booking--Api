@@ -46,7 +46,7 @@ const createBooking = async (req, res, next) => {
             return res.status(403).json({error:"Price is not valid"})
         }        
         const percentToTheBookingCompany = 10;    //company percentage 
-        const commission = (percentToTheBookingCompany / 100) * price // Commission
+        const commission = Math.round((percentToTheBookingCompany / 100) * price) // Commission
         console.log(`commission: ${commission}`);
 
         // generate unique booking ID in the generateBookingCustomId function
@@ -568,8 +568,7 @@ const checkoutBooking = async (req, res, next)=>{
   
       return res.status(200).json({ updatedBooking: bookingRecord, message: 'Checkout successful' });
       
-        // Perform a commission transaction 
-        // Perform a debit transactions to the hotel owners wallet
+        // Perform a commission transaction with second verification to determine if the commision wil be charged by the company or owner in their wallet
 
     } catch (err) {
         next(err)

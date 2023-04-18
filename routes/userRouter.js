@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { deleteUser, getUser, getUsers, updateUser, updateUserPassword } = require("../controllers/userController");
+const { deleteUser, getUser, getUsers, updateUser, updateUserPassword, updateUserProfileDp, } = require("../controllers/userController");
 const {isVerifiedOwner, verifyAdmin, verifyToken } = require("../utils/verifyToken");
 
 
@@ -17,6 +17,9 @@ router.put("/:id",verifyToken, updateUser)
 
 //update password
 router.put("/pass/:id",verifyToken, updateUserPassword)
+
+//update user image
+router.put("/image/:id",verifyToken, updateUserProfileDp)
 
 //delete
 router.delete("/:id",verifyToken, verifyAdmin, deleteUser)
