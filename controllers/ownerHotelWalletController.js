@@ -500,8 +500,73 @@ const  refundBooking   = async (req, res, next)=>{
     }
 }
 
+const getWalletIdByHotelId = async (req, res, next) => {
+    try {
+        const { hotelId } = req.params;
+        const ownerHotelWallet = await OwnerHotelWallet.findOne({ hotelId });
+        if (!ownerHotelWallet) {
+          return res.status(404).json({ message: 'Owner hotel wallet not found' });
+        }
+        const wallet = ownerHotelWallet.toObject();
+        return res.status(200).json({ wallet });
+    } catch (err) {
+        next(err)
+    }
+};
+ 
+const getWalletDataByHotelIdAndMonthId = async (req, res, next) => {
+    try {
+        const { hotelId, monthId } = req.params;
+        const ownerHotelWallet = await OwnerHotelWallet.findOne({
+          hotelId,
+          'commissionRecords._id': monthId,
+        });
+        if (!ownerHotelWallet) {
+          return res.status(404).json({ message: 'Owner hotel wallet not found' });
+        }
+        const commissionRecord = ownerHotelWallet.commissionRecords.find(
+          (record) => record._id.toString() === monthId
+        );
+        if (!commissionRecord) {
+          return res.status(404).json({ message: 'Commission record not found' });
+        }
+        return res.status(200).json({ commissionRecord });
+    } catch (err) {
+      next(err);
+    }
+};
+ 
+const getCommissionRecordsofLast3MonthByHotelId = async (req, res, next) => {
+    try {
+        const { hotelId } = req.params;
+
+        // get the current date and the date 3 months ago
+        const currentDate = new Date();
+        const threeMonthsAgo = new Date();
+        threeMonthsAgo.setMonth(currentDate.getMonth() - 3);
+
+        // query for the owner hotel wallet and filter the commission records
+        const ownerHotelWallet = await OwnerHotelWallet.findOne({ hotelId });
+        if (!ownerHotelWallet) {
+        return res.status(404).json({ message: 'Owner hotel wallet not found' });
+        }
+        const commissionRecords = ownerHotelWallet.commissionRecords.filter(record => {
+        const recordDate = new Date(record.createdAt);
+        const monthName = `${recordDate.toLocaleString('default', { month: 'long' })}-${recordDate.getFullYear()}`;
+        return monthName === `${currentDate.toLocaleString('default', { month: 'long' })}-${currentDate.getFullYear()}` || 
+                monthName === `${currentDate.toLocaleString('default', { month: 'long' })}-${currentDate.getFullYear() - 1}` ||
+                monthName === `${currentDate.toLocaleString('default', { month: 'long' })}-${currentDate.getFullYear() - 2}`;
+        }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        return res.status(200).json({ commissionRecords });
+    } catch (err) {
+      next(err);
+    }
+};
+  
+
 module.exports ={
-    addCommissionDataManual, checkinBooking, checkoutBooking,  cancelReservation,  refundBooking
+    addCommissionDataManual, checkinBooking, checkoutBooking,  cancelReservation,  refundBooking, getWalletIdByHotelId, getWalletDataByHotelIdAndMonthId, getCommissionRecordsofLast3MonthByHotelId
 } 
 
 

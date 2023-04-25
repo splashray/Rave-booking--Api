@@ -3,12 +3,10 @@ const crypto = require("crypto");
 
 const OwnerHotelWalletModelSchema = new mongoose.Schema({
     hotelId: { type: mongoose.Schema.Types.ObjectId, ref: 'Hotel', required: true, unique: true },
-    generalBalance: { type: Number, required: true, default: 0 },
-
 
     commissionRecords: [{
         monthName: { type: String, required: true },
-        monthId:  { type: String, required: true },
+        monthCustomId:  { type: String, required: true },
         monthBalance: { type: Number, required: true, default: 0 },
         monthCommission: [{
             bookingId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Bookings', unique: true },
@@ -56,13 +54,13 @@ const OwnerHotelWalletModelSchema = new mongoose.Schema({
     OwnerHotelWalletModelSchema.methods.addCommissionRecord = async function () {
         const currentDate = new Date();
         const currentMonth = getMonthNameAndYear(currentDate);
-        const monthId = crypto.randomBytes(10).toString("hex");
+        const monthCustomId = crypto.randomBytes(5).toString("hex");
 
         const recordExists = this.commissionRecords.some(record => record.monthName === currentMonth);
         if (!recordExists) {
             const newCommissionRecord = {
                 monthName: currentMonth,
-                monthId: monthId,
+                monthCustomId: monthCustomId,
                 monthBalance: 0,
                 monthCommission: []
             }

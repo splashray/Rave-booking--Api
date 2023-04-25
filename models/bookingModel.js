@@ -5,6 +5,7 @@ const BookingSchema = new mongoose.Schema({
     bookingRecords:[
         {
             // booking details 
+            //bookingid here is the custom bookingid, pls tsake note, i might need to change later
             bookingId:{type: String, required: true},
             email:{ type: String, required: true},
             price:{type: Number, required: true},
