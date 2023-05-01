@@ -240,7 +240,7 @@ const getBookings = async (req, res, next)=>{
                 .select({bookingRecords: {$slice: -limit}});
                 
             if (!bookingRecord) {
-                return res.status(404).json({message: "Booking record not found for the user"});
+                return res.status(404).json({message: "Booking record not found"});
             }
             
             const bookings = bookingRecord.bookingRecords.reverse();
@@ -300,7 +300,7 @@ const getOwnerBookings = async (req, res, next) => {
       console.error(err.message);
       res.status(500).send('Server Error');
     }
-  };
+};
   
 const getOwnerSingleBookings = async (req, res, next)=>{
     // #swagger.tags = ['Bookings']

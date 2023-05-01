@@ -93,4 +93,4 @@ mongoose.connection.once("open", () => {
 //with this setup, app won't listen until mongoDB is cconnected. Helps avoid future error
 
 cronJobs.taskExpiredBooking.start(); // call the task for booking cron Job functions for Expired Booking
-cronJobs.commissionReconciliationJob.start(); // cal the task for commission Reconciliation cron Job for unpaid
+// cronJobs.commissionReconciliationJob.start(); // call the task for commission Reconciliation cron Job for unpaid

@@ -35,55 +35,55 @@ const taskExpiredBooking = cron.schedule('0 0 */24 * * *', async () => {
 
 //Reminder: untested
 // Task 2: Define the commissionReconciliationJob to run every 30 days
-const commissionReconciliationJob = cron.schedule('0 0 1 * * *', async () => {
-  try {
-    // Get all bookings that have been checked out in the last month
-    const monthAgo = new Date();
-    monthAgo.setMonth(monthAgo.getMonth() - 1);
-    const bookings = await Booking.find({
-      "bookingRecords.bookingInfo.isCheckOut.status": true,
-      "bookingRecords.bookingInfo.isCheckOut.date": { $gte: monthAgo },
-    });
+// const commissionReconciliationJob = cron.schedule('0 0 1 * * *', async () => {
+//   try {
+//     // Get all bookings that have been checked out in the last month
+//     const monthAgo = new Date();
+//     monthAgo.setMonth(monthAgo.getMonth() - 1);
+//     const bookings = await Booking.find({
+//       "bookingRecords.bookingInfo.isCheckOut.status": true,
+//       "bookingRecords.bookingInfo.isCheckOut.date": { $gte: monthAgo },
+//     });
 
-    // Group bookings by hotel
-    const bookingsByHotel = bookings.reduce((result, booking) => {
-      const hotelId = booking.bookingRecords[0].hotelDetails.hotelId.toString();
-      if (!result[hotelId]) {
-        result[hotelId] = {
-          hotelName: booking.bookingRecords[0].hotelDetails.hotelName,
-          totalCommissionPaid: 0,
-          totalCommissionDue: 0,
-        };
-      }
+//     // Group bookings by hotel
+//     const bookingsByHotel = bookings.reduce((result, booking) => {
+//       const hotelId = booking.bookingRecords[0].hotelDetails.hotelId.toString();
+//       if (!result[hotelId]) {
+//         result[hotelId] = {
+//           hotelName: booking.bookingRecords[0].hotelDetails.hotelName,
+//           totalCommissionPaid: 0,
+//           totalCommissionDue: 0,
+//         };
+//       }
 
-      booking.bookingRecords.forEach(record => {
-        if (record.paymentType === "onsite") {
-          result[hotelId].totalCommissionPaid += record.commission;
-        } else {
-          result[hotelId].totalCommissionDue += record.commission;
-        }
-      });
+//       booking.bookingRecords.forEach(record => {
+//         if (record.paymentType === "onsite") {
+//           result[hotelId].totalCommissionPaid += record.commission;
+//         } else {
+//           result[hotelId].totalCommissionDue += record.commission;
+//         }
+//       });
 
-      return result;
-    }, {});
+//       return result;
+//     }, {});
 
-    // Send reminders for outstanding payments
-    const owners = await Owner.find({});
-    owners.forEach(owner => {
-      const hotelId = owner.hotelId.toString();
-      const hotelInfo = bookingsByHotel[hotelId];
-    // If hotel has any outstanding commission due, send a reminder
-    if (hotelInfo && hotelInfo.totalCommissionDue > 0) {
-      const emailContent = `Dear ${owner.name},\n\nThis is a reminder that your hotel ${hotelInfo.hotelName} has an outstanding commission payment of $${hotelInfo.totalCommissionDue} due to us. Please make the payment as soon as possible.\n\nBest regards,\nThe Commission Reconciliation Team`;
-      sendEmail(owner.email, 'Commission Payment Reminder', emailContent);
-      }
-    });
+//     // Send reminders for outstanding payments
+//     const owners = await Owner.find({});
+//     owners.forEach(owner => {
+//       const hotelId = owner.hotelId.toString();
+//       const hotelInfo = bookingsByHotel[hotelId];
+//     // If hotel has any outstanding commission due, send a reminder
+//     if (hotelInfo && hotelInfo.totalCommissionDue > 0) {
+//       const emailContent = `Dear ${owner.name},\n\nThis is a reminder that your hotel ${hotelInfo.hotelName} has an outstanding commission payment of $${hotelInfo.totalCommissionDue} due to us. Please make the payment as soon as possible.\n\nBest regards,\nThe Commission Reconciliation Team`;
+//       sendEmail(owner.email, 'Commission Payment Reminder', emailContent);
+//       }
+//     });
 
-  console.log('Commission reconciliation job ran successfully');
-} catch (error) {
-  console.log('Error running commission reconciliation job:', error.message);
-}
-}, { scheduled: true });
+//   console.log('Commission reconciliation job ran successfully');
+// } catch (error) {
+//   console.log('Error running commission reconciliation job:', error.message);
+// }
+// }, { scheduled: true });
 
 // Task 3: Define the taskCheckOutBooking to run Automatic checkout date function, if the checkout wasn't done after 2 days by the user provided that the user checked in before  
 
@@ -92,5 +92,5 @@ const commissionReconciliationJob = cron.schedule('0 0 1 * * *', async () => {
 
 // Start the tasks
 taskExpiredBooking.start();
-commissionReconciliationJob.start();
-module.exports = { taskExpiredBooking , commissionReconciliationJob };
+// commissionReconciliationJob.start();
+module.exports = { taskExpiredBooking  };
